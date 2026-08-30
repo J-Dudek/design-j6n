@@ -1,0 +1,10 @@
+[build]
+  publish = "."
+
+# La démo vit dans demo/ mais référence ../theme.css et ../theme.js (le design
+# system à la racine) : on publie donc tout le dépôt tel quel — les chemins
+# relatifs des pages restent identiques à l'ouverture locale d'un fichier.
+[[redirects]]
+  from = "/"
+  to = "/demo/index.html"
+  status = 200
