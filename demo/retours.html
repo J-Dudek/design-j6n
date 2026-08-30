@@ -12,16 +12,16 @@
 
   <header class="j6n-header">
     <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
-    <nav class="j6n-nav">
+    <nav class="j6n-nav" aria-label="Navigation principale">
       <a class="j6n-nav__link" href="index.html">Sommaire</a>
       <a class="j6n-nav__link" href="actions.html">Actions</a>
       <a class="j6n-nav__link" href="formulaires.html">Formulaires</a>
       <a class="j6n-nav__link" href="navigation.html">Navigation</a>
-      <a class="j6n-nav__link is-active" href="retours.html">Retours</a>
+      <a class="j6n-nav__link is-active" href="retours.html" aria-current="page">Retours</a>
       <a class="j6n-nav__link" href="donnees.html">Données</a>
     </nav>
     <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
-    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme">Thème</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme" aria-pressed="false">Thème sombre</button>
   </header>
 
   <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
@@ -31,7 +31,7 @@
         <a class="j6n-sidemenu__link" href="actions.html">Actions</a>
         <a class="j6n-sidemenu__link" href="formulaires.html">Formulaires</a>
         <a class="j6n-sidemenu__link" href="navigation.html">Navigation</a>
-        <a class="j6n-sidemenu__link is-active" href="retours.html">Retours &amp; alertes</a>
+        <a class="j6n-sidemenu__link is-active" href="retours.html" aria-current="page">Retours &amp; alertes</a>
         <a class="j6n-sidemenu__link" href="donnees.html">Données &amp; contenu</a>
       </nav>
     </aside>
@@ -88,9 +88,9 @@
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <button class="j6n-btn" data-j6n-modal-open="delete-modal">Supprimer la sortie…</button>
-          <dialog class="j6n-modal" id="delete-modal">
+          <dialog class="j6n-modal" id="delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
             <div class="j6n-modal__header">
-              <h3 class="j6n-modal__title">Supprimer cette sortie ?</h3>
+              <h3 class="j6n-modal__title" id="delete-modal-title">Supprimer cette sortie ?</h3>
               <button type="button" class="j6n-close" data-j6n-modal-close aria-label="Fermer">×</button>
             </div>
             <div class="j6n-modal__body">
@@ -168,11 +168,15 @@
   <script src="showcase.js"></script>
   <script src="../theme.js"></script>
   <script>
-    document.getElementById('theme').addEventListener('click', () => {
-      const el = document.documentElement;
-      const dark = el.dataset.theme === 'dark' ||
-        (!el.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
-      el.dataset.theme = dark ? 'light' : 'dark';
+    const themeBtn = document.getElementById('theme');
+    function isDark() {
+      return document.documentElement.dataset.theme === 'dark' ||
+        (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+    themeBtn.setAttribute('aria-pressed', String(isDark()));
+    themeBtn.addEventListener('click', () => {
+      document.documentElement.dataset.theme = isDark() ? 'light' : 'dark';
+      themeBtn.setAttribute('aria-pressed', String(isDark()));
     });
 
     document.getElementById('toast-info').addEventListener('click', () => j6n.toast('Sortie enregistrée.'));

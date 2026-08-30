@@ -12,16 +12,16 @@
 
   <header class="j6n-header">
     <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
-    <nav class="j6n-nav">
+    <nav class="j6n-nav" aria-label="Navigation principale">
       <a class="j6n-nav__link" href="index.html">Sommaire</a>
       <a class="j6n-nav__link" href="actions.html">Actions</a>
       <a class="j6n-nav__link" href="formulaires.html">Formulaires</a>
       <a class="j6n-nav__link" href="navigation.html">Navigation</a>
       <a class="j6n-nav__link" href="retours.html">Retours</a>
-      <a class="j6n-nav__link is-active" href="donnees.html">Données</a>
+      <a class="j6n-nav__link is-active" href="donnees.html" aria-current="page">Données</a>
     </nav>
     <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
-    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme">Thème</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme" aria-pressed="false">Thème sombre</button>
   </header>
 
   <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
@@ -32,7 +32,7 @@
         <a class="j6n-sidemenu__link" href="formulaires.html">Formulaires</a>
         <a class="j6n-sidemenu__link" href="navigation.html">Navigation</a>
         <a class="j6n-sidemenu__link" href="retours.html">Retours &amp; alertes</a>
-        <a class="j6n-sidemenu__link is-active" href="donnees.html">Données &amp; contenu</a>
+        <a class="j6n-sidemenu__link is-active" href="donnees.html" aria-current="page">Données &amp; contenu</a>
       </nav>
     </aside>
 
@@ -93,6 +93,7 @@
         <template>
           <div class="j6n-table-wrap">
             <table class="j6n-table" data-j6n-js="table-sort">
+              <caption class="j6n-sr-only">Historique des sorties, triable par colonne</caption>
               <thead>
                 <tr>
                   <th><button type="button" class="j6n-table__sort">Sortie</button></th>
@@ -156,7 +157,7 @@
       <h2>Menu utilisateur — <code>.j6n-user-menu</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
-          <button class="j6n-user-menu__trigger" popovertarget="user-menu">
+          <button class="j6n-user-menu__trigger" popovertarget="user-menu" aria-haspopup="true" aria-expanded="false">
             <span class="j6n-user-menu__avatar">JD</span>
             <span class="j6n-user-menu__name">Julien</span>
           </button>
@@ -185,11 +186,15 @@
   <script src="showcase.js"></script>
   <script src="../theme.js"></script>
   <script>
-    document.getElementById('theme').addEventListener('click', () => {
-      const el = document.documentElement;
-      const dark = el.dataset.theme === 'dark' ||
-        (!el.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
-      el.dataset.theme = dark ? 'light' : 'dark';
+    const themeBtn = document.getElementById('theme');
+    function isDark() {
+      return document.documentElement.dataset.theme === 'dark' ||
+        (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+    themeBtn.setAttribute('aria-pressed', String(isDark()));
+    themeBtn.addEventListener('click', () => {
+      document.documentElement.dataset.theme = isDark() ? 'light' : 'dark';
+      themeBtn.setAttribute('aria-pressed', String(isDark()));
     });
 
     // La bascule d'unités ne fait que diffuser un évènement (voir theme.js) ;

@@ -53,7 +53,7 @@ document.documentElement.dataset.theme = 'dark'; // ou 'light'
 | --- | --- |
 | Marque | `--j6n-accent`, `--j6n-accent-strong`, `--j6n-accent-soft`, `--j6n-pine`, `--j6n-pine-soft` |
 | Sémantique | `--j6n-success`, `--j6n-warning`, `--j6n-danger`, `--j6n-info` |
-| Surfaces | `--j6n-bg`, `--j6n-surface`, `--j6n-surface-2`, `--j6n-border`, `--j6n-border-strong` |
+| Surfaces | `--j6n-bg`, `--j6n-surface`, `--j6n-surface-2`, `--j6n-border`, `--j6n-border-strong` (décoratif), `--j6n-border-interactive` (3:1 garanti — champ, tag, tuile de choix, piste d'interrupteur…) |
 | Texte | `--j6n-text`, `--j6n-text-muted`, `--j6n-text-invert` |
 | Typo | `--j6n-font-sans`, `--j6n-font-mono`, `--j6n-text-xs` → `--j6n-text-3xl` |
 | Cadence | `--j6n-space-1` (4px) → `--j6n-space-9` (96px) |
@@ -132,7 +132,7 @@ document.documentElement.dataset.theme = 'dark'; // ou 'light'
 
 ### Utilitaires
 
-`.j6n-container` `.j6n-stack` `.j6n-row` `.j6n-grid` `.j6n-layout` (mise en page à sommaire latéral) `.j6n-eyebrow` `.j6n-muted` `.j6n-mono` `.j6n-divider-run` `.j6n-skeleton` `.j6n-chevron` `.j6n-close` `.j6n-spinner`
+`.j6n-container` `.j6n-stack` `.j6n-row` `.j6n-grid` `.j6n-layout` (mise en page à sommaire latéral) `.j6n-eyebrow` `.j6n-muted` `.j6n-mono` `.j6n-divider-run` `.j6n-skeleton` `.j6n-chevron` `.j6n-close` `.j6n-spinner` `.j6n-sr-only` (contenu réservé aux lecteurs d'écran)
 
 ## Contrôles & dynamisme
 
@@ -196,6 +196,19 @@ Chaque exemple des cinq pages de composants a un bloc **Résultat / Code** avec 
 - cibles tactiles à 44 px minimum ;
 - `--j6n-font-mono` pour les valeurs mesurées, les libellés en petites capitales et le code ;
 - séparer comportement et style : les hooks JS sont des attributs `data-j6n-*`, jamais des classes `.j6n-*`.
+
+## Accessibilité (RGAA / WCAG 2.1 AA)
+
+Un audit du code a été fait et corrigé sur cette base — pas seulement une relecture visuelle :
+
+- **Contraste** : chaque paire texte/fond et chaque frontière fonctionnelle (champ, tuile de choix, tag, piste d'interrupteur…) a été *calculée* (conversion oklch → luminance relative WCAG), pas estimée à l'œil. Ça a fait remonter et corrigé de vrais échecs : `--j6n-border-strong` ne passait pas 3:1 sur fond clair *ni* sombre (d'où le nouveau `--j6n-border-interactive`, réservé aux frontières qui portent seules une information — les liserés purement décoratifs gardent `--j6n-border-strong`) ; `--j6n-danger` et `--j6n-pine`/`--j6n-pine-soft` tombaient sous 4.5:1 en thème sombre faute d'y avoir jamais été redéfinis ; l'ancien anneau de focus translucide n'atteignait que 1.3:1 en clair — remplacé par un anneau plein à deux tons (écart + trait), qui reste lisible même sur un bouton déjà coloré.
+- **Clavier** : chaque composant interactif est utilisable sans souris, y compris ceux avec un état caché (menu déroulant, combobox, onglets, accordéon, modale). Un vrai bug a été trouvé et corrigé au passage : l'étiquette `.j6n-tag` imbriquait un `<span>` de retrait *dans* le bouton principal — inatteignable au Tab et dupliquant le nom accessible du bouton. C'est maintenant deux boutons frères.
+- **Focus** : la modale (`<dialog>` natif) piège le focus et le restitue au déclencheur nativement ; les menus (Popover API) rendent le focus au bouton qui les a ouverts à la fermeture.
+- **ARIA** : posé dans le HTML source de chaque page, pas seulement calculé par `theme.js` au chargement — un analyseur statique (SonarQube, axe…) ne voit que le balisage, jamais le DOM que le JS construit ; `theme.js` reconfirme les mêmes attributs à l'exécution, en filet de sécurité pour qui oublierait de les écrire. `aria-expanded`/`aria-haspopup` sur les déclencheurs de menu (le Popover API ne les écrit pas lui-même), `role="listbox"`/`"option"` + `aria-selected`/`aria-controls` du combobox, `aria-current="page"` sur le lien de navigation actif, association automatique champ ↔ message d'aide/erreur via `aria-describedby` (`initFieldDescriptions`), annonce discrète (`aria-live`) du résultat d'un tri de tableau. Le combobox suit le motif officiel du WAI-ARIA (`role="option"` sur des `<div>`, pas de `<option>` natif) — c'est volontaire : aucun élément natif ne combine filtrage libre à la frappe et liste stylée (`<select>` ne filtre pas, `<datalist>` ne se stylise pas). Un linter générique « préfère le natif à ARIA » peut le signaler ; c'est un faux positif connu sur ce motif, documenté dans `demo/formulaires.html`.
+- **Structure** : lien d'évitement, hiérarchie de titres sans saut de niveau, un seul `<main>` par page, `<nav>` distingués par `aria-label` quand il y en a plusieurs, légende de tableau (`.j6n-sr-only`), `autocomplete` sur les champs d'identité (email, mot de passe, pseudo).
+- **Mouvement** : `prefers-reduced-motion` déjà pris en compte pour tout le système ; l'indicateur de chargement (`.j6n-spinner`) garde un mouvement minimal même dans ce cas, un indicateur figé ne voulant plus rien dire.
+
+**Limite honnête** : ceci est un audit de code, pas une certification RGAA. Une conformité déclarée demande une méthodologie que je ne peux pas reproduire ici — échantillon de pages, tests réels au lecteur d'écran (NVDA, JAWS, VoiceOver), navigation clavier bout en bout par une personne, et la déclaration d'accessibilité elle-même. Avant une mise en production, fais au moins un passage clavier seul (Tab/Échap/flèches sur chaque page) et un passage avec un lecteur d'écran sur les composants les plus riches (combobox, modale, menu déroulant, tableau triable).
 
 À éviter :
 - dégradés de fond et ombres floues ;

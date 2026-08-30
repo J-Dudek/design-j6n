@@ -19,7 +19,7 @@
 
   /* Sémantique */
   --j6n-success: oklch(0.55 0.12 155);
-  --j6n-warning: oklch(0.72 0.14 90);
+  --j6n-warning: oklch(0.63 0.14 90);   /* assombri vs 0.72 — 3:1 (non-texte) sur surface/bg, RGAA 3.2 */
   --j6n-danger:  oklch(0.55 0.16 25);
   --j6n-info:    oklch(0.56 0.10 230);
 
@@ -29,6 +29,11 @@
   --j6n-surface-2: oklch(0.965 0.008 155);
   --j6n-border:    oklch(0.905 0.010 155);
   --j6n-border-strong: oklch(0.82 0.012 155);
+  /* Bordures qui portent seules une limite fonctionnelle (champ, tuile de choix, tag,
+     piste d'interrupteur…) : 3:1 mini sur surface/bg/surface-2 — RGAA 3.2 / WCAG 1.4.11.
+     --j6n-border-strong reste plus discret pour les liserés purement décoratifs (survol
+     de carte, citation, séparateur) qui ne sont jamais le seul indice disponible. */
+  --j6n-border-interactive: oklch(0.61 0.010 155);
   --j6n-text:      oklch(0.24 0.015 155);
   --j6n-text-muted: oklch(0.52 0.012 155);
   --j6n-text-invert: oklch(0.99 0.004 155);
@@ -69,7 +74,10 @@
   /* Élévation — discrète, jamais floue */
   --j6n-shadow-sm: 0 1px 2px oklch(0.24 0.015 155 / 0.06);
   --j6n-shadow-md: 0 2px 4px oklch(0.24 0.015 155 / 0.06), 0 8px 24px oklch(0.24 0.015 155 / 0.06);
-  --j6n-ring: 0 0 0 3px oklch(0.52 0.15 148 / 0.28);
+  /* Anneau de focus : liseré « écart » (couleur de fond) + anneau plein — reste visible
+     quel que soit le fond derrière l'élément, et sur les boutons de couleur eux-mêmes
+     (un halo translucide se fondait dans un fond déjà accent). RGAA 10.7 / WCAG 2.4.7. */
+  --j6n-ring: 0 0 0 2px var(--j6n-surface), 0 0 0 4px var(--j6n-accent-strong);
 
   /* Mouvement — courbe « stride » : départ franc, arrivée souple */
   --j6n-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -90,21 +98,29 @@
   --j6n-accent:        oklch(0.80 0.19 148);
   --j6n-accent-strong: oklch(0.86 0.16 148);
   --j6n-accent-soft:   oklch(0.28 0.07 148);
-  --j6n-pine:          oklch(0.62 0.09 158);
-  --j6n-pine-soft:     oklch(0.28 0.04 158);
+  --j6n-pine:          oklch(0.66 0.09 158);
+  --j6n-pine-soft:     oklch(0.22 0.04 158);
+
+  /* Sémantique — non redéfinies par défaut avant cet audit, donc identiques au clair ;
+     le texte danger tombait à 3.2:1 sur fond sombre (RGAA 3.2 exige 4.5:1). */
+  --j6n-success: oklch(0.60 0.12 155);
+  --j6n-warning: oklch(0.64 0.14 90);
+  --j6n-danger:  oklch(0.64 0.16 25);
+  --j6n-info:    oklch(0.62 0.10 230);
 
   --j6n-bg:        oklch(0.185 0.012 155);
   --j6n-surface:   oklch(0.225 0.014 155);
   --j6n-surface-2: oklch(0.265 0.014 155);
   --j6n-border:    oklch(0.325 0.016 155);
   --j6n-border-strong: oklch(0.42 0.018 155);
+  --j6n-border-interactive: oklch(0.56 0.018 155);
   --j6n-text:      oklch(0.955 0.006 155);
   --j6n-text-muted: oklch(0.70 0.012 155);
   --j6n-text-invert: oklch(0.18 0.012 155);
 
   --j6n-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
   --j6n-shadow-md: 0 2px 4px oklch(0 0 0 / 0.3), 0 8px 24px oklch(0 0 0 / 0.35);
-  --j6n-ring: 0 0 0 3px oklch(0.80 0.19 148 / 0.35);
+  /* --j6n-ring recalcule tout seul (var(--j6n-surface)/var(--j6n-accent-strong) ci-dessus) */
 }
 
 /* ---------- 2. Base ---------- */
@@ -162,6 +178,9 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
 .j6n-grid    { display: grid; gap: var(--j6n-space-5); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .j6n-muted   { color: var(--j6n-text-muted); }
 .j6n-mono    { font-family: var(--j6n-font-mono); }
+/* Contenu utile aux lecteurs d'écran mais sans équivalent visuel nécessaire
+   (légende de tableau, contexte additionnel…) — RGAA 11.1. */
+.j6n-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
 
 /* ---------- 3. Boutons ---------- */
 .j6n-btn {
@@ -186,7 +205,7 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
 .j6n-btn:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
 .j6n-btn[disabled], .j6n-btn.is-disabled { opacity: 0.45; pointer-events: none; }
 
-.j6n-btn--secondary { --_bg: transparent; --_fg: var(--j6n-text); --_bd: var(--j6n-border-strong); }
+.j6n-btn--secondary { --_bg: transparent; --_fg: var(--j6n-text); --_bd: var(--j6n-border-interactive); }
 .j6n-btn--secondary:hover { --_bg: var(--j6n-surface-2); }
 .j6n-btn--pine  { --_bg: var(--j6n-pine); --_fg: var(--j6n-text-invert); }
 .j6n-btn--ghost { --_bg: transparent; --_fg: var(--j6n-accent-strong); box-shadow: none; }
@@ -202,7 +221,7 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
 .j6n-input, .j6n-select, .j6n-textarea {
   font-family: inherit; font-size: var(--j6n-text-sm); color: var(--j6n-text);
   background: var(--j6n-surface);
-  border: var(--j6n-border-width) solid var(--j6n-border-strong);
+  border: var(--j6n-border-width) solid var(--j6n-border-interactive);
   border-radius: var(--j6n-radius-md);
   padding: 12px var(--j6n-space-4);
   min-height: 44px;
@@ -262,8 +281,8 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
   transition: transform var(--j6n-dur-2) var(--j6n-ease);
 }
 .j6n-nav__link:hover { color: var(--j6n-text); }
-.j6n-nav__link:hover::after, .j6n-nav__link.is-active::after { transform: scaleX(1); }
-.j6n-nav__link.is-active { color: var(--j6n-text); }
+.j6n-nav__link:hover::after, .j6n-nav__link.is-active::after, .j6n-nav__link[aria-current='page']::after { transform: scaleX(1); }
+.j6n-nav__link.is-active, .j6n-nav__link[aria-current='page'] { color: var(--j6n-text); }
 
 /* ---------- 7. Badges & tags ---------- */
 .j6n-badge {
@@ -320,8 +339,10 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
 .j6n-toast--success { border-left-color: var(--j6n-success); }
 .j6n-toast--warning { border-left-color: var(--j6n-warning); }
 .j6n-toast--danger  { border-left-color: var(--j6n-danger); }
-.j6n-toast__close { margin-left: auto; flex: none; background: none; border: 0; color: inherit; opacity: 0.7; cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 2px; }
-.j6n-toast__close:hover { opacity: 1; }
+/* couleur pleine, pas d'opacité : un « x » à 70% d'opacité tombait sous 4.5:1 en thème sombre */
+.j6n-toast__close { margin-left: auto; flex: none; background: none; border: 0; color: inherit; cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 2px; border-radius: var(--j6n-radius-sm); }
+.j6n-toast__close:hover { background: color-mix(in oklab, currentColor 18%, transparent); }
+.j6n-toast__close:focus-visible { outline: none; box-shadow: 0 0 0 2px currentColor; }
 @keyframes j6n-slide-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes j6n-slide-out { to { opacity: 0; transform: translateY(4px) scale(0.98); } }
 
@@ -346,7 +367,7 @@ code, .j6n-code-inline {
 .j6n-pre code { background: none; border: 0; padding: 0; font-size: inherit; }
 .j6n-pre .tok-key { color: oklch(0.80 0.19 148); }
 .j6n-pre .tok-str { color: oklch(0.78 0.09 210); }
-.j6n-pre .tok-com { color: oklch(0.58 0.012 155); font-style: italic; }
+.j6n-pre .tok-com { color: oklch(0.60 0.012 155); font-style: italic; }
 
 /* ---------- 10. Divers ---------- */
 .j6n-divider-run { height: 2px; background: repeating-linear-gradient(90deg, var(--j6n-border-strong) 0 14px, transparent 14px 22px); border: 0; }
@@ -363,19 +384,23 @@ code, .j6n-code-inline {
     --j6n-accent: oklch(0.80 0.19 148);
     --j6n-accent-strong: oklch(0.86 0.16 148);
     --j6n-accent-soft: oklch(0.28 0.07 148);
-    --j6n-pine: oklch(0.62 0.09 158);
-    --j6n-pine-soft: oklch(0.28 0.04 158);
+    --j6n-pine: oklch(0.66 0.09 158);
+    --j6n-pine-soft: oklch(0.22 0.04 158);
+    --j6n-success: oklch(0.60 0.12 155);
+    --j6n-warning: oklch(0.64 0.14 90);
+    --j6n-danger: oklch(0.64 0.16 25);
+    --j6n-info: oklch(0.62 0.10 230);
     --j6n-bg: oklch(0.185 0.012 155);
     --j6n-surface: oklch(0.225 0.014 155);
     --j6n-surface-2: oklch(0.265 0.014 155);
     --j6n-border: oklch(0.325 0.016 155);
     --j6n-border-strong: oklch(0.42 0.018 155);
+    --j6n-border-interactive: oklch(0.56 0.018 155);
     --j6n-text: oklch(0.955 0.006 155);
     --j6n-text-muted: oklch(0.70 0.012 155);
     --j6n-text-invert: oklch(0.18 0.012 155);
     --j6n-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
     --j6n-shadow-md: 0 2px 4px oklch(0 0 0 / 0.3), 0 8px 24px oklch(0 0 0 / 0.35);
-    --j6n-ring: 0 0 0 3px oklch(0.80 0.19 148 / 0.35);
   }
 }
 
@@ -456,7 +481,7 @@ code, .j6n-code-inline {
 .j6n-choice-tile {
   display: flex; align-items: center; gap: var(--j6n-space-3);
   padding: var(--j6n-space-3) var(--j6n-space-4);
-  border: var(--j6n-border-width) solid var(--j6n-border-strong);
+  border: var(--j6n-border-width) solid var(--j6n-border-interactive);
   border-radius: var(--j6n-radius-md);
   cursor: pointer;
   transition: border-color var(--j6n-dur-1) var(--j6n-ease), background var(--j6n-dur-1) var(--j6n-ease);
@@ -528,7 +553,7 @@ code, .j6n-code-inline {
   display: flex; flex-direction: column; align-items: center; gap: var(--j6n-space-3);
   padding: var(--j6n-space-6);
   text-align: center;
-  border: 2px dashed var(--j6n-border-strong);
+  border: 2px dashed var(--j6n-border-interactive);
   border-radius: var(--j6n-radius-lg);
   transition: border-color var(--j6n-dur-1) var(--j6n-ease), background var(--j6n-dur-1) var(--j6n-ease);
 }
@@ -582,7 +607,7 @@ code, .j6n-code-inline {
 .j6n-toggle input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .j6n-toggle__track {
   position: relative; flex: none; width: 40px; height: 24px;
-  background: var(--j6n-border-strong); border-radius: var(--j6n-radius-pill);
+  background: var(--j6n-border-interactive); border-radius: var(--j6n-radius-pill);
   transition: background var(--j6n-dur-2) var(--j6n-ease);
 }
 .j6n-toggle__track::after {
@@ -594,24 +619,32 @@ code, .j6n-code-inline {
 .j6n-toggle input:checked + .j6n-toggle__track::after { transform: translateX(16px); }
 .j6n-toggle input:focus-visible + .j6n-toggle__track { box-shadow: var(--j6n-ring); }
 
+/* Deux boutons frères, jamais un bouton dans un bouton : le retrait doit être
+   atteignable au Tab indépendamment de la sélection (RGAA 7.1 / WCAG 2.1.1 —
+   un <span> avec aria-label imbriqué dans le bouton principal était inatteignable
+   au clavier et dupliquait le nom accessible du bouton englobant). */
 .j6n-tag {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex; align-items: center; gap: 2px;
   font-size: var(--j6n-text-xs); font-weight: 500;
-  padding: 6px 6px 6px 12px;
+  padding-left: 12px;
   border-radius: var(--j6n-radius-pill);
-  border: var(--j6n-border-width) solid var(--j6n-border-strong);
+  border: var(--j6n-border-width) solid var(--j6n-border-interactive);
   background: var(--j6n-surface); color: var(--j6n-text);
-  cursor: pointer;
   transition: border-color var(--j6n-dur-1) var(--j6n-ease), background var(--j6n-dur-1) var(--j6n-ease), color var(--j6n-dur-1) var(--j6n-ease);
 }
 .j6n-tag:hover { border-color: var(--j6n-accent); }
 .j6n-tag.is-active { background: var(--j6n-accent); border-color: var(--j6n-accent); color: var(--j6n-text-invert); }
+.j6n-tag__label {
+  font: inherit; color: inherit; background: none; border: 0; padding: 6px 2px; cursor: pointer;
+}
+.j6n-tag__label:focus-visible { outline: none; box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-sm); }
 .j6n-tag__remove {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 18px; height: 18px; border-radius: 50%; border: 0; background: transparent; color: inherit;
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 22px; height: 22px; margin-right: 4px; border-radius: 50%; border: 0; background: transparent; color: inherit;
   font-size: 0.9em; line-height: 1; cursor: pointer;
 }
 .j6n-tag__remove:hover { background: color-mix(in oklab, currentColor 18%, transparent); }
+.j6n-tag__remove:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
 
 /* ---------- 16. Navigation ---------- */
 .j6n-breadcrumb ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--j6n-space-2); margin: 0; padding: 0; }
@@ -668,7 +701,7 @@ code, .j6n-code-inline {
   transition: color var(--j6n-dur-1) var(--j6n-ease), border-color var(--j6n-dur-1) var(--j6n-ease), background var(--j6n-dur-1) var(--j6n-ease);
 }
 .j6n-sidemenu__link:hover { background: var(--j6n-surface-2); color: var(--j6n-text); }
-.j6n-sidemenu__link.is-active { border-left-color: var(--j6n-accent); color: var(--j6n-text); font-weight: 600; background: var(--j6n-accent-soft); }
+.j6n-sidemenu__link.is-active, .j6n-sidemenu__link[aria-current='page'] { border-left-color: var(--j6n-accent); color: var(--j6n-text); font-weight: 600; background: var(--j6n-accent-soft); }
 .j6n-sidemenu__sublist { display: flex; flex-direction: column; gap: 2px; margin: 2px 0 4px var(--j6n-space-4); }
 .j6n-sidemenu__sublist[hidden] { display: none; }
 
@@ -715,7 +748,7 @@ code, .j6n-code-inline {
   display: flex; align-items: center; justify-content: center;
   width: 32px; height: 32px; border-radius: 50%;
   font-family: var(--j6n-font-mono); font-size: var(--j6n-text-xs); font-weight: 600;
-  background: var(--j6n-surface); border: 2px solid var(--j6n-border-strong); color: var(--j6n-text-muted);
+  background: var(--j6n-surface); border: 2px solid var(--j6n-border-interactive); color: var(--j6n-text-muted);
 }
 .j6n-stepper__label { font-size: var(--j6n-text-xs); color: var(--j6n-text-muted); max-width: 12ch; }
 .j6n-stepper__step.is-current .j6n-stepper__num { border-color: var(--j6n-accent); color: var(--j6n-accent-strong); }
@@ -761,7 +794,7 @@ code, .j6n-code-inline {
   .j6n-nav__toggle {
     display: inline-flex; align-items: center; justify-content: center;
     width: 44px; height: 44px; margin-left: auto;
-    background: transparent; border: var(--j6n-border-width) solid var(--j6n-border-strong); border-radius: var(--j6n-radius-md);
+    background: transparent; border: var(--j6n-border-width) solid var(--j6n-border-interactive); border-radius: var(--j6n-radius-md);
     cursor: pointer;
   }
   .j6n-header:has(.j6n-nav__toggle) .j6n-nav {
@@ -916,7 +949,7 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
   display: inline-flex; align-items: center; gap: var(--j6n-space-3);
   padding: 10px var(--j6n-space-4); min-height: 44px;
   background: var(--j6n-surface); color: var(--j6n-text);
-  border: var(--j6n-border-width) solid var(--j6n-border-strong); border-radius: var(--j6n-radius-md);
+  border: var(--j6n-border-width) solid var(--j6n-border-interactive); border-radius: var(--j6n-radius-md);
   font-size: var(--j6n-text-sm); font-weight: 500; cursor: pointer;
   transition: border-color var(--j6n-dur-1) var(--j6n-ease), box-shadow var(--j6n-dur-1) var(--j6n-ease);
 }
