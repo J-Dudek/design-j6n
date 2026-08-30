@@ -226,6 +226,10 @@ git push origin v1.0.0
 - `scripts/validate.sh` — les mêmes vérifications tournent à chaque push/PR (`ci.yml`) et avant chaque release ; à lancer en local avant de taguer.
 - `scripts/package.sh` — assemble le paquet ; utilisable en local pour en vérifier le contenu (`VERSION=0.0.0-test scripts/package.sh`).
 
+### Démo en ligne
+
+`netlify.toml` publie tout le dépôt (les pages de `demo/` référencent `../theme.css`/`../theme.js`, donc la racine doit être servie aussi) et redirige `/` vers `demo/index.html`. Connecter le dépôt sur [app.netlify.com](https://app.netlify.com) suffit — Netlify lit `netlify.toml` automatiquement, aucune configuration supplémentaire.
+
 ## Licence
 
 MIT.
