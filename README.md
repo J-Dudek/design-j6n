@@ -2,7 +2,6 @@
 
 Design system personnel — **Foulée**. Nature et trail pour les couleurs, vert terminal pour l'énergie.
 Deux fichiers (`theme.css` + `theme.js`), aucune dépendance, aucun build. Utilisable en HTML statique, Angular ou React.
-Parité fonctionnelle avec les composants et contrôles du [Système de Design de l'État](https://www.systeme-de-design.gouv.fr/) (DSFR), adaptée à la charte Foulée — les composants trop institutionnels (FranceConnect, cookies RGPD, sélecteur de langue…) sont réinterprétés pour un usage perso plutôt que copiés tels quels.
 
 - Préfixe : `--j6n-*` pour les variables, `.j6n-*` pour les classes, `data-j6n-*` pour les hooks JS
 - Typographie : [Sora](https://fonts.google.com/specimen/Sora) + [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono)
@@ -197,6 +196,11 @@ Chaque exemple des cinq pages de composants a un bloc **Résultat / Code** avec 
 - `--j6n-font-mono` pour les valeurs mesurées, les libellés en petites capitales et le code ;
 - séparer comportement et style : les hooks JS sont des attributs `data-j6n-*`, jamais des classes `.j6n-*`.
 
+À éviter :
+- dégradés de fond et ombres floues ;
+- le mono pour du texte courant ;
+- des px hors de l'échelle de cadence.
+
 ## Accessibilité (RGAA / WCAG 2.1 AA)
 
 Un audit du code a été fait et corrigé sur cette base — pas seulement une relecture visuelle :
@@ -210,10 +214,17 @@ Un audit du code a été fait et corrigé sur cette base — pas seulement une r
 
 **Limite honnête** : ceci est un audit de code, pas une certification RGAA. Une conformité déclarée demande une méthodologie que je ne peux pas reproduire ici — échantillon de pages, tests réels au lecteur d'écran (NVDA, JAWS, VoiceOver), navigation clavier bout en bout par une personne, et la déclaration d'accessibilité elle-même. Avant une mise en production, fais au moins un passage clavier seul (Tab/Échap/flèches sur chaque page) et un passage avec un lecteur d'écran sur les composants les plus riches (combobox, modale, menu déroulant, tableau triable).
 
-À éviter :
-- dégradés de fond et ombres floues ;
-- le mono pour du texte courant ;
-- des px hors de l'échelle de cadence.
+## Publication
+
+Chaque tag `vX.Y.Z` poussé sur `master` déclenche une Release GitHub automatique (`.github/workflows/release.yml`) : le projet est d'abord vérifié (`ci.yml`, réutilisé), puis empaqueté (`theme.css` + `theme.js` + `README.md` + `LICENSE`) en `.zip` et `.tar.gz` attachés à la Release, avec des notes générées depuis les commits/PR depuis le tag précédent.
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+- `scripts/validate.sh` — les mêmes vérifications tournent à chaque push/PR (`ci.yml`) et avant chaque release ; à lancer en local avant de taguer.
+- `scripts/package.sh` — assemble le paquet ; utilisable en local pour en vérifier le contenu (`VERSION=0.0.0-test scripts/package.sh`).
 
 ## Licence
 
