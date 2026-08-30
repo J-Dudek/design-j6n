@@ -1,0 +1,57 @@
+/* ============================================================
+   FOULÉE — vitrine de démo (demo/ uniquement)
+   Pas une partie du design system livré : c'est l'habillage
+   « Résultat / Code + simulateur de largeur » de ces pages de
+   démonstration, dans l'esprit systeme-de-design.gouv.fr.
+   ============================================================ */
+
+.j6n-showcase {
+  border: var(--j6n-border-width) solid var(--j6n-border);
+  border-radius: var(--j6n-radius-md);
+  overflow: hidden;
+}
+.j6n-showcase__preview {
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: var(--j6n-space-6) var(--j6n-space-5);
+  background: var(--j6n-bg);
+  overflow: auto;
+  contain: layout paint; /* confine les enfants position:fixed (notice, consentement) à cette boîte */
+}
+.j6n-showcase__preview > * { max-width: 100%; }
+.j6n-showcase__preview-inner { width: 100%; transition: max-width var(--j6n-dur-2) var(--j6n-ease); }
+
+.j6n-showcase__code.j6n-pre { display: none; border-radius: 0; border: 0; margin: 0; }
+.j6n-showcase.is-code .j6n-showcase__preview { display: none; }
+.j6n-showcase.is-code .j6n-showcase__code.j6n-pre { display: block; }
+
+.j6n-showcase__toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--j6n-space-3);
+  padding: var(--j6n-space-2) var(--j6n-space-3);
+  background: var(--j6n-surface-2);
+  border-top: var(--j6n-border-width) solid var(--j6n-border);
+}
+.j6n-showcase__tabs, .j6n-showcase__viewport { display: flex; gap: 2px; }
+.j6n-showcase__tabs button, .j6n-showcase__viewport button, .j6n-showcase__copy {
+  font-family: var(--j6n-font-mono); font-size: var(--j6n-text-xs); font-weight: 500;
+  text-transform: uppercase; letter-spacing: var(--j6n-tracking-wide);
+  min-height: 32px; padding: 0 var(--j6n-space-3);
+  border-radius: var(--j6n-radius-sm); border: 0; background: transparent; color: var(--j6n-text-muted);
+  cursor: pointer;
+  transition: background var(--j6n-dur-1) var(--j6n-ease), color var(--j6n-dur-1) var(--j6n-ease);
+}
+.j6n-showcase__tabs button:hover, .j6n-showcase__viewport button:hover, .j6n-showcase__copy:hover { color: var(--j6n-text); }
+.j6n-showcase__tabs button.is-active, .j6n-showcase__viewport button.is-active {
+  background: var(--j6n-surface); color: var(--j6n-text); box-shadow: var(--j6n-shadow-sm);
+}
+.j6n-showcase__tabs button:focus-visible, .j6n-showcase__viewport button:focus-visible, .j6n-showcase__copy:focus-visible {
+  outline: none; box-shadow: var(--j6n-ring);
+}
+.j6n-showcase__viewport { margin-left: auto; }
+.j6n-showcase.is-code .j6n-showcase__viewport { display: none; }
+.j6n-showcase__copy { display: none; }
+.j6n-showcase.is-code .j6n-showcase__copy { display: inline-flex; }
+
+@media (max-width: 560px) {
+  .j6n-showcase__toolbar { justify-content: flex-start; }
+  .j6n-showcase__viewport { margin-left: 0; }
+}

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Foulée — navigation</title>
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="showcase.css">
+</head>
+<body>
+  <a class="j6n-skiplink" href="#contenu">Aller au contenu</a>
+
+  <header class="j6n-header">
+    <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
+    <nav class="j6n-nav">
+      <a class="j6n-nav__link" href="index.html">Sommaire</a>
+      <a class="j6n-nav__link" href="actions.html">Actions</a>
+      <a class="j6n-nav__link" href="formulaires.html">Formulaires</a>
+      <a class="j6n-nav__link is-active" href="navigation.html">Navigation</a>
+      <a class="j6n-nav__link" href="retours.html">Retours</a>
+      <a class="j6n-nav__link" href="donnees.html">Données</a>
+    </nav>
+    <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme">Thème</button>
+  </header>
+
+  <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
+    <aside>
+      <nav class="j6n-sidemenu" aria-label="Sections de la démo">
+        <a class="j6n-sidemenu__link" href="index.html">Sommaire</a>
+        <a class="j6n-sidemenu__link" href="actions.html">Actions</a>
+        <a class="j6n-sidemenu__link" href="formulaires.html">Formulaires</a>
+        <a class="j6n-sidemenu__link is-active" href="navigation.html">Navigation</a>
+        <a class="j6n-sidemenu__link" href="retours.html">Retours &amp; alertes</a>
+        <a class="j6n-sidemenu__link" href="donnees.html">Données &amp; contenu</a>
+      </nav>
+      <p class="j6n-hint" style="margin-top: var(--j6n-space-5); max-width: 200px;">Cette colonne est elle-même un <code>.j6n-sidemenu</code>. Le lien d'évitement en haut de page est un <code>.j6n-skiplink</code> — appuie sur Tab au chargement pour le voir apparaître.</p>
+
+      <p class="j6n-eyebrow" style="margin-top: var(--j6n-space-6);">Sommaire</p>
+      <nav class="j6n-toc" data-j6n-js="toc" aria-label="Sur cette page">
+        <a href="#fil-ariane">Fil d'Ariane</a>
+        <a href="#onglets">Onglets</a>
+        <a href="#menu-deroulant">Menu déroulant</a>
+        <a href="#pagination">Pagination</a>
+        <a href="#etapes">Étapes</a>
+        <a href="#tuiles">Tuiles</a>
+        <a href="#pied-de-page">Pied de page</a>
+      </nav>
+    </aside>
+
+    <main id="contenu" class="j6n-stack">
+      <p class="j6n-eyebrow">Composants</p>
+      <h1>Navigation</h1>
+      <p class="j6n-muted">Repérage, changement de contexte et pied de page.</p>
+
+      <h2 id="fil-ariane">Fil d'Ariane — <code>.j6n-breadcrumb</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <nav class="j6n-breadcrumb" aria-label="Fil d'Ariane">
+            <ol>
+              <li><a href="index.html">Foulée</a></li>
+              <li><a href="navigation.html">Navigation</a></li>
+              <li aria-current="page">Fil d'Ariane</li>
+            </ol>
+          </nav>
+        </template>
+      </div>
+
+      <h2 id="onglets">Onglets — <code>.j6n-tabs</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div data-j6n-js="tabs">
+            <div class="j6n-tabs__list" role="tablist" aria-label="Vue de la sortie">
+              <button class="j6n-tabs__tab" role="tab" id="tab-carte" aria-controls="panel-carte" aria-selected="true">Carte</button>
+              <button class="j6n-tabs__tab" role="tab" id="tab-profil" aria-controls="panel-profil" aria-selected="false">Profil D+</button>
+              <button class="j6n-tabs__tab" role="tab" id="tab-splits" aria-controls="panel-splits" aria-selected="false">Splits</button>
+            </div>
+            <div class="j6n-tabs__panel" id="panel-carte" role="tabpanel" aria-labelledby="tab-carte">
+              <p class="j6n-muted">Tracé GPX affiché sur fond topographique.</p>
+            </div>
+            <div class="j6n-tabs__panel" id="panel-profil" role="tabpanel" aria-labelledby="tab-profil" hidden>
+              <p class="j6n-muted">Dénivelé cumulé le long du parcours.</p>
+            </div>
+            <div class="j6n-tabs__panel" id="panel-splits" role="tabpanel" aria-labelledby="tab-splits" hidden>
+              <p class="j6n-muted">Allure kilomètre par kilomètre.</p>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="menu-deroulant">Menu déroulant — <code>.j6n-dropdown</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <button class="j6n-btn j6n-btn--secondary" popovertarget="actions-menu">Actions ▾</button>
+          <div class="j6n-dropdown__menu" popover id="actions-menu">
+            <button type="button" class="j6n-dropdown__item">Dupliquer la sortie</button>
+            <button type="button" class="j6n-dropdown__item">Exporter en GPX</button>
+            <hr class="j6n-dropdown__divider">
+            <button type="button" class="j6n-dropdown__item" style="color: var(--j6n-danger);">Supprimer</button>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="pagination">Pagination — <code>.j6n-pagination</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <ul class="j6n-pagination" aria-label="Pages de résultats">
+            <li><a href="#" class="is-disabled" aria-disabled="true">← Précédent</a></li>
+            <li><a href="#" aria-current="page">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><span class="is-ellipsis">…</span></li>
+            <li><a href="#">12</a></li>
+            <li><a href="#">Suivant →</a></li>
+          </ul>
+        </template>
+      </div>
+
+      <h2 id="etapes">Étapes — <code>.j6n-stepper</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-stepper">
+            <div class="j6n-stepper__step is-done">
+              <span class="j6n-stepper__num">1</span>
+              <span class="j6n-stepper__label">Import GPX</span>
+            </div>
+            <div class="j6n-stepper__step is-done">
+              <span class="j6n-stepper__num">2</span>
+              <span class="j6n-stepper__label">Vérification</span>
+            </div>
+            <div class="j6n-stepper__step is-current">
+              <span class="j6n-stepper__num">3</span>
+              <span class="j6n-stepper__label">Publication</span>
+            </div>
+            <div class="j6n-stepper__step">
+              <span class="j6n-stepper__num">4</span>
+              <span class="j6n-stepper__label">Partage</span>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="tuiles">Tuiles de navigation — <code>.j6n-tile</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-grid">
+            <a class="j6n-tile" href="formulaires.html">
+              <span class="j6n-tile__mark"></span>
+              <span class="j6n-tile__title">Formulaires</span>
+              <p class="j6n-tile__desc">Champs, recherche, import de fichiers.</p>
+            </a>
+            <a class="j6n-tile" href="retours.html">
+              <span class="j6n-tile__mark"></span>
+              <span class="j6n-tile__title">Retours</span>
+              <p class="j6n-tile__desc">Modales, notices, alertes.</p>
+            </a>
+            <a class="j6n-tile" href="donnees.html">
+              <span class="j6n-tile__mark"></span>
+              <span class="j6n-tile__title">Données</span>
+              <p class="j6n-tile__desc">Tableaux, citations, comptes.</p>
+            </a>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="pied-de-page">Pied de page — <code>.j6n-footer</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <footer class="j6n-footer" style="margin-top:0; border-top:0;">
+            <div class="j6n-footer__grid">
+              <div class="j6n-footer__col">
+                <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
+              </div>
+              <div class="j6n-footer__col">
+                <h4>Composants</h4>
+                <ul><li><a href="actions.html">Actions</a></li><li><a href="formulaires.html">Formulaires</a></li></ul>
+              </div>
+              <div class="j6n-footer__col">
+                <h4>Contenu</h4>
+                <ul><li><a href="retours.html">Retours</a></li><li><a href="donnees.html">Données</a></li></ul>
+              </div>
+            </div>
+            <div class="j6n-footer__bottom"><span>Foulée — MIT</span></div>
+          </footer>
+        </template>
+      </div>
+    </main>
+  </div>
+
+  <script src="showcase.js"></script>
+  <script src="../theme.js"></script>
+  <script>
+    document.getElementById('theme').addEventListener('click', () => {
+      const el = document.documentElement;
+      const dark = el.dataset.theme === 'dark' ||
+        (!el.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+      el.dataset.theme = dark ? 'light' : 'dark';
+    });
+  </script>
+</body>
+</html>

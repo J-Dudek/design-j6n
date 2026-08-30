@@ -1,97 +1,138 @@
-<!doctype html>
+  <!doctype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>design-j6n — démo</title>
+<title>Foulée — sommaire</title>
 <link rel="stylesheet" href="../theme.css">
 </head>
 <body>
+  <a class="j6n-skiplink" href="#contenu">Aller au contenu</a>
+
   <header class="j6n-header">
-    <a class="j6n-brand" href="#"><span class="j6n-brand__mark"></span> j6n</a>
+    <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
     <nav class="j6n-nav">
-      <a class="j6n-nav__link is-active" href="#">Sorties</a>
-      <a class="j6n-nav__link" href="#">Statistiques</a>
-      <a class="j6n-nav__link" href="#">Projets</a>
+      <a class="j6n-nav__link is-active" href="index.html">Sommaire</a>
+      <a class="j6n-nav__link" href="actions.html">Actions</a>
+      <a class="j6n-nav__link" href="formulaires.html">Formulaires</a>
+      <a class="j6n-nav__link" href="navigation.html">Navigation</a>
+      <a class="j6n-nav__link" href="retours.html">Retours</a>
+      <a class="j6n-nav__link" href="donnees.html">Données</a>
     </nav>
+    <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme">Thème</button>
   </header>
 
-  <main class="j6n-container j6n-stack" style="padding-block: var(--j6n-space-8)">
-    <p class="j6n-eyebrow">Démo</p>
-    <h1>design-j6n</h1>
-    <p class="j6n-muted">Tous les composants du système, sur une page. Bascule le thème pour vérifier les deux modes.</p>
+  <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
+    <aside>
+      <nav class="j6n-sidemenu" aria-label="Sections de la démo">
+        <a class="j6n-sidemenu__link is-active" href="index.html">Sommaire</a>
+        <a class="j6n-sidemenu__link" href="actions.html">Actions</a>
+        <a class="j6n-sidemenu__link" href="formulaires.html">Formulaires</a>
+        <a class="j6n-sidemenu__link" href="navigation.html">Navigation</a>
+        <a class="j6n-sidemenu__link" href="retours.html">Retours &amp; alertes</a>
+        <a class="j6n-sidemenu__link" href="donnees.html">Données &amp; contenu</a>
+      </nav>
+    </aside>
 
-    <div class="j6n-row">
-      <button class="j6n-btn" id="theme">Basculer le thème</button>
-      <button class="j6n-btn j6n-btn--secondary">Secondaire</button>
-      <button class="j6n-btn j6n-btn--pine">Sapin</button>
-      <button class="j6n-btn j6n-btn--ghost">Fantôme</button>
-      <button class="j6n-btn j6n-btn--sm">Petit</button>
-      <button class="j6n-btn" disabled>Désactivé</button>
-    </div>
+    <main id="contenu" class="j6n-stack">
+      <p class="j6n-eyebrow">Design system</p>
+      <h1>Foulée</h1>
+      <p class="j6n-muted">Un seul fichier CSS (<code>theme.css</code>) et un seul fichier JS (<code>theme.js</code>), sans dépendance ni build. Parité fonctionnelle avec les composants et contrôles du <a href="https://www.systeme-de-design.gouv.fr/" target="_blank" rel="noopener">Système de Design de l'État</a>, adaptée à la charte Foulée — nature et trail pour les couleurs, vert terminal pour l'énergie.</p>
 
-    <hr class="j6n-divider-run">
+      <div class="j6n-row">
+        <a class="j6n-btn" href="formulaires.html">Voir les composants</a>
+        <a class="j6n-btn j6n-btn--secondary" href="https://github.com/" target="_blank" rel="noopener">Dépôt</a>
+      </div>
 
-    <div class="j6n-grid">
-      <article class="j6n-card j6n-card--interactive">
-        <p class="j6n-card__meta">SAM. 29 AOÛT · 07:12</p>
-        <h3 class="j6n-card__title">Crête des Ayes</h3>
-        <p class="j6n-muted">Sortie longue en sentier, brouillard jusqu'à 1200 m.</p>
-        <div class="j6n-row" style="gap: var(--j6n-space-6)">
-          <div class="j6n-stat">
-            <span class="j6n-stat__value">18,4<span class="j6n-stat__unit"> km</span></span>
-            <span class="j6n-stat__label">Distance</span>
+      <hr class="j6n-divider-run">
+
+      <h2>Tokens</h2>
+      <p class="j6n-muted">Toutes les valeurs viennent des variables <code>--j6n-*</code> — aucune valeur codée en dur dans les composants.</p>
+
+      <div class="j6n-grid">
+        <article class="j6n-card">
+          <h3 class="j6n-card__title">Couleurs</h3>
+          <div class="j6n-row" style="gap: var(--j6n-space-2);">
+            <span style="width:32px;height:32px;border-radius:var(--j6n-radius-sm);background:var(--j6n-accent);" title="--j6n-accent"></span>
+            <span style="width:32px;height:32px;border-radius:var(--j6n-radius-sm);background:var(--j6n-pine);" title="--j6n-pine"></span>
+            <span style="width:32px;height:32px;border-radius:var(--j6n-radius-sm);background:var(--j6n-success);" title="--j6n-success"></span>
+            <span style="width:32px;height:32px;border-radius:var(--j6n-radius-sm);background:var(--j6n-warning);" title="--j6n-warning"></span>
+            <span style="width:32px;height:32px;border-radius:var(--j6n-radius-sm);background:var(--j6n-danger);" title="--j6n-danger"></span>
+            <span style="width:32px;height:32px;border-radius:var(--j6n-radius-sm);background:var(--j6n-info);" title="--j6n-info"></span>
           </div>
-          <div class="j6n-stat">
-            <span class="j6n-stat__value">5:04<span class="j6n-stat__unit"> /km</span></span>
-            <span class="j6n-stat__label">Allure</span>
+        </article>
+        <article class="j6n-card">
+          <h3 class="j6n-card__title">Typographie</h3>
+          <p class="j6n-mono j6n-muted" style="margin:0;">Sora — texte courant<br>IBM Plex Mono — valeurs, code</p>
+        </article>
+        <article class="j6n-card">
+          <h3 class="j6n-card__title">Cadence</h3>
+          <div class="j6n-row" style="align-items:flex-end; gap: var(--j6n-space-1);">
+            <span style="width:4px;height:4px;background:var(--j6n-pine);"></span>
+            <span style="width:8px;height:8px;background:var(--j6n-pine);"></span>
+            <span style="width:12px;height:12px;background:var(--j6n-pine);"></span>
+            <span style="width:16px;height:16px;background:var(--j6n-pine);"></span>
+            <span style="width:24px;height:24px;background:var(--j6n-pine);"></span>
+            <span style="width:32px;height:32px;background:var(--j6n-pine);"></span>
           </div>
-        </div>
-      </article>
-
-      <form class="j6n-card j6n-stack">
-        <div class="j6n-field">
-          <label class="j6n-label" for="nom">Nom de la sortie</label>
-          <input class="j6n-input" id="nom" placeholder="Boucle du lac, matin">
-          <span class="j6n-hint">Visible sur ton profil public.</span>
-        </div>
-        <div class="j6n-field">
-          <label class="j6n-label" for="terrain">Terrain</label>
-          <select class="j6n-select" id="terrain">
-            <option>Sentier</option><option>Route</option><option>Piste</option>
-          </select>
-        </div>
-        <label class="j6n-check"><input type="checkbox" checked> Synchroniser avec la montre</label>
-      </form>
-    </div>
-
-    <div class="j6n-row">
-      <span class="j6n-badge">Java 21</span>
-      <span class="j6n-badge j6n-badge--accent">Spring Boot</span>
-      <span class="j6n-badge j6n-badge--pine">Angular</span>
-      <span class="j6n-badge j6n-badge--solid">En cours</span>
-      <span class="j6n-badge"><span class="j6n-badge__dot"></span>Déployé</span>
-    </div>
-
-    <div class="j6n-stack">
-      <div class="j6n-alert j6n-alert--success">
-        <div><p class="j6n-alert__title">Sortie synchronisée</p><p class="j6n-alert__body">18,4 km importés depuis la montre.</p></div>
+        </article>
       </div>
-      <div class="j6n-alert j6n-alert--warning">
-        <div><p class="j6n-alert__title">Cardio manquant</p><p class="j6n-alert__body">La ceinture n'a pas émis pendant 4 minutes.</p></div>
+
+      <hr class="j6n-divider-run">
+
+      <h2>Règles</h2>
+      <div class="j6n-grid">
+        <div class="j6n-callout">
+          <p class="j6n-callout__title">À faire</p>
+          <p>Passer par les variables <code>--j6n-*</code>, un seul accent par écran, cibles tactiles 44&nbsp;px minimum, mono pour les valeurs mesurées et le code.</p>
+        </div>
+        <div class="j6n-callout j6n-callout--pine">
+          <p class="j6n-callout__title">À éviter</p>
+          <p>Dégradés de fond et ombres floues, mono pour du texte courant, px hors de l'échelle de cadence.</p>
+        </div>
       </div>
-      <div class="j6n-alert j6n-alert--danger">
-        <div><p class="j6n-alert__title">Échec de l'export GPX</p><p class="j6n-alert__body">Fichier illisible au-delà du km 12.</p></div>
+    </main>
+  </div>
+
+  <footer class="j6n-footer">
+    <div class="j6n-container">
+      <div class="j6n-footer__grid">
+        <div class="j6n-footer__col">
+          <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
+          <p class="j6n-muted" style="margin-top: var(--j6n-space-3);">Design system personnel — nature et trail pour les couleurs, vert terminal pour l'énergie.</p>
+        </div>
+        <div class="j6n-footer__col">
+          <h4>Composants</h4>
+          <ul>
+            <li><a href="actions.html">Actions</a></li>
+            <li><a href="formulaires.html">Formulaires</a></li>
+            <li><a href="navigation.html">Navigation</a></li>
+          </ul>
+        </div>
+        <div class="j6n-footer__col">
+          <h4>Contenu</h4>
+          <ul>
+            <li><a href="retours.html">Retours &amp; alertes</a></li>
+            <li><a href="donnees.html">Données &amp; contenu</a></li>
+          </ul>
+        </div>
+        <div class="j6n-footer__col">
+          <h4>Ressources</h4>
+          <ul>
+            <li><a href="../README.md">README</a></li>
+            <li><a href="https://www.systeme-de-design.gouv.fr/" target="_blank" rel="noopener">DSFR</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="j6n-toast" style="align-self:flex-start">Nouveau record sur 10 km</div>
+      <div class="j6n-footer__bottom">
+        <span>Foulée — MIT</span>
+        <span>theme.css + theme.js, aucune dépendance</span>
+      </div>
     </div>
+  </footer>
 
-    <pre class="j6n-pre"><code><span class="tok-com">// theme.css n'impose aucun build</span>
-<span class="tok-key">public record</span> Sortie(<span class="tok-key">String</span> nom, <span class="tok-key">double</span> distanceKm) {
-  <span class="tok-key">public</span> <span class="tok-key">String</span> resume() { <span class="tok-key">return</span> nom + <span class="tok-str">" — "</span> + distanceKm + <span class="tok-str">" km"</span>; }
-}</code></pre>
-  </main>
-
+  <script src="../theme.js"></script>
   <script>
     document.getElementById('theme').addEventListener('click', () => {
       const el = document.documentElement;

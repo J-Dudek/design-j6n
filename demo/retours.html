@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Foulée — retours</title>
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="showcase.css">
+</head>
+<body>
+  <a class="j6n-skiplink" href="#contenu">Aller au contenu</a>
+
+  <header class="j6n-header">
+    <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
+    <nav class="j6n-nav">
+      <a class="j6n-nav__link" href="index.html">Sommaire</a>
+      <a class="j6n-nav__link" href="actions.html">Actions</a>
+      <a class="j6n-nav__link" href="formulaires.html">Formulaires</a>
+      <a class="j6n-nav__link" href="navigation.html">Navigation</a>
+      <a class="j6n-nav__link is-active" href="retours.html">Retours</a>
+      <a class="j6n-nav__link" href="donnees.html">Données</a>
+    </nav>
+    <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme">Thème</button>
+  </header>
+
+  <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
+    <aside>
+      <nav class="j6n-sidemenu" aria-label="Sections de la démo">
+        <a class="j6n-sidemenu__link" href="index.html">Sommaire</a>
+        <a class="j6n-sidemenu__link" href="actions.html">Actions</a>
+        <a class="j6n-sidemenu__link" href="formulaires.html">Formulaires</a>
+        <a class="j6n-sidemenu__link" href="navigation.html">Navigation</a>
+        <a class="j6n-sidemenu__link is-active" href="retours.html">Retours &amp; alertes</a>
+        <a class="j6n-sidemenu__link" href="donnees.html">Données &amp; contenu</a>
+      </nav>
+    </aside>
+
+    <main id="contenu" class="j6n-stack">
+      <p class="j6n-eyebrow">Composants</p>
+      <h1>Retours &amp; alertes</h1>
+      <p class="j6n-muted">Ce qui informe, avertit ou demande une confirmation.</p>
+
+      <h2>Alerte — <code>.j6n-alert</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-stack">
+            <div class="j6n-alert j6n-alert--success" id="alert-1">
+              <div><p class="j6n-alert__title">Sortie synchronisée</p><p class="j6n-alert__body">18,4 km importés depuis la montre.</p></div>
+              <button type="button" class="j6n-close j6n-alert__close" data-j6n-dismiss-target="alert-1" aria-label="Fermer">×</button>
+            </div>
+            <div class="j6n-alert j6n-alert--warning" id="alert-2">
+              <div><p class="j6n-alert__title">Cardio manquant</p><p class="j6n-alert__body">La ceinture n'a pas émis pendant 4 minutes.</p></div>
+              <button type="button" class="j6n-close j6n-alert__close" data-j6n-dismiss-target="alert-2" aria-label="Fermer">×</button>
+            </div>
+            <div class="j6n-alert j6n-alert--danger" id="alert-3">
+              <div><p class="j6n-alert__title">Échec de l'export GPX</p><p class="j6n-alert__body">Fichier illisible au-delà du km 12.</p></div>
+              <button type="button" class="j6n-close j6n-alert__close" data-j6n-dismiss-target="alert-3" aria-label="Fermer">×</button>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <h2>Toast — API <code>j6n.toast()</code></h2>
+      <p class="j6n-hint">Appelle une file d'attente globale (<code>#j6n-toast-region</code>) : les toasts s'affichent en bas à droite de la vraie page, pas dans l'encadré.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-row">
+            <button class="j6n-btn j6n-btn--secondary" id="toast-info">Toast info</button>
+            <button class="j6n-btn j6n-btn--secondary" id="toast-success">Toast succès</button>
+            <button class="j6n-btn j6n-btn--secondary" id="toast-danger">Toast erreur</button>
+          </div>
+        </template>
+      </div>
+
+      <h2>Infobulle — <code>[data-tooltip]</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-row">
+            <button class="j6n-btn j6n-btn--secondary" data-tooltip="Distance totale du parcours">Distance</button>
+            <button class="j6n-btn j6n-btn--secondary" data-tooltip="Dénivelé positif cumulé">D+</button>
+            <button class="j6n-btn j6n-btn--secondary" data-tooltip="Vitesse moyenne sur l'ensemble" data-tooltip-pos="bottom">Allure moyenne</button>
+          </div>
+        </template>
+      </div>
+
+      <h2>Modale — <code>.j6n-modal</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <button class="j6n-btn" data-j6n-modal-open="delete-modal">Supprimer la sortie…</button>
+          <dialog class="j6n-modal" id="delete-modal">
+            <div class="j6n-modal__header">
+              <h3 class="j6n-modal__title">Supprimer cette sortie ?</h3>
+              <button type="button" class="j6n-close" data-j6n-modal-close aria-label="Fermer">×</button>
+            </div>
+            <div class="j6n-modal__body">
+              <p>« Crête des Ayes » et ses 18,4 km seront définitivement supprimés. Cette action est irréversible.</p>
+            </div>
+            <div class="j6n-modal__footer">
+              <button type="button" class="j6n-btn j6n-btn--secondary" data-j6n-modal-close>Annuler</button>
+              <button type="button" class="j6n-btn" data-j6n-modal-close>Supprimer</button>
+            </div>
+          </dialog>
+        </template>
+      </div>
+
+      <h2>Accordéon — <code>.j6n-accordion</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-accordion" data-j6n-js="accordion-group">
+            <details class="j6n-accordion__item" open>
+              <summary class="j6n-accordion__trigger">Comment est calculée l'allure ?<span class="j6n-chevron"></span></summary>
+              <div class="j6n-accordion__panel"><p>Distance divisée par le temps en mouvement, hors pauses de plus de 30 secondes.</p></div>
+            </details>
+            <details class="j6n-accordion__item">
+              <summary class="j6n-accordion__trigger">Puis-je importer un fichier GPX ?<span class="j6n-chevron"></span></summary>
+              <div class="j6n-accordion__panel"><p>Oui, depuis le formulaire d'import — voir la page Formulaires.</p></div>
+            </details>
+            <details class="j6n-accordion__item">
+              <summary class="j6n-accordion__trigger">Transcription de la sortie audio</summary>
+              <div class="j6n-accordion__panel"><p class="j6n-mono">00:00 Départ du parking — 00:42 Bifurcation sentier — 01:15 Sommet, pause courte — 02:03 Retour.</p></div>
+            </details>
+          </div>
+        </template>
+      </div>
+
+      <h2>Mise en avant — <code>.j6n-callout</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-callout j6n-callout--pine">
+            <p class="j6n-callout__title">Astuce</p>
+            <p>Active la synchronisation automatique pour ne plus jamais perdre une sortie en cas de coupure réseau.</p>
+          </div>
+        </template>
+      </div>
+
+      <h2>Notice — <code>.j6n-notice</code></h2>
+      <p class="j6n-muted">Bandeau pleine largeur. Fermeture mémorisée en local, comme sur le DSFR.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-notice" id="beta-notice">
+            <span>Cette démo est en construction — certains composants sont encore en cours d'ajustement.</span>
+            <button type="button" class="j6n-close" data-j6n-dismiss="j6n-notice-beta" data-j6n-dismiss-target="beta-notice" aria-label="Fermer la notice">×</button>
+          </div>
+          <p style="padding: var(--j6n-space-3) 0 0; text-align:center;"><button type="button" class="j6n-btn j6n-btn--ghost j6n-btn--sm" id="reset-notice">Réinitialiser</button></p>
+        </template>
+      </div>
+
+      <h2>Consentement — <code>.j6n-consent</code></h2>
+      <p class="j6n-muted">Réinterprétation du composant « cookies » du DSFR pour un usage perso — bandeau générique, mémorisé en local, confiné ici à l'encadré.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div style="position:relative; height:180px; contain:layout paint;">
+            <div class="j6n-consent" id="cookie-consent">
+              <p>Foulée utilise le stockage local de ton navigateur pour retenir tes préférences (thème, unités). Rien n'est envoyé à un serveur tiers.</p>
+              <div class="j6n-consent__actions">
+                <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" data-j6n-dismiss="j6n-consent" data-j6n-dismiss-target="cookie-consent">Refuser</button>
+                <button type="button" class="j6n-btn j6n-btn--sm" data-j6n-dismiss="j6n-consent" data-j6n-dismiss-target="cookie-consent">Accepter</button>
+              </div>
+            </div>
+            <p style="position:absolute; top:0; left:0; right:0; text-align:center;"><button type="button" class="j6n-btn j6n-btn--ghost j6n-btn--sm" id="reset-consent">Réinitialiser</button></p>
+          </div>
+        </template>
+      </div>
+    </main>
+  </div>
+
+  <script src="showcase.js"></script>
+  <script src="../theme.js"></script>
+  <script>
+    document.getElementById('theme').addEventListener('click', () => {
+      const el = document.documentElement;
+      const dark = el.dataset.theme === 'dark' ||
+        (!el.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+      el.dataset.theme = dark ? 'light' : 'dark';
+    });
+
+    document.getElementById('toast-info').addEventListener('click', () => j6n.toast('Sortie enregistrée.'));
+    document.getElementById('toast-success').addEventListener('click', () => j6n.toast('Export GPX terminé.', { tone: 'success' }));
+    document.getElementById('toast-danger').addEventListener('click', () => j6n.toast('Échec de la synchronisation.', { tone: 'danger' }));
+
+    // La notice et le bandeau de consentement se souviennent de leur fermeture
+    // (voir data-j6n-dismiss dans theme.js) ; ces boutons les réinitialisent pour la démo.
+    document.getElementById('reset-notice').addEventListener('click', () => {
+      localStorage.removeItem('j6n-notice-beta');
+      document.getElementById('beta-notice').hidden = false;
+    });
+    document.getElementById('reset-consent').addEventListener('click', () => {
+      localStorage.removeItem('j6n-consent');
+      document.getElementById('cookie-consent').hidden = false;
+    });
+  </script>
+</body>
+</html>

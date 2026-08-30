@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Foulée — données</title>
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="showcase.css">
+</head>
+<body>
+  <a class="j6n-skiplink" href="#contenu">Aller au contenu</a>
+
+  <header class="j6n-header">
+    <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
+    <nav class="j6n-nav">
+      <a class="j6n-nav__link" href="index.html">Sommaire</a>
+      <a class="j6n-nav__link" href="actions.html">Actions</a>
+      <a class="j6n-nav__link" href="formulaires.html">Formulaires</a>
+      <a class="j6n-nav__link" href="navigation.html">Navigation</a>
+      <a class="j6n-nav__link" href="retours.html">Retours</a>
+      <a class="j6n-nav__link is-active" href="donnees.html">Données</a>
+    </nav>
+    <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme">Thème</button>
+  </header>
+
+  <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
+    <aside>
+      <nav class="j6n-sidemenu" aria-label="Sections de la démo">
+        <a class="j6n-sidemenu__link" href="index.html">Sommaire</a>
+        <a class="j6n-sidemenu__link" href="actions.html">Actions</a>
+        <a class="j6n-sidemenu__link" href="formulaires.html">Formulaires</a>
+        <a class="j6n-sidemenu__link" href="navigation.html">Navigation</a>
+        <a class="j6n-sidemenu__link" href="retours.html">Retours &amp; alertes</a>
+        <a class="j6n-sidemenu__link is-active" href="donnees.html">Données &amp; contenu</a>
+      </nav>
+    </aside>
+
+    <main id="contenu" class="j6n-stack">
+      <p class="j6n-eyebrow">Composants</p>
+      <h1>Données &amp; contenu</h1>
+      <p class="j6n-muted">Cartes, tableaux, contenu éditorial et comptes.</p>
+
+      <h2>Carte &amp; badges</h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-grid">
+            <article class="j6n-card j6n-card--interactive">
+              <p class="j6n-card__meta">SAM. 29 AOÛT · 07:12</p>
+              <h3 class="j6n-card__title">Crête des Ayes</h3>
+              <p class="j6n-muted">Sortie longue en sentier, brouillard jusqu'à 1200 m.</p>
+              <div class="j6n-row" style="gap: var(--j6n-space-6)" id="unit-stats">
+                <div class="j6n-stat">
+                  <span class="j6n-stat__value" data-km="18.4">18,4<span class="j6n-stat__unit"> km</span></span>
+                  <span class="j6n-stat__label">Distance</span>
+                </div>
+                <div class="j6n-stat">
+                  <span class="j6n-stat__value">5:04<span class="j6n-stat__unit"> /km</span></span>
+                  <span class="j6n-stat__label">Allure</span>
+                </div>
+              </div>
+            </article>
+
+            <div class="j6n-card j6n-stack">
+              <h3 class="j6n-card__title">Badges &amp; tags</h3>
+              <div class="j6n-row">
+                <span class="j6n-badge">Java 21</span>
+                <span class="j6n-badge j6n-badge--accent">Spring Boot</span>
+                <span class="j6n-badge j6n-badge--pine">Angular</span>
+                <span class="j6n-badge j6n-badge--solid">En cours</span>
+                <span class="j6n-badge"><span class="j6n-badge__dot"></span>Déployé</span>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <h2>Bascule d'unités — <code>.j6n-unit-switch</code></h2>
+      <p class="j6n-muted">Réinterprétation du sélecteur de langue du DSFR : la statistique de la carte ci-dessus change d'unité.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-unit-switch" data-j6n-js="unit-switch">
+            <div class="j6n-segmented" role="radiogroup" aria-label="Unité de distance">
+              <input type="radio" name="unit" id="unit-km" value="km" checked><label for="unit-km">km</label>
+              <input type="radio" name="unit" id="unit-mi" value="mi"><label for="unit-mi">mi</label>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <h2>Tableau — <code>.j6n-table</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-table-wrap">
+            <table class="j6n-table" data-j6n-js="table-sort">
+              <thead>
+                <tr>
+                  <th><button type="button" class="j6n-table__sort">Sortie</button></th>
+                  <th>Terrain</th>
+                  <th data-numeric><button type="button" class="j6n-table__sort">Distance (km)</button></th>
+                  <th data-numeric><button type="button" class="j6n-table__sort">D+ (m)</button></th>
+                  <th data-numeric>Allure</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Crête des Ayes</td><td>Sentier</td><td data-numeric>18.4</td><td data-numeric>620</td><td data-numeric>5:04</td></tr>
+                <tr><td>Boucle du lac</td><td>Route</td><td data-numeric>8.2</td><td data-numeric>90</td><td data-numeric>4:35</td></tr>
+                <tr><td>Traversée Belledonne</td><td>Sentier</td><td data-numeric>32.1</td><td data-numeric>1840</td><td data-numeric>6:12</td></tr>
+                <tr><td>Footing récup</td><td>Piste</td><td data-numeric>6.0</td><td data-numeric>20</td><td data-numeric>5:40</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+      </div>
+
+      <h2>Téléchargement — <code>.j6n-download</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <a class="j6n-download" href="#" download>
+            <span class="j6n-download__ext">GPX</span>
+            <span>
+              <span class="j6n-download__name">crete-des-ayes.gpx</span>
+              <span class="j6n-download__meta">312 Ko</span>
+            </span>
+          </a>
+        </template>
+      </div>
+
+      <h2>Citation — <code>.j6n-quote</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <blockquote class="j6n-quote">
+            <p>Le sentier ne pardonne pas l'impatience ; il récompense la régularité.</p>
+            <cite class="j6n-quote__cite">Carnet de sortie, col de la Ayes</cite>
+          </blockquote>
+        </template>
+      </div>
+
+      <h2>Mise en exergue — <code>.j6n-highlight</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <p class="j6n-highlight">Ravitaillement obligatoire au km 12 : la source suivante est à plus de 9 km, remplis les bidons.</p>
+        </template>
+      </div>
+
+      <h2>Code — <code>.j6n-pre</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <pre class="j6n-pre"><code><span class="tok-com">// theme.css n'impose aucun build</span>
+<span class="tok-key">public record</span> Sortie(<span class="tok-key">String</span> nom, <span class="tok-key">double</span> distanceKm) {
+  <span class="tok-key">public</span> <span class="tok-key">String</span> resume() { <span class="tok-key">return</span> nom + <span class="tok-str">" — "</span> + distanceKm + <span class="tok-str">" km"</span>; }
+}</code></pre>
+        </template>
+      </div>
+
+      <h2>Menu utilisateur — <code>.j6n-user-menu</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <button class="j6n-user-menu__trigger" popovertarget="user-menu">
+            <span class="j6n-user-menu__avatar">JD</span>
+            <span class="j6n-user-menu__name">Julien</span>
+          </button>
+          <div class="j6n-dropdown__menu" popover id="user-menu">
+            <a class="j6n-dropdown__item" href="#">Profil</a>
+            <a class="j6n-dropdown__item" href="#">Paramètres</a>
+            <hr class="j6n-dropdown__divider">
+            <button type="button" class="j6n-dropdown__item">Déconnexion</button>
+          </div>
+        </template>
+      </div>
+
+      <h2>Connexion à un service externe — <code>.j6n-connect</code></h2>
+      <p class="j6n-hint">Réinterprétation du composant « FranceConnect » du DSFR pour relier un compte tiers.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-row">
+            <button type="button" class="j6n-connect j6n-connect--strava"><span class="j6n-connect__mark"></span> Connecter Strava</button>
+            <button type="button" class="j6n-connect j6n-connect--garmin"><span class="j6n-connect__mark"></span> Connecter Garmin</button>
+          </div>
+        </template>
+      </div>
+    </main>
+  </div>
+
+  <script src="showcase.js"></script>
+  <script src="../theme.js"></script>
+  <script>
+    document.getElementById('theme').addEventListener('click', () => {
+      const el = document.documentElement;
+      const dark = el.dataset.theme === 'dark' ||
+        (!el.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+      el.dataset.theme = dark ? 'light' : 'dark';
+    });
+
+    // La bascule d'unités ne fait que diffuser un évènement (voir theme.js) ;
+    // la conversion elle-même est propre à cette démo, pas au design system.
+    document.addEventListener('j6n:unit-change', (e) => {
+      const el = document.querySelector('#unit-stats .j6n-stat__value');
+      const km = parseFloat(el.dataset.km);
+      const value = e.detail.unit === 'mi' ? (km * 0.621371).toFixed(1).replace('.', ',') : km.toFixed(1).replace('.', ',');
+      const unit = e.detail.unit === 'mi' ? ' mi' : ' km';
+      el.innerHTML = `${value}<span class="j6n-stat__unit">${unit}</span>`;
+    });
+  </script>
+</body>
+</html>
