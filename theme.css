@@ -412,8 +412,6 @@ code, .j6n-code-inline {
 
 /* ============================================================
    CONTRÔLES & DYNAMISME
-   Les sections ci-dessous couvrent la parité fonctionnelle avec
-   systeme-de-design.gouv.fr (DSFR), adaptée à la charte Foulée.
    Le comportement JS correspondant vit dans theme.js (facultatif :
    la plupart des composants sont utilisables sans JS grâce aux
    éléments natifs <details>, <dialog>, popover).
@@ -918,7 +916,7 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
   font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer;
   text-transform: inherit; letter-spacing: inherit;
 }
-.j6n-table__sort::after { content: ''; width: 5px; height: 5px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); opacity: 0.4; }
+.j6n-table__sort::after { content: ''; width: 5px; height: 5px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); opacity: 0.4; }
 .j6n-table__sort[aria-sort='ascending']::after { transform: rotate(-135deg); opacity: 1; }
 .j6n-table__sort[aria-sort='descending']::after { transform: rotate(45deg); opacity: 1; }
 
