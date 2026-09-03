@@ -22,6 +22,7 @@
     </nav>
     <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme" aria-pressed="false">Thème sombre</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="variant" aria-pressed="false">Thème moderne</button>
   </header>
 
   <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
@@ -122,6 +123,17 @@
     themeBtn.addEventListener('click', () => {
       document.documentElement.dataset.theme = isDark() ? 'light' : 'dark';
       themeBtn.setAttribute('aria-pressed', String(isDark()));
+    });
+
+    const variantBtn = document.getElementById('variant');
+    function isModern() {
+      return document.documentElement.dataset.j6nTheme === 'moderne';
+    }
+    variantBtn.setAttribute('aria-pressed', String(isModern()));
+    variantBtn.addEventListener('click', () => {
+      if (isModern()) document.documentElement.removeAttribute('data-j6n-theme');
+      else document.documentElement.dataset.j6nTheme = 'moderne';
+      variantBtn.setAttribute('aria-pressed', String(isModern()));
     });
 
     // Bouton de chargement : démo — bascule l'état au clic.

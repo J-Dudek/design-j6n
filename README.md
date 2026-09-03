@@ -2,6 +2,7 @@
 
 Design system personnel — **Foulée**. Nature et trail pour les couleurs, vert terminal pour l'énergie.
 Deux fichiers (`theme.css` + `theme.js`), aucune dépendance, aucun build. Utilisable en HTML statique, Angular ou React.
+Deux thèmes visuels partagent les mêmes composants : **nature** (par défaut) et **moderne** (gris/bleu) — voir [Thèmes](#thèmes).
 
 - Préfixe : `--j6n-*` pour les variables, `.j6n-*` pour les classes, `data-j6n-*` pour les hooks JS
 - Typographie : [Sora](https://fonts.google.com/specimen/Sora) + [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono)
@@ -45,6 +46,28 @@ Sans rien faire, le thème suit `prefers-color-scheme`. Pour forcer un mode, pos
 ```js
 document.documentElement.dataset.theme = 'dark'; // ou 'light'
 ```
+
+## Thèmes
+
+Deux thèmes visuels, mêmes composants et mêmes classes `.j6n-*` — seuls les tokens
+(couleurs + polices) changent. Par défaut : **nature** (vert terrain, Sora + IBM Plex
+Mono). Pour passer au thème **moderne** (bleu/gris, Inter + JetBrains Mono), poser
+l'attribut sur `<html>` :
+
+```js
+document.documentElement.dataset.j6nTheme = 'moderne'; // ou retirer l'attribut pour revenir à nature
+```
+
+```html
+<html data-j6n-theme="moderne">
+```
+
+Se combine librement avec `data-theme` (clair/sombre/auto) — les deux attributs sont
+indépendants, donc les quatre combinaisons (nature clair/sombre, moderne clair/sombre)
+fonctionnent, y compris `prefers-color-scheme` sans `data-theme` explicite. Les couleurs
+sémantiques (succès/attention/erreur) et les couleurs de marque tierce (`.j6n-connect`)
+restent identiques d'un thème à l'autre ; chaque token du thème moderne a été vérifié au
+même seuil WCAG que nature (4.5:1 texte, 3:1 frontière fonctionnelle).
 
 ## Tokens
 

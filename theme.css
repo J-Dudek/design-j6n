@@ -4,9 +4,11 @@
    Usage : <link rel="stylesheet" href="theme.css">
    Mode sombre : <html data-theme="dark"> (ou automatique via
    prefers-color-scheme si data-theme est absent).
+   Thème visuel : <html data-j6n-theme="moderne"> (par défaut : nature).
+   Les deux attributs se combinent librement (les 4 combinaisons existent).
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ---------- 1. Tokens ---------- */
 :root {
@@ -123,6 +125,90 @@
   /* --j6n-ring recalcule tout seul (var(--j6n-surface)/var(--j6n-accent-strong) ci-dessus) */
 }
 
+/* ---------- 1bis. Thème « moderne » — via [data-j6n-theme="moderne"] ----------
+   Mêmes tokens, mêmes composants, autre habillage : bleu/gris au lieu du vert
+   nature, Inter + JetBrains Mono au lieu de Sora + IBM Plex Mono. Se combine
+   avec [data-theme] exactement comme le thème nature (clair/sombre/auto) —
+   toutes les valeurs ci-dessous ont été vérifiées au même seuil WCAG que le
+   thème nature (4.5:1 texte, 3:1 frontière fonctionnelle/large texte). */
+[data-j6n-theme='moderne'] {
+  --j6n-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --j6n-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --j6n-accent:        oklch(0.52 0.18 258);
+  --j6n-accent-strong: oklch(0.44 0.17 258);
+  --j6n-accent-soft:   oklch(0.94 0.035 258);
+  --j6n-pine:          oklch(0.36 0.03 250);   /* secondaire — bleu ardoise */
+  --j6n-pine-soft:     oklch(0.93 0.015 250);
+
+  --j6n-success: oklch(0.55 0.12 155);
+  --j6n-warning: oklch(0.63 0.14 90);
+  --j6n-danger:  oklch(0.55 0.16 25);
+  --j6n-info:    oklch(0.55 0.09 200);   /* décalé du bleu de marque pour rester distinct */
+
+  --j6n-bg:        oklch(0.985 0.006 258);
+  --j6n-surface:   oklch(1 0 0);
+  --j6n-surface-2: oklch(0.960 0.008 258);
+  --j6n-border:    oklch(0.905 0.010 258);
+  --j6n-border-strong: oklch(0.82 0.012 258);
+  --j6n-border-interactive: oklch(0.61 0.012 258);
+  --j6n-text:      oklch(0.24 0.015 258);
+  --j6n-text-muted: oklch(0.52 0.012 258);
+  --j6n-text-invert: oklch(0.99 0.004 258);
+}
+
+[data-j6n-theme='moderne'][data-theme='dark'] {
+  --j6n-accent:        oklch(0.78 0.16 258);
+  --j6n-accent-strong: oklch(0.84 0.14 258);
+  --j6n-accent-soft:   oklch(0.28 0.07 258);
+  --j6n-pine:          oklch(0.68 0.06 250);
+  --j6n-pine-soft:     oklch(0.24 0.03 250);
+
+  --j6n-success: oklch(0.60 0.12 155);
+  --j6n-warning: oklch(0.64 0.14 90);
+  --j6n-danger:  oklch(0.64 0.16 25);
+  --j6n-info:    oklch(0.62 0.09 200);
+
+  --j6n-bg:        oklch(0.185 0.014 258);
+  --j6n-surface:   oklch(0.225 0.016 258);
+  --j6n-surface-2: oklch(0.265 0.016 258);
+  --j6n-border:    oklch(0.325 0.018 258);
+  --j6n-border-strong: oklch(0.42 0.020 258);
+  --j6n-border-interactive: oklch(0.56 0.020 258);
+  --j6n-text:      oklch(0.955 0.006 258);
+  --j6n-text-muted: oklch(0.70 0.012 258);
+  --j6n-text-invert: oklch(0.18 0.012 258);
+
+  --j6n-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
+  --j6n-shadow-md: 0 2px 4px oklch(0 0 0 / 0.3), 0 8px 24px oklch(0 0 0 / 0.35);
+}
+
+/* Thème moderne + préférence système sombre, sans [data-theme] explicite */
+@media (prefers-color-scheme: dark) {
+  [data-j6n-theme='moderne']:not([data-theme='light']):not([data-theme='dark']) {
+    --j6n-accent:        oklch(0.78 0.16 258);
+    --j6n-accent-strong: oklch(0.84 0.14 258);
+    --j6n-accent-soft:   oklch(0.28 0.07 258);
+    --j6n-pine:          oklch(0.68 0.06 250);
+    --j6n-pine-soft:     oklch(0.24 0.03 250);
+    --j6n-success: oklch(0.60 0.12 155);
+    --j6n-warning: oklch(0.64 0.14 90);
+    --j6n-danger:  oklch(0.64 0.16 25);
+    --j6n-info:    oklch(0.62 0.09 200);
+    --j6n-bg:        oklch(0.185 0.014 258);
+    --j6n-surface:   oklch(0.225 0.016 258);
+    --j6n-surface-2: oklch(0.265 0.016 258);
+    --j6n-border:    oklch(0.325 0.018 258);
+    --j6n-border-strong: oklch(0.42 0.020 258);
+    --j6n-border-interactive: oklch(0.56 0.020 258);
+    --j6n-text:      oklch(0.955 0.006 258);
+    --j6n-text-muted: oklch(0.70 0.012 258);
+    --j6n-text-invert: oklch(0.18 0.012 258);
+    --j6n-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
+    --j6n-shadow-md: 0 2px 4px oklch(0 0 0 / 0.3), 0 8px 24px oklch(0 0 0 / 0.35);
+  }
+}
+
 /* ---------- 2. Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -148,7 +234,7 @@ hr { border: 0; border-top: var(--j6n-border-width) solid var(--j6n-border); mar
 a, .j6n-link {
   color: var(--j6n-accent-strong);
   text-decoration: none;
-  border-bottom: 1px solid oklch(0.52 0.15 148 / 0.35);
+  border-bottom: 1px solid color-mix(in oklch, var(--j6n-accent) 35%, transparent);
   transition: color var(--j6n-dur-1) var(--j6n-ease), border-color var(--j6n-dur-1) var(--j6n-ease);
 }
 a:hover, .j6n-link:hover { color: var(--j6n-accent); border-bottom-color: currentColor; }
@@ -384,9 +470,13 @@ code, .j6n-code-inline {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
-/* ---------- 11. Sombre automatique (si data-theme n'est pas posé) ---------- */
+/* ---------- 11. Sombre automatique (si data-theme n'est pas posé) ----------
+   :not([data-j6n-theme='moderne']) évite un conflit de cascade avec le bloc
+   « moderne + système sombre » ci-dessus : même spécificité, donc sans cette
+   exclusion la règle qui apparaît en dernier dans le fichier gagnerait et
+   écraserait les tokens moderne par les tokens nature. */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']):not([data-theme='dark']) {
+  :root:not([data-theme='light']):not([data-theme='dark']):not([data-j6n-theme='moderne']) {
     --j6n-accent: oklch(0.80 0.19 148);
     --j6n-accent-strong: oklch(0.86 0.16 148);
     --j6n-accent-soft: oklch(0.28 0.07 148);

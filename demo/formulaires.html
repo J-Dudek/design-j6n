@@ -22,6 +22,7 @@
     </nav>
     <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme" aria-pressed="false">Thème sombre</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="variant" aria-pressed="false">Thème moderne</button>
   </header>
 
   <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
@@ -163,14 +164,6 @@
       </div>
 
       <h2>Combobox — <code>.j6n-combobox</code></h2>
-      <!--
-        role="option"/"listbox" plutôt que <option> natif : c'est le motif combobox
-        du WAI-ARIA (W3C) — filtrage libre à la frappe + liste stylée, ce qu'aucun
-        élément natif ne fait à la fois (<select> ne filtre pas, <datalist> ne se
-        stylise pas). Un linter générique du type « préfère le natif à ARIA » peut
-        le signaler ; c'est un faux positif connu sur ce motif précis, pas une
-        erreur — voir la section Accessibilité du README.
-      -->
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-field" style="max-width:360px;">
@@ -204,6 +197,17 @@
     themeBtn.addEventListener('click', () => {
       document.documentElement.dataset.theme = isDark() ? 'light' : 'dark';
       themeBtn.setAttribute('aria-pressed', String(isDark()));
+    });
+
+    const variantBtn = document.getElementById('variant');
+    function isModern() {
+      return document.documentElement.dataset.j6nTheme === 'moderne';
+    }
+    variantBtn.setAttribute('aria-pressed', String(isModern()));
+    variantBtn.addEventListener('click', () => {
+      if (isModern()) document.documentElement.removeAttribute('data-j6n-theme');
+      else document.documentElement.dataset.j6nTheme = 'moderne';
+      variantBtn.setAttribute('aria-pressed', String(isModern()));
     });
 
     // Compteur de caractères — pas un comportement générique du design system,

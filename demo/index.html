@@ -21,6 +21,7 @@
     </nav>
     <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme" aria-pressed="false">Thème sombre</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="variant" aria-pressed="false">Thème moderne</button>
   </header>
 
   <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
@@ -38,7 +39,7 @@
     <main id="contenu" class="j6n-stack">
       <p class="j6n-eyebrow">Design system</p>
       <h1>Foulée</h1>
-      <p class="j6n-muted">Un seul fichier CSS (<code>theme.css</code>) et un seul fichier JS (<code>theme.js</code>), sans dépendance ni build. Parité fonctionnelle avec les composants et contrôles du <a href="https://www.systeme-de-design.gouv.fr/" target="_blank" rel="noopener">Système de Design de l'État</a>, adaptée à la charte Foulée — nature et trail pour les couleurs, vert terminal pour l'énergie.</p>
+      <p class="j6n-muted">Un seul fichier CSS (<code>theme.css</code>) et un seul fichier JS (<code>theme.js</code>).</p>
 
       <div class="j6n-row">
         <a class="j6n-btn" href="formulaires.html">Voir les composants</a>
@@ -143,6 +144,17 @@
     themeBtn.addEventListener('click', () => {
       document.documentElement.dataset.theme = isDark() ? 'light' : 'dark';
       themeBtn.setAttribute('aria-pressed', String(isDark()));
+    });
+
+    const variantBtn = document.getElementById('variant');
+    function isModern() {
+      return document.documentElement.dataset.j6nTheme === 'moderne';
+    }
+    variantBtn.setAttribute('aria-pressed', String(isModern()));
+    variantBtn.addEventListener('click', () => {
+      if (isModern()) document.documentElement.removeAttribute('data-j6n-theme');
+      else document.documentElement.dataset.j6nTheme = 'moderne';
+      variantBtn.setAttribute('aria-pressed', String(isModern()));
     });
   </script>
 </body>
