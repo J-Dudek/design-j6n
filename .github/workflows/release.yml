@@ -1,8 +1,12 @@
 name: Release
 
 # Se déclenche sur un tag de version (ex. v1.2.0) : vérifie le projet, assemble
-# un paquet téléchargeable (theme.css + theme.js + README + LICENCE) et publie
-# une Release GitHub avec ce paquet en pièce jointe (zip + tar.gz).
+# un paquet téléchargeable (theme.css + theme.js + README + LICENCE), publie
+# une Release GitHub avec ce paquet en pièce jointe (zip + tar.gz), et publie
+# le paquet sur npm (version alignée sur le tag) via Trusted Publishing (OIDC) —
+# aucun secret npm à stocker. Le "Trusted Publisher" doit être configuré une
+# fois sur npmjs.com (package design-j6n → Settings → Trusted Publisher →
+# GitHub Actions → org "J-Dudek", repo "design-j6n", workflow "release.yml").
 on:
   push:
     tags:
@@ -18,6 +22,9 @@ jobs:
   release:
     needs: validate
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write # requis par npm Trusted Publishing (OIDC)
     steps:
       - uses: actions/checkout@v4
 
@@ -32,3 +39,13 @@ jobs:
           files: |
             ${{ env.PKG }}.zip
             ${{ env.PKG }}.tar.gz
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Publier sur npm
+        run: |
+          npm install -g npm@latest
+          npm pkg set version="${GITHUB_REF_NAME#v}"
+          npm publish --provenance

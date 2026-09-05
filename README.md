@@ -12,7 +12,13 @@ Deux thèmes visuels partagent les mêmes composants : **nature** (par défaut) 
 
 ## Installation
 
-Copier `theme.css` (styles) et `theme.js` (comportements) dans le projet. Les polices sont importées par `theme.css` lui-même.
+Via npm :
+
+```sh
+npm install design-j6n
+```
+
+Ou copier `theme.css` (styles) et `theme.js` (comportements) directement dans le projet. Les polices sont importées par `theme.css` lui-même.
 
 ### HTML statique
 
@@ -33,8 +39,8 @@ Copier `theme.css` (styles) et `theme.js` (comportements) dans le projet. Les po
 
 ```js
 // main.jsx ou index.js
-import './theme.css';
-import './theme.js';
+import 'design-j6n/theme.css'; // ou './theme.css' si copié dans le projet
+import 'design-j6n/theme.js';  // ou './theme.js'
 ```
 
 En SPA, si du contenu est injecté dynamiquement après le chargement initial (ex. un composant React monté plus tard), appeler `j6n.init(monConteneur)` pour activer les comportements sur ce sous-arbre.
