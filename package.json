@@ -1,0 +1,26 @@
+{
+  "name": "design-j6n",
+  "version": "0.1.0",
+  "description": "Design system personnel — Foulée. theme.css + theme.js, sans dépendance ni build.",
+  "main": "theme.js",
+  "style": "theme.css",
+  "files": [
+    "theme.css",
+    "theme.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "author": "J. Dudek",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/J-Dudek/design-j6n.git"
+  },
+  "homepage": "https://github.com/J-Dudek/design-j6n#readme",
+  "keywords": [
+    "design-system",
+    "css",
+    "theme",
+    "oklch"
+  ]
+}
