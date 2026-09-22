@@ -391,6 +391,18 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
 .j6n-badge--accent  { background: var(--j6n-accent-soft); color: var(--j6n-accent-strong); border-color: transparent; }
 .j6n-badge--pine    { background: var(--j6n-pine-soft); color: var(--j6n-pine); border-color: transparent; }
 .j6n-badge--solid   { background: var(--j6n-accent); color: var(--j6n-text-invert); border-color: transparent; }
+/* Variantes sémantiques : fond teinté à 14% sur la surface, texte = ton mêlé au texte
+   courant (65/35) — ≥ 5.3:1 dans les 4 combinaisons nature/moderne × clair/sombre
+   (RGAA 3.2). Le ton pur seul ne suffit pas : warning tombe à 3.4:1 sur fond clair. */
+.j6n-badge--success { --_tone: var(--j6n-success); }
+.j6n-badge--warning { --_tone: var(--j6n-warning); }
+.j6n-badge--danger  { --_tone: var(--j6n-danger); }
+.j6n-badge--info    { --_tone: var(--j6n-info); }
+.j6n-badge--success, .j6n-badge--warning, .j6n-badge--danger, .j6n-badge--info {
+  background: color-mix(in oklab, var(--_tone) 14%, var(--j6n-surface));
+  color: color-mix(in oklab, var(--_tone) 65%, var(--j6n-text));
+  border-color: transparent;
+}
 .j6n-badge__dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
 /* ---------- 8. Alertes / toasts ---------- */

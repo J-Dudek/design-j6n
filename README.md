@@ -148,7 +148,7 @@ même seuil WCAG que nature (4.5:1 texte, 3:1 frontière fonctionnelle).
 | --- | --- |
 | `.j6n-card` | `--interactive`, plus `.j6n-card__title`, `.j6n-card__meta` |
 | `.j6n-stat` | `__value`, `__unit`, `__label` — chiffres tabulaires |
-| `.j6n-badge` | `--accent` `--pine` `--solid`, plus `.j6n-badge__dot` |
+| `.j6n-badge` | `--accent` `--pine` `--solid` `--success` `--warning` `--danger` `--info`, plus `.j6n-badge__dot` |
 | `.j6n-table` | `.j6n-table-wrap`, `[data-numeric]`, `.j6n-table__sort` (tri au clic) |
 | `.j6n-quote` | citation avec `__cite` |
 | `.j6n-highlight` | mise en exergue de texte |
