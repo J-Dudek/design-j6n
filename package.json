@@ -1,6 +1,6 @@
 {
   "name": "design-j6n",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Design system personnel — Foulée. theme.css + theme.js, sans dépendance ni build.",
   "main": "theme.js",
   "style": "theme.css",
