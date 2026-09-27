@@ -318,6 +318,36 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
 .j6n-textarea { min-height: 120px; resize: vertical; line-height: var(--j6n-leading-body); }
 .j6n-input::placeholder, .j6n-textarea::placeholder { color: var(--j6n-text-muted); }
 .j6n-input:focus, .j6n-select:focus, .j6n-textarea:focus { outline: none; border-color: var(--j6n-accent); box-shadow: var(--j6n-ring); }
+/* Select : rendu natif neutralisé (iOS/Android ignorent le padding, rognent le texte et
+   imposent leur fond clair). Chevron dessiné en currentColor → suit le thème et le mode sombre. */
+.j6n-select {
+  -webkit-appearance: none; appearance: none;
+  line-height: 1.25;
+  padding-right: calc(var(--j6n-space-4) * 2 + 10px);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - var(--j6n-space-4) - 5px) 50%,
+    calc(100% - var(--j6n-space-4)) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.j6n-select::-ms-expand { display: none; }
+.j6n-select[multiple], .j6n-select[size]:not([size='1']) {
+  padding-right: var(--j6n-space-4); background-image: none; white-space: normal; overflow: auto;
+}
+/* Liste déroulante native : fond et texte explicites, sinon texte clair sur fond blanc en sombre */
+.j6n-select option, .j6n-select optgroup { background-color: var(--j6n-surface); color: var(--j6n-text); }
+.j6n-input:disabled, .j6n-select:disabled, .j6n-textarea:disabled {
+  background-color: var(--j6n-surface-2); color: var(--j6n-text-muted); cursor: not-allowed;
+}
+/* Tactile : 16px mini, sinon iOS zoome la page au focus du champ */
+@media (pointer: coarse), (max-width: 720px) {
+  .j6n-input, .j6n-select, .j6n-textarea { font-size: var(--j6n-text-md); }
+}
 .j6n-input[aria-invalid='true'] { border-color: var(--j6n-danger); }
 .j6n-check { display: inline-flex; align-items: center; gap: var(--j6n-space-3); font-size: var(--j6n-text-sm); cursor: pointer; }
 .j6n-check input { width: 18px; height: 18px; accent-color: var(--j6n-accent); }

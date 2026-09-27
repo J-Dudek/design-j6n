@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var BOUND = 'j6nBound';
+  const BOUND = 'j6nBound';
 
   function each(list, fn) { Array.prototype.forEach.call(list, fn); }
   function bind(el, key) {
@@ -38,12 +38,12 @@
   function initTabs(root) {
     each(root.querySelectorAll('[data-j6n-js="tabs"]'), function (group) {
       if (!bind(group, 'tabs')) return;
-      var tabs = Array.prototype.slice.call(group.querySelectorAll('.j6n-tabs__tab'));
-      var panels = tabs.map(function (tab) { return document.getElementById(tab.getAttribute('aria-controls')); });
+      const tabs = Array.prototype.slice.call(group.querySelectorAll('.j6n-tabs__tab'));
+      const panels = tabs.map(function (tab) { return document.getElementById(tab.getAttribute('aria-controls')); });
 
       function select(index, focus) {
         tabs.forEach(function (tab, i) {
-          var active = i === index;
+          const active = i === index;
           tab.setAttribute('aria-selected', String(active));
           tab.tabIndex = active ? 0 : -1;
           if (panels[i]) panels[i].hidden = !active;
@@ -54,8 +54,8 @@
       tabs.forEach(function (tab, i) {
         tab.addEventListener('click', function () { select(i, false); });
         tab.addEventListener('keydown', function (e) {
-          var last = tabs.length - 1;
-          var next = null;
+          const last = tabs.length - 1;
+          let next = null;
           if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = i === last ? 0 : i + 1;
           else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = i === 0 ? last : i - 1;
           else if (e.key === 'Home') next = 0;
@@ -64,7 +64,7 @@
         });
       });
 
-      var current = tabs.findIndex(function (t) { return t.getAttribute('aria-selected') === 'true'; });
+      const current = tabs.findIndex(function (t) { return t.getAttribute('aria-selected') === 'true'; });
       select(current > -1 ? current : 0, false);
     });
   }
@@ -74,7 +74,7 @@
     each(root.querySelectorAll('[data-j6n-modal-open]'), function (btn) {
       if (!bind(btn, 'modal-open')) return;
       btn.addEventListener('click', function () {
-        var dialog = document.getElementById(btn.getAttribute('data-j6n-modal-open'));
+        const dialog = document.getElementById(btn.getAttribute('data-j6n-modal-open'));
         if (dialog) dialog.showModal();
       });
     });
@@ -89,14 +89,14 @@
     });
   }
 
-  function openModal(id) { var d = document.getElementById(id); if (d) d.showModal(); }
-  function closeModal(id) { var d = document.getElementById(id); if (d) d.close(); }
+  function openModal(id) { const d = document.getElementById(id); if (d) d.showModal(); }
+  function closeModal(id) { const d = document.getElementById(id); if (d) d.close(); }
 
   /* ---------- Menus déroulants (popover natif) : positionnement ---------- */
   function placePopover(trigger, popover) {
-    var rect = trigger.getBoundingClientRect();
-    var width = popover.offsetWidth || 200;
-    var left = Math.min(rect.left, window.innerWidth - width - 8);
+    const rect = trigger.getBoundingClientRect();
+    const width = popover.offsetWidth || 200;
+    const left = Math.min(rect.left, window.innerWidth - width - 8);
     popover.style.position = 'fixed';
     popover.style.top = (rect.bottom + 6) + 'px';
     popover.style.left = Math.max(8, left) + 'px';
@@ -105,7 +105,7 @@
   function initDropdowns(root) {
     each(root.querySelectorAll('[popovertarget]'), function (trigger) {
       if (!bind(trigger, 'popover-trigger')) return;
-      var popover = document.getElementById(trigger.getAttribute('popovertarget'));
+      const popover = document.getElementById(trigger.getAttribute('popovertarget'));
       if (!popover) return;
       if (!trigger.hasAttribute('aria-haspopup')) trigger.setAttribute('aria-haspopup', 'true');
       trigger.setAttribute('aria-expanded', 'false');
@@ -113,7 +113,7 @@
       // reflète l'état ouvert/fermé sur le déclencheur — RGAA 7.3 / WCAG 4.1.2 :
       // ne pas compter uniquement sur l'exposition implicite du Popover API.
       popover.addEventListener('toggle', function (e) {
-        var open = e.newState === 'open';
+        const open = e.newState === 'open';
         trigger.setAttribute('aria-expanded', String(open));
         if (!open && popover.contains(document.activeElement)) trigger.focus();
       });
@@ -127,10 +127,10 @@
   function initCombobox(root) {
     each(root.querySelectorAll('[data-j6n-js="combobox"]'), function (wrap) {
       if (!bind(wrap, 'combobox')) return;
-      var input = wrap.querySelector('input');
-      var list = wrap.querySelector('.j6n-combobox__list');
-      var options = Array.prototype.slice.call(wrap.querySelectorAll('.j6n-combobox__option'));
-      var activeIndex = -1;
+      const input = wrap.querySelector('input');
+      const list = wrap.querySelector('.j6n-combobox__list');
+      const options = Array.prototype.slice.call(wrap.querySelectorAll('.j6n-combobox__option'));
+      let activeIndex = -1;
 
       // rôles ARIA du motif combobox — posés en JS pour rester corrects même si le
       // balisage d'origine les oublie (RGAA 7.3 / WAI-ARIA APG Combobox).
@@ -157,7 +157,7 @@
       }
       function setActive(index) {
         options.forEach(function (o) { o.classList.remove('is-active'); o.setAttribute('aria-selected', 'false'); });
-        var visible = options.filter(function (o) { return !o.hidden; });
+        const visible = options.filter(function (o) { return !o.hidden; });
         if (!visible.length) return;
         activeIndex = ((index % visible.length) + visible.length) % visible.length;
         visible[activeIndex].classList.add('is-active');
@@ -171,14 +171,14 @@
       }
 
       input.addEventListener('input', function () {
-        var q = input.value.trim().toLowerCase();
-        var any = false;
+        const q = input.value.trim().toLowerCase();
+        let any = false;
         options.forEach(function (o) {
-          var match = !q || o.textContent.toLowerCase().indexOf(q) > -1;
+          const match = !q || o.textContent.toLowerCase().indexOf(q) > -1;
           o.hidden = !match;
           if (match) any = true;
         });
-        var empty = wrap.querySelector('.j6n-combobox__empty');
+        const empty = wrap.querySelector('.j6n-combobox__empty');
         if (empty) empty.hidden = any;
         open();
       });
@@ -187,7 +187,7 @@
         if (e.key === 'ArrowDown') { e.preventDefault(); open(); setActive(activeIndex + 1); }
         else if (e.key === 'ArrowUp') { e.preventDefault(); open(); setActive(activeIndex - 1); }
         else if (e.key === 'Enter') {
-          var visible = options.filter(function (o) { return !o.hidden; });
+          const visible = options.filter(function (o) { return !o.hidden; });
           if (activeIndex > -1 && visible[activeIndex]) { e.preventDefault(); choose(visible[activeIndex]); }
         } else if (e.key === 'Escape') close();
       });
@@ -201,11 +201,11 @@
   /* ---------- Infobulle : support tactile ---------- */
   function initTooltips(root) {
     if (!bind(root === document ? document.documentElement : root, 'tooltip')) return;
-    var isTouch = matchMedia('(hover: none)').matches;
+    const isTouch = matchMedia('(hover: none)').matches;
     if (!isTouch) return;
     each(root.querySelectorAll('[data-tooltip]'), function (el) {
       el.addEventListener('click', function (e) {
-        var wasOpen = el.classList.contains('is-visible');
+        const wasOpen = el.classList.contains('is-visible');
         each(document.querySelectorAll('[data-tooltip].is-visible'), function (o) { o.classList.remove('is-visible'); });
         if (!wasOpen) { el.classList.add('is-visible'); e.stopPropagation(); }
       });
@@ -217,7 +217,7 @@
 
   /* ---------- Mot de passe : visibilité + force ---------- */
   function passwordScore(value) {
-    var score = 0;
+    let score = 0;
     if (value.length >= 8) score++;
     if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score++;
     if (/\d/.test(value)) score++;
@@ -227,16 +227,16 @@
   function initPassword(root) {
     each(root.querySelectorAll('[data-j6n-js="password"]'), function (wrap) {
       if (!bind(wrap, 'password')) return;
-      var input = wrap.querySelector('input');
-      var toggle = wrap.querySelector('[data-j6n-password-toggle]');
-      var meter = wrap.parentElement.querySelector('.j6n-password__meter');
-      var meterLabel = wrap.parentElement.querySelector('.j6n-password__meter-label');
-      var labels = ['Très faible', 'Faible', 'Correct', 'Bon', 'Excellent'];
-      var classes = ['is-weak', 'is-weak', 'is-fair', 'is-good', 'is-strong'];
+      const input = wrap.querySelector('input');
+      const toggle = wrap.querySelector('[data-j6n-password-toggle]');
+      const meter = wrap.parentElement.querySelector('.j6n-password__meter');
+      const meterLabel = wrap.parentElement.querySelector('.j6n-password__meter-label');
+      const labels = ['Très faible', 'Faible', 'Correct', 'Bon', 'Excellent'];
+      const classes = ['is-weak', 'is-weak', 'is-fair', 'is-good', 'is-strong'];
 
       if (toggle) {
         toggle.addEventListener('click', function () {
-          var showing = input.type === 'text';
+          const showing = input.type === 'text';
           input.type = showing ? 'password' : 'text';
           toggle.textContent = showing ? 'Afficher' : 'Masquer';
           toggle.setAttribute('aria-pressed', String(!showing));
@@ -244,7 +244,7 @@
       }
       if (meter) {
         input.addEventListener('input', function () {
-          var score = input.value ? passwordScore(input.value) : 0;
+          const score = input.value ? passwordScore(input.value) : 0;
           meter.className = 'j6n-password__meter ' + (input.value ? classes[score] : '');
           if (meterLabel) meterLabel.textContent = input.value ? labels[score] : '';
         });
@@ -256,10 +256,10 @@
   function initRange(root) {
     each(root.querySelectorAll('[data-j6n-js="range"]'), function (input) {
       if (!bind(input, 'range')) return;
-      var field = input.closest('.j6n-range-field');
-      var output = field ? field.querySelector('.j6n-range-field__value') : null;
+      const field = input.closest('.j6n-range-field');
+      const output = field ? field.querySelector('.j6n-range-field__value') : null;
       function update() {
-        var pct = ((input.value - input.min) / (input.max - input.min)) * 100;
+        const pct = ((input.value - input.min) / (input.max - input.min)) * 100;
         input.style.setProperty('--_fill', pct + '%');
         if (output) output.textContent = input.value + (input.dataset.unit || '');
       }
@@ -271,36 +271,36 @@
   /* ---------- Import de fichiers ---------- */
   function humanSize(bytes) {
     if (bytes < 1024) return bytes + ' o';
-    var units = ['Ko', 'Mo', 'Go'];
-    var i = -1;
+    const units = ['Ko', 'Mo', 'Go'];
+    let i = -1;
     do { bytes /= 1024; i++; } while (bytes >= 1024 && i < units.length - 1);
     return bytes.toFixed(1) + ' ' + units[i];
   }
   function initUpload(root) {
     each(root.querySelectorAll('[data-j6n-js="upload"]'), function (zone) {
       if (!bind(zone, 'upload')) return;
-      var input = zone.querySelector('input[type="file"]');
-      var list = zone.parentElement.querySelector('.j6n-upload__list') || zone.querySelector('.j6n-upload__list');
+      const input = zone.querySelector('input[type="file"]');
+      const list = zone.parentElement.querySelector('.j6n-upload__list') || zone.querySelector('.j6n-upload__list');
 
       function render(files) {
         if (!list) return;
         list.innerHTML = '';
         each(files, function (file, i) {
-          var row = document.createElement('div');
+          const row = document.createElement('div');
           row.className = 'j6n-upload__item';
-          var name = document.createElement('span');
+          const name = document.createElement('span');
           name.className = 'j6n-upload__item-name';
           name.textContent = file.name;
-          var size = document.createElement('span');
+          const size = document.createElement('span');
           size.className = 'j6n-upload__item-size';
           size.textContent = humanSize(file.size);
-          var remove = document.createElement('button');
+          const remove = document.createElement('button');
           remove.type = 'button';
           remove.className = 'j6n-close';
           remove.setAttribute('aria-label', 'Retirer ' + file.name);
           remove.textContent = '×';
           remove.addEventListener('click', function () {
-            var dt = new DataTransfer();
+            const dt = new DataTransfer();
             each(input.files, function (f, j) { if (j !== i) dt.items.add(f); });
             input.files = dt.files;
             render(input.files);
@@ -330,9 +330,9 @@
   function initDismiss(root) {
     each(root.querySelectorAll('[data-j6n-dismiss], [data-j6n-dismiss-target]'), function (btn) {
       if (!bind(btn, 'dismiss')) return;
-      var key = btn.getAttribute('data-j6n-dismiss');
-      var targetId = btn.getAttribute('data-j6n-dismiss-target');
-      var target = targetId ? document.getElementById(targetId) : btn.closest('.j6n-notice, .j6n-consent, .j6n-alert');
+      const key = btn.getAttribute('data-j6n-dismiss');
+      const targetId = btn.getAttribute('data-j6n-dismiss-target');
+      const target = targetId ? document.getElementById(targetId) : btn.closest('.j6n-notice, .j6n-consent, .j6n-alert');
       if (!target) return;
       if (key && localStorage.getItem(key)) { target.hidden = true; return; }
       btn.addEventListener('click', function () {
@@ -346,16 +346,16 @@
   function initToc(root) {
     each(root.querySelectorAll('[data-j6n-js="toc"]'), function (toc) {
       if (!bind(toc, 'toc')) return;
-      var links = Array.prototype.slice.call(toc.querySelectorAll('a[href^="#"]'));
-      var targets = links
+      const links = Array.prototype.slice.call(toc.querySelectorAll('a[href^="#"]'));
+      const targets = links
         .map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); })
         .filter(Boolean);
       if (!targets.length || !('IntersectionObserver' in window)) return;
-      var observer = new IntersectionObserver(function (entries) {
+      const observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
           links.forEach(function (a) { a.classList.remove('is-current'); });
-          var link = links[targets.indexOf(entry.target)];
+          const link = links[targets.indexOf(entry.target)];
           if (link) link.classList.add('is-current');
         });
       }, { rootMargin: '-20% 0px -70% 0px' });
@@ -367,19 +367,19 @@
   function initTableSort(root) {
     each(root.querySelectorAll('[data-j6n-js="table-sort"]'), function (table) {
       if (!bind(table, 'table-sort')) return;
-      var tbody = table.querySelector('tbody');
+      const tbody = table.querySelector('tbody');
       each(table.querySelectorAll('.j6n-table__sort'), function (btn) {
         btn.addEventListener('click', function () {
-          var th = btn.closest('th');
-          var index = Array.prototype.indexOf.call(th.parentElement.children, th);
-          var asc = th.getAttribute('aria-sort') !== 'ascending';
+          const th = btn.closest('th');
+          const index = Array.prototype.indexOf.call(th.parentElement.children, th);
+          const asc = th.getAttribute('aria-sort') !== 'ascending';
           each(table.querySelectorAll('.j6n-table__sort'), function (b) { b.closest('th').removeAttribute('aria-sort'); });
           th.setAttribute('aria-sort', asc ? 'ascending' : 'descending');
-          var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
-          var numeric = th.hasAttribute('data-numeric');
+          const rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+          const numeric = th.hasAttribute('data-numeric');
           rows.sort(function (a, b) {
-            var av = a.children[index].textContent.trim();
-            var bv = b.children[index].textContent.trim();
+            let av = a.children[index].textContent.trim();
+            let bv = b.children[index].textContent.trim();
             if (numeric) { av = parseFloat(av.replace(',', '.')) || 0; bv = parseFloat(bv.replace(',', '.')) || 0; }
             if (av < bv) return asc ? -1 : 1;
             if (av > bv) return asc ? 1 : -1;
@@ -396,7 +396,7 @@
   function initMenuToggle(root) {
     each(root.querySelectorAll('[data-j6n-js="menu-toggle"]'), function (btn) {
       if (!bind(btn, 'menu-toggle')) return;
-      var nav = btn.closest('.j6n-header').querySelector('.j6n-nav');
+      const nav = btn.closest('.j6n-header').querySelector('.j6n-nav');
       if (!nav) return;
       function set(open) {
         nav.classList.toggle('is-open', open);
@@ -425,7 +425,7 @@
   }
 
   /* ---------- Annonces discrètes pour lecteur d'écran (RGAA 7.4 / WCAG 4.1.3) ---------- */
-  var announceRegion;
+  let announceRegion;
   function announce(message) {
     if (!announceRegion) {
       announceRegion = document.createElement('div');
@@ -442,7 +442,7 @@
 
   /* ---------- Toasts ---------- */
   function toastRegion() {
-    var region = document.getElementById('j6n-toast-region');
+    let region = document.getElementById('j6n-toast-region');
     if (!region) {
       region = document.createElement('div');
       region.id = 'j6n-toast-region';
@@ -454,12 +454,12 @@
   }
   function toast(message, opts) {
     opts = opts || {};
-    var region = toastRegion();
-    var el = document.createElement('div');
+    const region = toastRegion();
+    const el = document.createElement('div');
     el.className = 'j6n-toast' + (opts.tone ? ' j6n-toast--' + opts.tone : '');
-    var text = document.createElement('span');
+    const text = document.createElement('span');
     text.textContent = message;
-    var close = document.createElement('button');
+    const close = document.createElement('button');
     close.type = 'button';
     close.className = 'j6n-toast__close';
     close.setAttribute('aria-label', 'Fermer');
@@ -481,10 +481,10 @@
   function initFieldDescriptions(root) {
     each(root.querySelectorAll('.j6n-field, .j6n-range-field'), function (field) {
       if (!bind(field, 'field-describe')) return;
-      var control = field.querySelector('input, select, textarea');
+      const control = field.querySelector('input, select, textarea');
       if (!control) return;
-      var describers = field.querySelectorAll('.j6n-hint, .j6n-field__count, .j6n-password__meter-label');
-      var ids = [];
+      const describers = field.querySelectorAll('.j6n-hint, .j6n-field__count, .j6n-password__meter-label');
+      const ids = [];
       describers.forEach(function (el, i) {
         // liés même si vides pour l'instant (ex. le score du mot de passe se remplit
         // au fil de la saisie) : la relation doit exister dès le départ.
@@ -492,7 +492,7 @@
         ids.push(el.id);
       });
       if (!ids.length) return;
-      var existing = (control.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      const existing = (control.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
       ids.forEach(function (id) { if (existing.indexOf(id) === -1) existing.push(id); });
       control.setAttribute('aria-describedby', existing.join(' '));
     });
