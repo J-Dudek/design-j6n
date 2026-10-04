@@ -131,4 +131,17 @@
   }
 
   document.querySelectorAll('.j6n-showcase[data-j6n-js="showcase"]').forEach(buildShowcase);
+
+  /* Numéro de version dans le header, lu dans package.json (servi avec la démo,
+     voir netlify.toml). Ouverte en file://, la lecture échoue : le badge reste caché. */
+  const versionBadge = document.querySelector('[data-demo-version]');
+  if (versionBadge) {
+    fetch('../package.json')
+      .then(function (res) { return res.ok ? res.json() : Promise.reject(res.status); })
+      .then(function (pkg) {
+        versionBadge.textContent = 'v' + pkg.version;
+        versionBadge.hidden = false;
+      })
+      .catch(function () {});
+  }
 })();

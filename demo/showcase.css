@@ -70,3 +70,11 @@
 
 /* Nom de classe dans un titre de section : ne pas le couper au tiret. */
 .j6n-layout h2 > code { white-space: nowrap; }
+
+/* Badge de version du header de démo, collé à la marque. */
+.j6n-demo-version { margin-left: calc(var(--j6n-space-3) - var(--j6n-space-6)); }
+.j6n-demo-version[hidden] { display: none; }
+@media (max-width: 960px) { .j6n-demo-version { margin-left: 0; } }
+/* Sous 480px, plus de place pour le badge sans faire passer le header à la ligne. */
+@media (max-width: 480px) { .j6n-demo-version:not([hidden]) { display: none; } }
+
