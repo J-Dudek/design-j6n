@@ -48,8 +48,9 @@
   --j6n-text-md:  1rem;      /* 16 */
   --j6n-text-lg:  1.25rem;   /* 20 */
   --j6n-text-xl:  1.75rem;   /* 28 */
-  --j6n-text-2xl: 2.5rem;    /* 40 */
-  --j6n-text-3xl: 3.75rem;   /* 60 */
+  /* Grands titres fluides : réduits sur petit écran pour qu'un mot ne se coupe pas. */
+  --j6n-text-2xl: clamp(1.75rem, 1.25rem + 2.5vw, 2.5rem);   /* 28 → 40 */
+  --j6n-text-3xl: clamp(2.25rem, 1.5rem + 3.5vw, 3.75rem);   /* 36 → 60 */
   --j6n-leading-tight: 1.1;
   --j6n-leading-body: 1.6;
   --j6n-tracking-tight: -0.02em;
@@ -88,6 +89,9 @@
   --j6n-dur-3: 420ms;
 
   --j6n-container: 1120px;
+
+  /* Marque */
+  --j6n-brand-logo-height: 28px;   /* hauteur du logo .j6n-brand__logo */
 }
 
 /* Palette sombre — via [data-theme="dark"] ou préférence système */
@@ -387,6 +391,9 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
 }
 .j6n-brand { display: flex; align-items: center; gap: var(--j6n-space-3); font-weight: 600; letter-spacing: var(--j6n-tracking-tight); text-decoration: none; color: var(--j6n-text); border: 0; }
 .j6n-brand__mark { width: 22px; height: 22px; border-radius: 50%; background: var(--j6n-accent); border: 4px solid var(--j6n-pine); flex: none; }
+/* Logo facultatif à la place du rond : <img class="j6n-brand__logo" src="logo.svg" alt="">.
+   Hauteur fixe (--j6n-brand-logo-height), largeur libre : logos carrés ou horizontaux. */
+.j6n-brand__logo { display: block; height: var(--j6n-brand-logo-height); width: auto; max-width: 180px; object-fit: contain; flex: none; }
 .j6n-nav { display: flex; gap: var(--j6n-space-1); margin-left: auto; }
 .j6n-nav__link {
   position: relative;
@@ -933,6 +940,7 @@ code, .j6n-code-inline {
 
 .j6n-nav__toggle { display: none; }
 @media (max-width: 960px) {
+  .j6n-header { gap: var(--j6n-space-3); }
   .j6n-nav__toggle {
     display: inline-flex; align-items: center; justify-content: center;
     width: 44px; height: 44px; margin-left: auto;

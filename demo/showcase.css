@@ -55,3 +55,18 @@
   .j6n-showcase__toolbar { justify-content: flex-start; }
   .j6n-showcase__viewport { margin-left: 0; }
 }
+
+/* Boutons de thème du header de démo : icône seule sous 960px pour que le
+   header tienne sur une ligne ; le libellé reste lu par les lecteurs d'écran. */
+.j6n-demo-switch__icon { display: none; }
+@media (max-width: 960px) {
+  .j6n-demo-switch { min-width: 44px; min-height: 44px; padding: 0; justify-content: center; }
+  .j6n-demo-switch__icon { display: inline-block; font-size: var(--j6n-text-md); }
+  .j6n-demo-switch__label {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+    white-space: nowrap; border: 0; padding: 0; margin: -1px;
+  }
+}
+
+/* Nom de classe dans un titre de section : ne pas le couper au tiret. */
+.j6n-layout h2 > code { white-space: nowrap; }

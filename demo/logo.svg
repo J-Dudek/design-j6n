@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Logo d'exemple pour la démo : remplacez-le par le vôtre. -->
+  <rect width="64" height="64" rx="14" fill="#2f6b45"/>
+  <path d="M8 50 L25 22 L34 36 L41 27 L56 50 Z" fill="#e8f3ea"/>
+  <path d="M25 22 L30 30 L27 29 L24 32 L21 28 Z" fill="#2f6b45"/>
+  <circle cx="47" cy="17" r="5" fill="#7fd19a"/>
+</svg>

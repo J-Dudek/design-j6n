@@ -129,6 +129,21 @@ même seuil WCAG que nature (4.5:1 texte, 3:1 frontière fonctionnelle).
 | `.j6n-tile` | tuile de navigation, `--horizontal` |
 | `.j6n-footer` | pied de page multi-colonnes (`__grid`, `__col`, `__bottom`) |
 
+**Logo de la marque (facultatif).** Par défaut, `.j6n-brand` affiche un rond aux couleurs du thème (`.j6n-brand__mark`). Pour utiliser votre logo, dans le header comme dans le footer, remplacez ce `<span>` par une image :
+
+```html
+<!-- Par défaut -->
+<a class="j6n-brand" href="/"><span class="j6n-brand__mark"></span> Foulée</a>
+
+<!-- Avec un logo, suivi du nom : alt vide, le texte nomme déjà le lien -->
+<a class="j6n-brand" href="/"><img class="j6n-brand__logo" src="logo.svg" alt=""> Foulée</a>
+
+<!-- Logo seul, qui contient déjà le nom : alt obligatoire -->
+<a class="j6n-brand" href="/"><img class="j6n-brand__logo" src="logo.svg" alt="Foulée — accueil"></a>
+```
+
+Le logo fait 28px de haut, avec une largeur libre (180px maximum), ce qui convient aux logos carrés comme horizontaux. Pour changer la hauteur : `--j6n-brand-logo-height: 36px;` sur `:root` ou sur un `.j6n-brand` précis.
+
 ### Retours
 
 | Classe | Variantes |
@@ -245,12 +260,17 @@ Un audit du code a été fait et corrigé sur cette base — pas seulement une r
 
 ## Publication
 
-Chaque tag `vX.Y.Z` poussé sur `master` déclenche une Release GitHub automatique (`.github/workflows/release.yml`) : le projet est d'abord vérifié (`ci.yml`, réutilisé), puis empaqueté (`theme.css` + `theme.js` + `README.md` + `LICENSE`) en `.zip` et `.tar.gz` attachés à la Release, avec des notes générées depuis les commits/PR depuis le tag précédent.
+Une version se publie de deux façons, toutes deux gérées par `.github/workflows/release.yml` :
+
+1. **Automatique** : changez `version` dans `package.json` et poussez sur `master` (push direct ou merge de PR). Si le tag `vX.Y.Z` correspondant n'existe pas encore, la CI le crée puis publie. Un push qui ne change pas la version ne publie rien.
+2. **Manuelle** : poussez vous-même un tag, comme avant.
 
 ```sh
 git tag v1.0.0
 git push origin v1.0.0
 ```
+
+Dans les deux cas, le projet est d'abord vérifié (`ci.yml`, réutilisé), puis empaqueté (`theme.css` + `theme.js` + `README.md` + `LICENSE`) en `.zip` et `.tar.gz` attachés à une Release GitHub, avec des notes générées depuis les commits/PR depuis le tag précédent, et enfin publié sur npm.
 
 - `scripts/validate.sh` — les mêmes vérifications tournent à chaque push/PR (`ci.yml`) et avant chaque release ; à lancer en local avant de taguer.
 - `scripts/package.sh` — assemble le paquet ; utilisable en local pour en vérifier le contenu (`VERSION=0.0.0-test scripts/package.sh`).

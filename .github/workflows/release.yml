@@ -1,40 +1,104 @@
 name: Release
 
-# Se déclenche sur un tag de version (ex. v1.2.0) : vérifie le projet, assemble
-# un paquet téléchargeable (theme.css + theme.js + README + LICENCE), publie
-# une Release GitHub avec ce paquet en pièce jointe (zip + tar.gz), et publie
-# le paquet sur npm (version alignée sur le tag) via Trusted Publishing (OIDC) —
-# aucun secret npm à stocker. Le "Trusted Publisher" doit être configuré une
-# fois sur npmjs.com (package design-j6n → Settings → Trusted Publisher →
-# GitHub Actions → org "J-Dudek", repo "design-j6n", workflow "release.yml").
+# Deux façons de publier une version :
+#   1. Changer "version" dans package.json et pousser sur master (push direct
+#      ou merge de PR) : si le tag vX.Y.Z n'existe pas encore, ce workflow le
+#      crée puis publie. Un push sur master sans nouvelle version ne publie rien.
+#   2. Pousser un tag vX.Y.Z à la main, comme avant.
+#
+# Tag créé et publication se font dans ce même workflow : un tag poussé avec
+# le GITHUB_TOKEN ne déclenche aucun autre workflow (règle de GitHub), et le
+# nom du fichier doit rester "release.yml" pour npm Trusted Publishing.
+#
+# Publication : vérifie le projet, assemble un paquet téléchargeable
+# (theme.css + theme.js + README + LICENCE), publie une Release GitHub avec ce
+# paquet en pièce jointe (zip + tar.gz), et publie le paquet sur npm (version
+# alignée sur le tag) via Trusted Publishing (OIDC) — aucun secret npm à
+# stocker. Le "Trusted Publisher" doit être configuré une fois sur npmjs.com
+# (package design-j6n → Settings → Trusted Publisher → GitHub Actions → org
+# "J-Dudek", repo "design-j6n", workflow "release.yml").
 on:
   push:
+    branches: [master]
+    paths: [package.json] # ignoré pour les tags : un tag poussé publie toujours
     tags:
       - 'v*.*.*'
 
 permissions:
   contents: write
 
+# Deux pushes rapprochés sur master ne doivent pas publier la même version deux fois.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      publish: ${{ steps.version.outputs.publish }}
+      create_tag: ${{ steps.version.outputs.create_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Déterminer la version à publier
+        id: version
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            echo "Tag poussé à la main : $GITHUB_REF_NAME"
+            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "create_tag=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v${VERSION}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version \"$VERSION\" invalide dans package.json (attendu X.Y.Z)."
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" > /dev/null; then
+            echo "Le tag ${TAG} existe déjà : rien à publier."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Nouvelle version ${VERSION} : le tag ${TAG} sera créé."
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+          echo "create_tag=true" >> "$GITHUB_OUTPUT"
+
   validate:
+    needs: version
+    if: needs.version.outputs.publish == 'true'
     uses: ./.github/workflows/ci.yml
 
   release:
-    needs: validate
+    needs: [version, validate]
     runs-on: ubuntu-latest
     permissions:
       contents: write
       id-token: write # requis par npm Trusted Publishing (OIDC)
+    env:
+      TAG: ${{ needs.version.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Créer le tag
+        if: needs.version.outputs.create_tag == 'true'
+        run: |
+          git tag "$TAG" "$GITHUB_SHA"
+          git push origin "$TAG"
+
       - name: Assembler le paquet
-        run: bash scripts/package.sh
+        run: VERSION="${TAG#v}" bash scripts/package.sh
 
       - name: Publier la Release GitHub
         uses: softprops/action-gh-release@v2
         with:
-          name: Foulée ${{ github.ref_name }}
+          tag_name: ${{ env.TAG }}
+          name: Foulée ${{ env.TAG }}
           generate_release_notes: true
           files: |
             ${{ env.PKG }}.zip
@@ -47,5 +111,5 @@ jobs:
       - name: Publier sur npm
         run: |
           npm install -g npm@latest
-          npm pkg set version="${GITHUB_REF_NAME#v}"
+          npm pkg set version="${TAG#v}"
           npm publish --provenance

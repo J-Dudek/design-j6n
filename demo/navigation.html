@@ -21,8 +21,8 @@
       <a class="j6n-nav__link" href="donnees.html">Données</a>
     </nav>
     <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
-    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="theme" aria-pressed="false">Thème sombre</button>
-    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm" id="variant" aria-pressed="false">Thème moderne</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="theme" aria-pressed="false"><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg><span class="j6n-demo-switch__label">Thème sombre</span></button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="variant" aria-pressed="false"><span class="j6n-demo-switch__icon" aria-hidden="true">✦</span><span class="j6n-demo-switch__label">Thème moderne</span></button>
   </header>
 
   <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
@@ -45,6 +45,7 @@
         <a href="#pagination">Pagination</a>
         <a href="#etapes">Étapes</a>
         <a href="#tuiles">Tuiles</a>
+        <a href="#marque">Marque</a>
         <a href="#pied-de-page">Pied de page</a>
       </nav>
     </aside>
@@ -164,13 +165,25 @@
         </template>
       </div>
 
+      <h2 id="marque">Marque — <code>.j6n-brand</code></h2>
+      <p>Le rond aux couleurs du thème s'affiche par défaut. Pour mettre votre logo à la place, remplacez le <code>&lt;span class="j6n-brand__mark"&gt;</code> par une <code>&lt;img class="j6n-brand__logo"&gt;</code>, dans le header comme dans le footer. Laissez <code>alt=""</code> si le nom est écrit à côté du logo ; décrivez le lien dans <code>alt</code> si le logo est seul.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div style="display:flex; flex-wrap:wrap; gap:var(--j6n-space-6); align-items:center;">
+            <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
+            <a class="j6n-brand" href="index.html"><img class="j6n-brand__logo" src="logo.svg" alt=""> Foulée</a>
+            <a class="j6n-brand" href="index.html"><img class="j6n-brand__logo" src="logo.svg" alt="Foulée — accueil"></a>
+          </div>
+        </template>
+      </div>
+
       <h2 id="pied-de-page">Pied de page — <code>.j6n-footer</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <footer class="j6n-footer" style="margin-top:0; border-top:0;">
             <div class="j6n-footer__grid">
               <div class="j6n-footer__col">
-                <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
+                <a class="j6n-brand" href="index.html"><img class="j6n-brand__logo" src="logo.svg" alt=""> Foulée</a>
               </div>
               <div class="j6n-footer__col">
                 <h4>Composants</h4>
