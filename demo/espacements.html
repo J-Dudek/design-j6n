@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Foulée — espacements</title>
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="showcase.css">
+</head>
+<body>
+  <a class="j6n-skiplink" href="#contenu">Aller au contenu</a>
+
+  <header class="j6n-header">
+    <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
+    <span class="j6n-badge j6n-demo-version" data-demo-version hidden></span>
+    <nav class="j6n-nav" aria-label="Navigation principale">
+      <a class="j6n-nav__link" href="index.html">Sommaire</a>
+      <a class="j6n-nav__link" href="actions.html">Actions</a>
+      <a class="j6n-nav__link" href="formulaires.html">Formulaires</a>
+      <a class="j6n-nav__link" href="navigation.html">Navigation</a>
+      <a class="j6n-nav__link" href="retours.html">Retours</a>
+      <a class="j6n-nav__link" href="donnees.html">Données</a>
+    </nav>
+    <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" type="button" data-demo-search aria-haspopup="dialog" hidden><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="j6n-demo-switch__label">Rechercher</span><kbd class="j6n-demo-search__kbd" aria-hidden="true">/</kbd></button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="theme" aria-pressed="false"><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg><span class="j6n-demo-switch__label">Thème sombre</span></button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="variant" aria-pressed="false"><span class="j6n-demo-switch__icon" aria-hidden="true">✦</span><span class="j6n-demo-switch__label">Thème moderne</span></button>
+  </header>
+
+  <div class="j6n-container j6n-layout j6n-py-7">
+    <aside>
+      <nav class="j6n-sidemenu" aria-label="Sections de la démo">
+        <a class="j6n-sidemenu__link" href="index.html">Sommaire</a>
+        <a class="j6n-sidemenu__link is-active" href="espacements.html" aria-current="page">Espacements</a>
+        <a class="j6n-sidemenu__link" href="actions.html">Actions</a>
+        <a class="j6n-sidemenu__link" href="formulaires.html">Formulaires</a>
+        <a class="j6n-sidemenu__link" href="navigation.html">Navigation</a>
+        <a class="j6n-sidemenu__link" href="retours.html">Retours &amp; alertes</a>
+        <a class="j6n-sidemenu__link" href="donnees.html">Données &amp; contenu</a>
+      </nav>
+    </aside>
+
+    <main id="contenu" class="j6n-stack">
+      <p class="j6n-eyebrow">Fondamentaux</p>
+      <h1>Espacements</h1>
+      <p class="j6n-muted">Marges, paddings et écarts suivent une seule échelle, la cadence : neuf pas, de 4 à 96 pixels. Les espacements s'appliquent avec des classes utilitaires dans le HTML, ou avec les variables <code>--j6n-space-*</code> dans votre CSS.</p>
+
+      <h2 id="echelle">Échelle de cadence — <code>--j6n-space-*</code></h2>
+      <p>Le chiffre du token est aussi celui des classes utilitaires : <code>--j6n-space-4</code> correspond à <code>.j6n-mt-4</code>, <code>.j6n-p-4</code>, <code>.j6n-gap-4</code>… La valeur <code>0</code> annule l'espacement et ne correspond à aucun token.</p>
+      <div class="j6n-table-wrap">
+        <table class="j6n-table">
+          <caption class="j6n-sr-only">Correspondance des tokens d'espacement</caption>
+          <thead>
+            <tr><th scope="col">Token</th><th scope="col" data-numeric>px</th><th scope="col" data-numeric>rem</th><th scope="col">Aperçu</th><th scope="col">Suffixe</th><th scope="col">Usage typique</th></tr>
+          </thead>
+          <tbody>
+              <tr><td><code>--j6n-space-1</code></td><td data-numeric>4</td><td data-numeric>0.25</td><td><span class="j6n-demo-bar j6n-demo-bar--1"></span></td><td><code>-1</code></td><td>valeur et son libellé, liens de navigation, onglets</td></tr>
+              <tr><td><code>--j6n-space-2</code></td><td data-numeric>8</td><td data-numeric>0.5</td><td><span class="j6n-demo-bar j6n-demo-bar--2"></span></td><td><code>-2</code></td><td>icône et texte, petits écarts internes</td></tr>
+              <tr><td><code>--j6n-space-3</code></td><td data-numeric>12</td><td data-numeric>0.75</td><td><span class="j6n-demo-bar j6n-demo-bar--3"></span></td><td><code>-3</code></td><td>éléments en ligne, marge sous les titres</td></tr>
+              <tr><td><code>--j6n-space-4</code></td><td data-numeric>16</td><td data-numeric>1</td><td><span class="j6n-demo-bar j6n-demo-bar--4"></span></td><td><code>-4</code></td><td>blocs empilés, marge sous les paragraphes, padding des alertes</td></tr>
+              <tr><td><code>--j6n-space-5</code></td><td data-numeric>24</td><td data-numeric>1.5</td><td><span class="j6n-demo-bar j6n-demo-bar--5"></span></td><td><code>-5</code></td><td>padding des cartes et modales, marges de la page</td></tr>
+              <tr><td><code>--j6n-space-6</code></td><td data-numeric>32</td><td data-numeric>2</td><td><span class="j6n-demo-bar j6n-demo-bar--6"></span></td><td><code>-6</code></td><td>gap du header, grandes zones</td></tr>
+              <tr><td><code>--j6n-space-7</code></td><td data-numeric>48</td><td data-numeric>3</td><td><span class="j6n-demo-bar j6n-demo-bar--7"></span></td><td><code>-7</code></td><td>séparation entre sections</td></tr>
+              <tr><td><code>--j6n-space-8</code></td><td data-numeric>64</td><td data-numeric>4</td><td><span class="j6n-demo-bar j6n-demo-bar--8"></span></td><td><code>-8</code></td><td>marge au-dessus du pied de page</td></tr>
+              <tr><td><code>--j6n-space-9</code></td><td data-numeric>96</td><td data-numeric>6</td><td><span class="j6n-demo-bar j6n-demo-bar--9"></span></td><td><code>-9</code></td><td>très grandes respirations</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="titres-paragraphes">Titres et paragraphes</h2>
+      <p>Le thème pose déjà une marge basse sur le texte. Inutile de l'ajouter ; pour la supprimer sur un dernier élément, utilisez <code>.j6n-mb-0</code>.</p>
+      <div class="j6n-table-wrap">
+        <table class="j6n-table">
+          <caption class="j6n-sr-only">Marges par défaut du texte</caption>
+          <thead><tr><th scope="col">Élément</th><th scope="col">Marge basse</th><th scope="col" data-numeric>px</th></tr></thead>
+          <tbody>
+            <tr><td>Titres <code>h1</code> à <code>h4</code></td><td><code>--j6n-space-3</code></td><td data-numeric>12</td></tr>
+            <tr><td>Paragraphes <code>p</code> (68 caractères de large au maximum)</td><td><code>--j6n-space-4</code></td><td data-numeric>16</td></tr>
+            <tr><td>Séparateur <code>hr</code> (haut et bas)</td><td><code>--j6n-space-7</code></td><td data-numeric>48</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="regles-utilisation">Règles d'utilisation</h2>
+      <div class="j6n-grid">
+        <article class="j6n-card">
+          <h3 class="j6n-card__title">Créer des relations</h3>
+          <p class="j6n-mb-0">Un petit écart (1 à 3) signale que des éléments vont ensemble : un libellé et son champ, les boutons d'un groupe. Un grand écart (6 à 9) isole un élément du reste de la page.</p>
+        </article>
+        <article class="j6n-card">
+          <h3 class="j6n-card__title">Créer une hiérarchie</h3>
+          <p class="j6n-mb-0">Plus d'espace autour d'un élément le met en avant. Gardez l'écart entre sections (7) plus grand que l'écart à l'intérieur d'une section (4 à 5).</p>
+        </article>
+        <article class="j6n-card">
+          <h3 class="j6n-card__title">Rester sur l'échelle</h3>
+          <p class="j6n-mb-0">Pas de valeur en pixels écrite à la main : une classe utilitaire ou un token <code>--j6n-space-*</code>. Si aucun pas ne convient, prenez le plus proche.</p>
+        </article>
+      </div>
+
+      <h2 id="classes-utilitaires">Classes utilitaires — <code>.j6n-m-*</code> <code>.j6n-p-*</code></h2>
+      <p>Une classe se compose de la propriété, de la direction (facultative) et de la valeur : <code>.j6n-</code> + <code>m</code> + <code>t</code> + <code>-4</code> donne <code>.j6n-mt-4</code>, une marge haute de 16px.</p>
+
+      <h3>Propriété</h3>
+      <div class="j6n-table-wrap">
+        <table class="j6n-table">
+          <caption class="j6n-sr-only">Nomenclature des propriétés</caption>
+          <thead><tr><th scope="col">Propriété</th><th scope="col">Préfixe</th><th scope="col">Exemple</th></tr></thead>
+          <tbody>
+            <tr><td>Marge externe (<code>margin</code>)</td><td><code>m</code></td><td><code>.j6n-m-2</code> : marge de 8px sur les quatre côtés</td></tr>
+            <tr><td>Marge interne (<code>padding</code>)</td><td><code>p</code></td><td><code>.j6n-p-2</code> : padding de 8px sur les quatre côtés</td></tr>
+            <tr><td>Écart entre enfants (<code>gap</code>)</td><td><code>gap</code></td><td><code>.j6n-gap-2</code> : 8px entre les enfants d'un flex ou d'une grille</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Direction</h3>
+      <div class="j6n-table-wrap">
+        <table class="j6n-table">
+          <caption class="j6n-sr-only">Nomenclature des directions</caption>
+          <thead><tr><th scope="col">Direction</th><th scope="col">Lettre</th><th scope="col">Exemple</th></tr></thead>
+          <tbody>
+            <tr><td>Les quatre côtés</td><td>(aucune)</td><td><code>.j6n-m-1</code>, <code>.j6n-p-1</code></td></tr>
+            <tr><td>Haut</td><td><code>t</code></td><td><code>.j6n-mt-1</code>, <code>.j6n-pt-1</code></td></tr>
+            <tr><td>Bas</td><td><code>b</code></td><td><code>.j6n-mb-1</code>, <code>.j6n-pb-1</code></td></tr>
+            <tr><td>Gauche</td><td><code>l</code></td><td><code>.j6n-ml-1</code>, <code>.j6n-pl-1</code></td></tr>
+            <tr><td>Droite</td><td><code>r</code></td><td><code>.j6n-mr-1</code>, <code>.j6n-pr-1</code></td></tr>
+            <tr><td>Gauche + droite</td><td><code>x</code></td><td><code>.j6n-mx-1</code>, <code>.j6n-px-1</code></td></tr>
+            <tr><td>Haut + bas</td><td><code>y</code></td><td><code>.j6n-my-1</code>, <code>.j6n-py-1</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Valeur</h3>
+      <div class="j6n-table-wrap">
+        <table class="j6n-table">
+          <caption class="j6n-sr-only">Nomenclature des valeurs</caption>
+          <thead><tr><th scope="col">Valeur</th><th scope="col">Suffixe</th><th scope="col">Exemple</th></tr></thead>
+          <tbody>
+            <tr><td>Un pas de l'échelle</td><td><code>-1</code> à <code>-9</code></td><td><code>.j6n-pb-5</code> : padding bas de 24px</td></tr>
+            <tr><td>Nulle</td><td><code>-0</code></td><td><code>.j6n-mt-0</code> : supprime la marge haute (d'un titre, d'un composant)</td></tr>
+            <tr><td>Automatique (marges uniquement)</td><td><code>-auto</code></td><td><code>.j6n-ml-auto</code> : pousse l'élément à droite dans un flex ; <code>.j6n-mx-auto</code> : centre un bloc</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="j6n-hint">Les utilitaires sont déclarés en fin de <code>theme.css</code> : ils remplacent l'espacement par défaut d'un composant, par exemple <code>&lt;footer class="j6n-footer j6n-mt-0"&gt;</code>.</p>
+
+      <h2 id="marge-padding">Marge et padding</h2>
+      <p>La marge (<code>m</code>) éloigne l'élément de ses voisins, à l'extérieur de sa bordure. Le padding (<code>p</code>) éloigne le contenu de la bordure, à l'intérieur. Légende : <span class="j6n-demo-key j6n-demo-key--margin"></span> marge, <span class="j6n-demo-key j6n-demo-key--padding"></span> padding, <span class="j6n-demo-key j6n-demo-key--content"></span> contenu.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-grid j6n-demo-grid">
+            <div class="j6n-demo-outer">
+              <div class="j6n-demo-box j6n-m-5"><div class="j6n-demo-content">j6n-m-5</div></div>
+            </div>
+            <div class="j6n-demo-outer">
+              <div class="j6n-demo-box j6n-p-5"><div class="j6n-demo-content">j6n-p-5</div></div>
+            </div>
+            <div class="j6n-demo-outer">
+              <div class="j6n-demo-box j6n-m-5 j6n-p-5"><div class="j6n-demo-content">j6n-m-5 j6n-p-5</div></div>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="directions">Directions</h2>
+      <p>La même valeur (<code>-5</code>, 24px) appliquée à chaque direction.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-grid j6n-demo-grid">
+            <div class="j6n-demo-outer"><div class="j6n-demo-box j6n-mt-5"><div class="j6n-demo-content">j6n-mt-5</div></div></div>
+            <div class="j6n-demo-outer"><div class="j6n-demo-box j6n-mb-5"><div class="j6n-demo-content">j6n-mb-5</div></div></div>
+            <div class="j6n-demo-outer"><div class="j6n-demo-box j6n-ml-5"><div class="j6n-demo-content">j6n-ml-5</div></div></div>
+            <div class="j6n-demo-outer"><div class="j6n-demo-box j6n-mr-5"><div class="j6n-demo-content">j6n-mr-5</div></div></div>
+            <div class="j6n-demo-outer"><div class="j6n-demo-box j6n-mx-5"><div class="j6n-demo-content">j6n-mx-5</div></div></div>
+            <div class="j6n-demo-outer"><div class="j6n-demo-box j6n-my-5"><div class="j6n-demo-content">j6n-my-5</div></div></div>
+            <div class="j6n-demo-outer"><div class="j6n-demo-box j6n-pt-5"><div class="j6n-demo-content">j6n-pt-5</div></div></div>
+            <div class="j6n-demo-outer"><div class="j6n-demo-box j6n-pl-5"><div class="j6n-demo-content">j6n-pl-5</div></div></div>
+            <div class="j6n-demo-outer"><div class="j6n-demo-box j6n-py-5"><div class="j6n-demo-content">j6n-py-5</div></div></div>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="ecart">Écart entre éléments — <code>.j6n-gap-*</code></h2>
+      <p>Dans un conteneur flex ou grille, <code>gap</code> espace les enfants sans marge sur chacun d'eux.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-stack">
+            <div class="j6n-row j6n-gap-1"><span class="j6n-badge">gap-1</span><span class="j6n-badge">4px</span><span class="j6n-badge">entre</span><span class="j6n-badge">chaque</span></div>
+            <div class="j6n-row j6n-gap-4"><span class="j6n-badge">gap-4</span><span class="j6n-badge">16px</span><span class="j6n-badge">entre</span><span class="j6n-badge">chaque</span></div>
+            <div class="j6n-row j6n-gap-7"><span class="j6n-badge">gap-7</span><span class="j6n-badge">48px</span><span class="j6n-badge">entre</span><span class="j6n-badge">chaque</span></div>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="pousser-centrer">Pousser et centrer — <code>.j6n-ml-auto</code> <code>.j6n-mx-auto</code></h2>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-row">
+            <button class="j6n-btn j6n-btn--secondary">Annuler</button>
+            <button class="j6n-btn j6n-ml-auto">Enregistrer</button>
+          </div>
+          <div class="j6n-demo-outer j6n-mt-5">
+            <div class="j6n-demo-box j6n-demo-box--narrow j6n-mx-auto"><div class="j6n-demo-content">j6n-mx-auto</div></div>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="mise-en-page">Espacements des classes de mise en page</h2>
+      <p>Ces classes portent leur propre écart. Pour le changer à un endroit, ajoutez un utilitaire : <code>&lt;div class="j6n-stack j6n-gap-2"&gt;</code>.</p>
+      <div class="j6n-table-wrap">
+        <table class="j6n-table">
+          <caption class="j6n-sr-only">Écarts par défaut des classes de mise en page</caption>
+          <thead><tr><th scope="col">Classe</th><th scope="col">Rôle</th><th scope="col">Espacement par défaut</th></tr></thead>
+          <tbody>
+            <tr><td><code>.j6n-container</code></td><td>centre le contenu (1120px maximum)</td><td>marges gauche et droite <code>--j6n-space-5</code> (24px)</td></tr>
+            <tr><td><code>.j6n-stack</code></td><td>empile verticalement</td><td>gap <code>--j6n-space-4</code> (16px)</td></tr>
+            <tr><td><code>.j6n-row</code></td><td>aligne horizontalement, passe à la ligne</td><td>gap <code>--j6n-space-3</code> (12px)</td></tr>
+            <tr><td><code>.j6n-grid</code></td><td>grille de colonnes de 260px minimum</td><td>gap <code>--j6n-space-5</code> (24px)</td></tr>
+            <tr><td><code>.j6n-layout</code></td><td>sommaire latéral + contenu</td><td>gap <code>--j6n-space-7</code> (48px)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="dans-votre-css">Dans votre CSS</h2>
+      <p>Pour un composant à vous, utilisez directement les variables plutôt qu'une suite de classes.</p>
+      <pre class="j6n-pre"><code><span class="tok-key">.ma-carte</span> {
+  padding: var(--j6n-space-5);
+  margin-bottom: var(--j6n-space-4);
+  display: flex;
+  gap: var(--j6n-space-3);
+}</code></pre>
+    </main>
+  </div>
+
+  <script src="showcase.js"></script>
+  <script src="../theme.js"></script>
+  <script>
+    const themeBtn = document.getElementById('theme');
+    function isDark() {
+      return document.documentElement.dataset.theme === 'dark' ||
+        (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+    themeBtn.setAttribute('aria-pressed', String(isDark()));
+    themeBtn.addEventListener('click', () => {
+      document.documentElement.dataset.theme = isDark() ? 'light' : 'dark';
+      themeBtn.setAttribute('aria-pressed', String(isDark()));
+    });
+
+    const variantBtn = document.getElementById('variant');
+    function isModern() {
+      return document.documentElement.dataset.j6nTheme === 'moderne';
+    }
+    variantBtn.setAttribute('aria-pressed', String(isModern()));
+    variantBtn.addEventListener('click', () => {
+      if (isModern()) document.documentElement.removeAttribute('data-j6n-theme');
+      else document.documentElement.dataset.j6nTheme = 'moderne';
+      variantBtn.setAttribute('aria-pressed', String(isModern()));
+    });
+  </script>
+</body>
+</html>

@@ -147,7 +147,7 @@
 
   /* ---------- Recherche de composant (bouton du header) ----------
      L'index est construit en lisant les titres de section (h2[id]) des pages
-     listées dans la navigation du header : rien à maintenir à la main.
+     listées dans le menu latéral : rien à maintenir à la main.
      Ouverte en file://, la lecture des pages échoue : le bouton reste caché. */
   const searchBtn = document.querySelector('[data-demo-search]');
   if (searchBtn) initSearch(searchBtn);
@@ -158,7 +158,7 @@
 
   function initSearch(btn) {
     const pages = Array.prototype.map.call(
-      document.querySelectorAll('.j6n-header .j6n-nav a[href]'),
+      document.querySelectorAll('aside .j6n-sidemenu a[href]:not([href^="#"])'),
       function (a) { return a.getAttribute('href'); }
     );
 
@@ -170,9 +170,10 @@
           const h1 = doc.querySelector('main h1');
           const pageTitle = h1 ? h1.textContent.trim() : href;
           return Array.prototype.map.call(doc.querySelectorAll('main h2[id]'), function (h2) {
-            const code = h2.querySelector('code');
             const title = h2.textContent.split(' — ')[0].trim();
-            const cls = code ? code.textContent.trim() : '';
+            const cls = Array.prototype.map.call(h2.querySelectorAll('code'), function (c) {
+              return c.textContent.trim();
+            }).join(' ');
             return {
               title: title, cls: cls, page: pageTitle, href: href + '#' + h2.id,
               haystack: normalize(title + ' ' + cls + ' ' + pageTitle)

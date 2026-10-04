@@ -1134,9 +1134,11 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 
 /* ---------- 20. Utilitaires d'espacement ----------
    Calqués sur l'échelle de cadence : le chiffre est celui du token
-   (.j6n-mt-4 = margin-top: var(--j6n-space-4)), 0 annule l'espacement.
-   x = inline (gauche/droite), y = block (haut/bas). Placés en fin de
-   fichier pour l'emporter sur l'espacement par défaut d'un composant. */
+   (.j6n-mt-4 = margin-top: var(--j6n-space-4)), 0 annule l'espacement,
+   auto (marges seulement) pousse l'élément. Directions : t (haut), b (bas),
+   l (gauche), r (droite), x (gauche + droite), y (haut + bas).
+   Placés en fin de fichier pour l'emporter sur l'espacement par défaut d'un
+   composant. Documentation : demo/espacements.html. */
 .j6n-m-0 { margin: 0; }
 .j6n-m-1 { margin: var(--j6n-space-1); }
 .j6n-m-2 { margin: var(--j6n-space-2); }
@@ -1147,6 +1149,7 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 .j6n-m-7 { margin: var(--j6n-space-7); }
 .j6n-m-8 { margin: var(--j6n-space-8); }
 .j6n-m-9 { margin: var(--j6n-space-9); }
+.j6n-m-auto { margin: auto; }
 
 .j6n-mt-0 { margin-top: 0; }
 .j6n-mt-1 { margin-top: var(--j6n-space-1); }
@@ -1158,6 +1161,7 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 .j6n-mt-7 { margin-top: var(--j6n-space-7); }
 .j6n-mt-8 { margin-top: var(--j6n-space-8); }
 .j6n-mt-9 { margin-top: var(--j6n-space-9); }
+.j6n-mt-auto { margin-top: auto; }
 
 .j6n-mb-0 { margin-bottom: 0; }
 .j6n-mb-1 { margin-bottom: var(--j6n-space-1); }
@@ -1169,6 +1173,31 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 .j6n-mb-7 { margin-bottom: var(--j6n-space-7); }
 .j6n-mb-8 { margin-bottom: var(--j6n-space-8); }
 .j6n-mb-9 { margin-bottom: var(--j6n-space-9); }
+.j6n-mb-auto { margin-bottom: auto; }
+
+.j6n-ml-0 { margin-left: 0; }
+.j6n-ml-1 { margin-left: var(--j6n-space-1); }
+.j6n-ml-2 { margin-left: var(--j6n-space-2); }
+.j6n-ml-3 { margin-left: var(--j6n-space-3); }
+.j6n-ml-4 { margin-left: var(--j6n-space-4); }
+.j6n-ml-5 { margin-left: var(--j6n-space-5); }
+.j6n-ml-6 { margin-left: var(--j6n-space-6); }
+.j6n-ml-7 { margin-left: var(--j6n-space-7); }
+.j6n-ml-8 { margin-left: var(--j6n-space-8); }
+.j6n-ml-9 { margin-left: var(--j6n-space-9); }
+.j6n-ml-auto { margin-left: auto; }
+
+.j6n-mr-0 { margin-right: 0; }
+.j6n-mr-1 { margin-right: var(--j6n-space-1); }
+.j6n-mr-2 { margin-right: var(--j6n-space-2); }
+.j6n-mr-3 { margin-right: var(--j6n-space-3); }
+.j6n-mr-4 { margin-right: var(--j6n-space-4); }
+.j6n-mr-5 { margin-right: var(--j6n-space-5); }
+.j6n-mr-6 { margin-right: var(--j6n-space-6); }
+.j6n-mr-7 { margin-right: var(--j6n-space-7); }
+.j6n-mr-8 { margin-right: var(--j6n-space-8); }
+.j6n-mr-9 { margin-right: var(--j6n-space-9); }
+.j6n-mr-auto { margin-right: auto; }
 
 .j6n-mx-0 { margin-inline: 0; }
 .j6n-mx-1 { margin-inline: var(--j6n-space-1); }
@@ -1192,6 +1221,7 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 .j6n-my-7 { margin-block: var(--j6n-space-7); }
 .j6n-my-8 { margin-block: var(--j6n-space-8); }
 .j6n-my-9 { margin-block: var(--j6n-space-9); }
+.j6n-my-auto { margin-block: auto; }
 
 .j6n-p-0 { padding: 0; }
 .j6n-p-1 { padding: var(--j6n-space-1); }
@@ -1225,6 +1255,28 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 .j6n-pb-7 { padding-bottom: var(--j6n-space-7); }
 .j6n-pb-8 { padding-bottom: var(--j6n-space-8); }
 .j6n-pb-9 { padding-bottom: var(--j6n-space-9); }
+
+.j6n-pl-0 { padding-left: 0; }
+.j6n-pl-1 { padding-left: var(--j6n-space-1); }
+.j6n-pl-2 { padding-left: var(--j6n-space-2); }
+.j6n-pl-3 { padding-left: var(--j6n-space-3); }
+.j6n-pl-4 { padding-left: var(--j6n-space-4); }
+.j6n-pl-5 { padding-left: var(--j6n-space-5); }
+.j6n-pl-6 { padding-left: var(--j6n-space-6); }
+.j6n-pl-7 { padding-left: var(--j6n-space-7); }
+.j6n-pl-8 { padding-left: var(--j6n-space-8); }
+.j6n-pl-9 { padding-left: var(--j6n-space-9); }
+
+.j6n-pr-0 { padding-right: 0; }
+.j6n-pr-1 { padding-right: var(--j6n-space-1); }
+.j6n-pr-2 { padding-right: var(--j6n-space-2); }
+.j6n-pr-3 { padding-right: var(--j6n-space-3); }
+.j6n-pr-4 { padding-right: var(--j6n-space-4); }
+.j6n-pr-5 { padding-right: var(--j6n-space-5); }
+.j6n-pr-6 { padding-right: var(--j6n-space-6); }
+.j6n-pr-7 { padding-right: var(--j6n-space-7); }
+.j6n-pr-8 { padding-right: var(--j6n-space-8); }
+.j6n-pr-9 { padding-right: var(--j6n-space-9); }
 
 .j6n-px-0 { padding-inline: 0; }
 .j6n-px-1 { padding-inline: var(--j6n-space-1); }

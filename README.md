@@ -107,15 +107,17 @@ Tous les espacements passent par l'échelle de cadence : en classes utilitaires 
 
 ### Classes utilitaires
 
-Le chiffre de la classe est celui du token : `.j6n-mt-4` applique `margin-top: var(--j6n-space-4)`. Chaque classe existe de `0` (annule l'espacement) à `9`.
+Le chiffre de la classe est celui du token : `.j6n-mt-4` applique `margin-top: var(--j6n-space-4)`. Chaque classe existe de `0` (annule l'espacement) à `9`, plus `auto` pour les marges. La documentation complète, avec démonstrations visuelles, est dans `demo/espacements.html`.
 
 | Préfixe | Propriété |
 | --- | --- |
 | `.j6n-m-*` | `margin` (les quatre côtés) |
 | `.j6n-mt-*` / `.j6n-mb-*` | `margin-top` / `margin-bottom` |
+| `.j6n-ml-*` / `.j6n-mr-*` | `margin-left` / `margin-right` (`.j6n-ml-auto` pousse à droite dans un flex) |
 | `.j6n-mx-*` / `.j6n-my-*` | marges gauche + droite / haut + bas (`.j6n-mx-auto` pour centrer) |
 | `.j6n-p-*` | `padding` (les quatre côtés) |
 | `.j6n-pt-*` / `.j6n-pb-*` | `padding-top` / `padding-bottom` |
+| `.j6n-pl-*` / `.j6n-pr-*` | `padding-left` / `padding-right` |
 | `.j6n-px-*` / `.j6n-py-*` | padding gauche + droite / haut + bas |
 | `.j6n-gap-*` | `gap` (écart entre les enfants d'un flex ou d'une grille) |
 
@@ -276,11 +278,12 @@ API publique : `j6n.init(root)` (réactiver un sous-arbre injecté dynamiquement
 </main>
 ```
 
-`demo/` couvre l'ensemble des composants sur six pages, à ouvrir directement dans un navigateur (aucun serveur requis) :
+`demo/` couvre l'ensemble des composants sur sept pages, à ouvrir directement dans un navigateur (aucun serveur requis) :
 
 | Page | Contenu |
 | --- | --- |
 | `demo/index.html` | sommaire, tokens, règles |
+| `demo/espacements.html` | échelle de cadence, marges par défaut, classes utilitaires d'espacement avec démonstrations |
 | `demo/actions.html` | boutons, contrôle segmenté, interrupteur, étiquettes |
 | `demo/formulaires.html` | champs, recherche, mot de passe, curseur, import, combobox |
 | `demo/navigation.html` | fil d'Ariane, onglets, menu déroulant, pagination, étapes, tuiles, pied de page |

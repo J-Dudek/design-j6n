@@ -97,8 +97,9 @@
 /* Sous 360px, le bouton de variante de thème cède sa place à la recherche. */
 @media (max-width: 360px) { #variant { display: none; } }
 
-/* Nom de classe dans un titre de section : ne pas le couper au tiret. */
-.j6n-layout h2 > code { white-space: nowrap; }
+/* Nom de classe ou de token dans un titre ou un tableau : ne pas le couper au tiret. */
+.j6n-layout h2 > code,
+.j6n-layout .j6n-table code { white-space: nowrap; }
 
 /* ---------- Fenêtre de recherche (<dialog> créé par showcase.js) ---------- */
 dialog.j6n-demo-search { max-width: 560px; margin-top: 10vh; }
@@ -112,3 +113,37 @@ dialog.j6n-demo-search { max-width: 560px; margin-top: 10vh; }
 
 /* Titre de section atteint par la recherche ou le sommaire : pas caché sous le header collant. */
 main h2[id] { scroll-margin-top: 84px; }
+
+/* ---------- Page Espacements : visualisation des marges et paddings ----------
+   Comme l'inspecteur du navigateur : fond rayé = marge, accent = padding,
+   surface = contenu. */
+.j6n-demo-outer {
+  display: flow-root; /* empêche la marge de l'enfant de traverser le conteneur */
+  background: var(--j6n-surface-2);
+  border: var(--j6n-border-width) dashed var(--j6n-border-interactive);
+  border-radius: var(--j6n-radius-sm);
+}
+/* Chaque démonstration garde sa hauteur propre : sans ça, la grille étire les
+   boîtes d'une même rangée et fait croire à une marge qui n'existe pas. */
+.j6n-demo-grid { align-items: start; }
+.j6n-demo-box { background: var(--j6n-accent-soft); border-radius: var(--j6n-radius-sm); }
+.j6n-demo-box--narrow { width: 50%; }
+.j6n-demo-content {
+  padding: var(--j6n-space-2) var(--j6n-space-3); text-align: center;
+  font-family: var(--j6n-font-mono), monospace; font-size: var(--j6n-text-xs);
+  background: var(--j6n-surface); border: var(--j6n-border-width) solid var(--j6n-border); border-radius: var(--j6n-radius-sm);
+}
+.j6n-demo-key { display: inline-block; width: 12px; height: 12px; vertical-align: -1px; border-radius: 2px; border: var(--j6n-border-width) solid var(--j6n-border-interactive); }
+.j6n-demo-key--margin { background: var(--j6n-surface-2); border-style: dashed; }
+.j6n-demo-key--padding { background: var(--j6n-accent-soft); }
+.j6n-demo-key--content { background: var(--j6n-surface); }
+.j6n-demo-bar { display: block; height: 12px; background: var(--j6n-pine); border-radius: 2px; }
+.j6n-demo-bar--1 { width: var(--j6n-space-1); }
+.j6n-demo-bar--2 { width: var(--j6n-space-2); }
+.j6n-demo-bar--3 { width: var(--j6n-space-3); }
+.j6n-demo-bar--4 { width: var(--j6n-space-4); }
+.j6n-demo-bar--5 { width: var(--j6n-space-5); }
+.j6n-demo-bar--6 { width: var(--j6n-space-6); }
+.j6n-demo-bar--7 { width: var(--j6n-space-7); }
+.j6n-demo-bar--8 { width: var(--j6n-space-8); }
+.j6n-demo-bar--9 { width: var(--j6n-space-9); }
