@@ -25,7 +25,7 @@
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="variant" aria-pressed="false"><span class="j6n-demo-switch__icon" aria-hidden="true">✦</span><span class="j6n-demo-switch__label">Thème moderne</span></button>
   </header>
 
-  <div class="j6n-container j6n-layout" style="padding-block: var(--j6n-space-7);">
+  <div class="j6n-container j6n-layout j6n-py-7">
     <aside>
       <nav class="j6n-sidemenu" aria-label="Sections de la démo">
         <a class="j6n-sidemenu__link" href="index.html">Sommaire</a>
@@ -35,9 +35,9 @@
         <a class="j6n-sidemenu__link" href="retours.html">Retours &amp; alertes</a>
         <a class="j6n-sidemenu__link" href="donnees.html">Données &amp; contenu</a>
       </nav>
-      <p class="j6n-hint" style="margin-top: var(--j6n-space-5); max-width: 200px;">Cette colonne est elle-même un <code>.j6n-sidemenu</code>. Le lien d'évitement en haut de page est un <code>.j6n-skiplink</code> — appuie sur Tab au chargement pour le voir apparaître.</p>
+      <p class="j6n-hint j6n-mt-5" style="max-width: 200px;">Cette colonne est elle-même un <code>.j6n-sidemenu</code>. Le lien d'évitement en haut de page est un <code>.j6n-skiplink</code> — appuie sur Tab au chargement pour le voir apparaître.</p>
 
-      <p class="j6n-eyebrow" style="margin-top: var(--j6n-space-6);">Sommaire</p>
+      <p class="j6n-eyebrow j6n-mt-6">Sommaire</p>
       <nav class="j6n-toc" data-j6n-js="toc" aria-label="Sur cette page">
         <a href="#fil-ariane">Fil d'Ariane</a>
         <a href="#onglets">Onglets</a>
@@ -169,7 +169,7 @@
       <p>Le rond aux couleurs du thème s'affiche par défaut. Pour mettre votre logo à la place, remplacez le <code>&lt;span class="j6n-brand__mark"&gt;</code> par une <code>&lt;img class="j6n-brand__logo"&gt;</code>, dans le header comme dans le footer. Laissez <code>alt=""</code> si le nom est écrit à côté du logo ; décrivez le lien dans <code>alt</code> si le logo est seul.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
-          <div style="display:flex; flex-wrap:wrap; gap:var(--j6n-space-6); align-items:center;">
+          <div class="j6n-row j6n-gap-6">
             <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
             <a class="j6n-brand" href="index.html"><img class="j6n-brand__logo" src="logo.svg" alt=""> Foulée</a>
             <a class="j6n-brand" href="index.html"><img class="j6n-brand__logo" src="logo.svg" alt="Foulée — accueil"></a>
@@ -180,7 +180,7 @@
       <h2 id="pied-de-page">Pied de page — <code>.j6n-footer</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
-          <footer class="j6n-footer" style="margin-top:0; border-top:0;">
+          <footer class="j6n-footer j6n-mt-0" style="border-top:0;">
             <div class="j6n-footer__grid">
               <div class="j6n-footer__col">
                 <a class="j6n-brand" href="index.html"><img class="j6n-brand__logo" src="logo.svg" alt=""> Foulée</a>

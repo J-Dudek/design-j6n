@@ -89,6 +89,64 @@ même seuil WCAG que nature (4.5:1 texte, 3:1 frontière fonctionnelle).
 | Élévation | `--j6n-shadow-sm`, `--j6n-shadow-md`, `--j6n-ring` |
 | Mouvement | `--j6n-ease`, `--j6n-dur-1` (120ms) · `-2` (220ms) · `-3` (420ms) |
 
+## Espacements (padding, margin, gap)
+
+Tous les espacements passent par l'échelle de cadence : en classes utilitaires directement dans le HTML, ou en variables dans votre CSS.
+
+| Token | Valeur | Usage typique dans le thème |
+| --- | --- | --- |
+| `--j6n-space-1` | 4px | écart entre une valeur et son libellé, entre les liens de navigation ou les onglets |
+| `--j6n-space-2` | 8px | petits écarts internes : icône et texte, padding vertical des petits éléments |
+| `--j6n-space-3` | 12px | écart entre éléments en ligne (`.j6n-row`), marge sous les titres, gap du header sur mobile |
+| `--j6n-space-4` | 16px | écart entre blocs empilés (`.j6n-stack`), marge sous les paragraphes, padding des alertes |
+| `--j6n-space-5` | 24px | marges latérales de `.j6n-container`, padding des cartes et des modales, gap de `.j6n-grid` |
+| `--j6n-space-6` | 32px | gap du header sur ordinateur, padding des grandes zones (import de fichiers) |
+| `--j6n-space-7` | 48px | séparation entre sections : gap de `.j6n-layout`, marges de `<hr>`, padding du footer |
+| `--j6n-space-8` | 64px | marge au-dessus du footer, grands blocs de page |
+| `--j6n-space-9` | 96px | réservé aux très grandes respirations (sections de page d'accueil) |
+
+### Classes utilitaires
+
+Le chiffre de la classe est celui du token : `.j6n-mt-4` applique `margin-top: var(--j6n-space-4)`. Chaque classe existe de `0` (annule l'espacement) à `9`.
+
+| Préfixe | Propriété |
+| --- | --- |
+| `.j6n-m-*` | `margin` (les quatre côtés) |
+| `.j6n-mt-*` / `.j6n-mb-*` | `margin-top` / `margin-bottom` |
+| `.j6n-mx-*` / `.j6n-my-*` | marges gauche + droite / haut + bas (`.j6n-mx-auto` pour centrer) |
+| `.j6n-p-*` | `padding` (les quatre côtés) |
+| `.j6n-pt-*` / `.j6n-pb-*` | `padding-top` / `padding-bottom` |
+| `.j6n-px-*` / `.j6n-py-*` | padding gauche + droite / haut + bas |
+| `.j6n-gap-*` | `gap` (écart entre les enfants d'un flex ou d'une grille) |
+
+```html
+<section class="j6n-py-7">
+  <h2 class="j6n-mb-5">Dernières sorties</h2>
+  <div class="j6n-row j6n-gap-5">…</div>
+  <p class="j6n-muted j6n-mt-3 j6n-mb-0">Mis à jour ce matin</p>
+</section>
+```
+
+Les utilitaires sont déclarés en fin de `theme.css` : ils remplacent l'espacement par défaut d'un composant (`.j6n-row j6n-gap-5`, `.j6n-footer j6n-mt-0`).
+
+### Dans votre CSS
+
+```css
+.ma-carte {
+  padding: var(--j6n-space-5);
+  margin-bottom: var(--j6n-space-4);
+  display: flex;
+  gap: var(--j6n-space-3);
+}
+```
+
+**Espacements déjà fournis par le thème :**
+- `h1` à `h4` ont une marge basse de `--j6n-space-3`, les `<p>` de `--j6n-space-4` (et une largeur maximale de 68 caractères) ;
+- les classes de mise en page portent leur propre écart : `.j6n-stack` (vertical, `--j6n-space-4`), `.j6n-row` (horizontal, `--j6n-space-3`), `.j6n-grid` (`--j6n-space-5`), `.j6n-layout` (`--j6n-space-7`) ;
+- `.j6n-container` centre le contenu et ajoute `--j6n-space-5` de marge latérale.
+
+Pour changer l'écart d'une de ces classes à un endroit précis, ajoutez un utilitaire : `<div class="j6n-stack j6n-gap-2">`.
+
 ## Composants
 
 ### Actions
@@ -175,7 +233,7 @@ Le logo fait 28px de haut, avec une largeur libre (180px maximum), ce qui convie
 
 ### Utilitaires
 
-`.j6n-container` `.j6n-stack` `.j6n-row` `.j6n-grid` `.j6n-layout` (mise en page à sommaire latéral) `.j6n-eyebrow` `.j6n-muted` `.j6n-mono` `.j6n-divider-run` `.j6n-skeleton` `.j6n-chevron` `.j6n-close` `.j6n-spinner` `.j6n-sr-only` (contenu réservé aux lecteurs d'écran)
+`.j6n-container` `.j6n-stack` `.j6n-row` `.j6n-grid` `.j6n-layout` (mise en page à sommaire latéral) `.j6n-eyebrow` `.j6n-muted` `.j6n-mono` `.j6n-divider-run` `.j6n-skeleton` `.j6n-chevron` `.j6n-close` `.j6n-spinner` `.j6n-sr-only` (contenu réservé aux lecteurs d'écran), et les utilitaires d'espacement `.j6n-m-*`, `.j6n-p-*`, `.j6n-gap-*`… (voir [Espacements](#espacements-padding-margin-gap))
 
 ## Contrôles & dynamisme
 
