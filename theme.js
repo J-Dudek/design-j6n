@@ -402,9 +402,21 @@
         nav.classList.toggle('is-open', open);
         btn.setAttribute('aria-expanded', String(open));
       }
-      btn.addEventListener('click', function (e) { e.stopPropagation(); set(!nav.classList.contains('is-open')); });
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const open = !nav.classList.contains('is-open');
+        set(open);
+        if (open) {
+          const first = nav.querySelector('a, button');
+          if (first) first.focus();
+        }
+      });
       nav.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); });
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape' || !nav.classList.contains('is-open')) return;
+        set(false);
+        btn.focus();
+      });
       document.addEventListener('click', function (e) {
         if (nav.classList.contains('is-open') && !nav.contains(e.target)) set(false);
       });

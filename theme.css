@@ -944,9 +944,15 @@ code, .j6n-code-inline {
     margin: 0; flex-direction: column; align-items: stretch; gap: 0;
     padding: var(--j6n-space-8) var(--j6n-space-5);
     background: var(--j6n-surface); border-left: var(--j6n-border-width) solid var(--j6n-border);
-    transform: translateX(100%); transition: transform var(--j6n-dur-3) var(--j6n-ease);
+    /* Fermé : visibility masque aussi les liens au clavier et aux lecteurs d'écran ;
+       elle bascule après la transition pour laisser le menu glisser hors champ. */
+    transform: translateX(100%); visibility: hidden;
+    transition: transform var(--j6n-dur-3) var(--j6n-ease), visibility 0s linear var(--j6n-dur-3);
   }
-  .j6n-header:has(.j6n-nav__toggle) .j6n-nav.is-open { transform: translateX(0); }
+  .j6n-header:has(.j6n-nav__toggle) .j6n-nav.is-open {
+    transform: translateX(0); visibility: visible;
+    transition: transform var(--j6n-dur-3) var(--j6n-ease), visibility 0s;
+  }
   .j6n-nav__link { padding-block: var(--j6n-space-3); }
 }
 
