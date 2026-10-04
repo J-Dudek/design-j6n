@@ -56,25 +56,59 @@
   .j6n-showcase__viewport { margin-left: 0; }
 }
 
-/* Boutons de thème du header de démo : icône seule sous 960px pour que le
-   header tienne sur une ligne ; le libellé reste lu par les lecteurs d'écran. */
+/* ---------- Header de démo ----------
+   Pleine largeur (≥ 1361px) : boutons avec libellé. En dessous, les boutons
+   (recherche, thèmes) passent en icône seule pour que le header tienne sur une
+   ligne ; le libellé reste lu par les lecteurs d'écran. */
 .j6n-demo-switch__icon { display: none; }
-@media (max-width: 960px) {
+[data-demo-search] .j6n-demo-switch__icon { display: inline-block; margin-right: var(--j6n-space-2); }
+[data-demo-search][hidden] { display: none; }
+.j6n-demo-search__kbd {
+  margin-left: var(--j6n-space-3); padding: 0 6px;
+  font-family: var(--j6n-font-mono), monospace; font-size: var(--j6n-text-xs); color: var(--j6n-text-muted);
+  border: var(--j6n-border-width) solid var(--j6n-border); border-radius: var(--j6n-radius-sm);
+}
+@media (max-width: 1360px) {
   .j6n-demo-switch { min-width: 44px; min-height: 44px; padding: 0; justify-content: center; }
-  .j6n-demo-switch__icon { display: inline-block; font-size: var(--j6n-text-md); }
+  .j6n-demo-switch__icon,
+  [data-demo-search] .j6n-demo-switch__icon { display: inline-block; margin-right: 0; font-size: var(--j6n-text-md); }
   .j6n-demo-switch__label {
     position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
     white-space: nowrap; border: 0; padding: 0; margin: -1px;
   }
+  .j6n-demo-search__kbd { display: none; }
 }
+/* Entre 961 et 1360px, la navigation du header est encore dépliée : écarts resserrés. */
+@media (min-width: 961px) and (max-width: 1360px) {
+  .j6n-header { gap: var(--j6n-space-4); }
+}
+
+/* Badge de version, collé à la marque (écart ramené à --j6n-space-3). */
+.j6n-demo-version { margin-left: calc(var(--j6n-space-3) - var(--j6n-space-6)); }
+.j6n-demo-version[hidden] { display: none; }
+@media (min-width: 961px) and (max-width: 1360px) {
+  .j6n-demo-version { margin-left: calc(var(--j6n-space-3) - var(--j6n-space-4)); }
+}
+@media (max-width: 960px) { .j6n-demo-version { margin-left: 0; } }
+/* Pas de place pour le badge : à côté de la navigation dépliée (961–1080px), et sous 480px. */
+@media (min-width: 961px) and (max-width: 1080px), (max-width: 480px) {
+  .j6n-demo-version:not([hidden]) { display: none; }
+}
+/* Sous 360px, le bouton de variante de thème cède sa place à la recherche. */
+@media (max-width: 360px) { #variant { display: none; } }
 
 /* Nom de classe dans un titre de section : ne pas le couper au tiret. */
 .j6n-layout h2 > code { white-space: nowrap; }
 
-/* Badge de version du header de démo, collé à la marque. */
-.j6n-demo-version { margin-left: calc(var(--j6n-space-3) - var(--j6n-space-6)); }
-.j6n-demo-version[hidden] { display: none; }
-@media (max-width: 960px) { .j6n-demo-version { margin-left: 0; } }
-/* Sous 480px, plus de place pour le badge sans faire passer le header à la ligne. */
-@media (max-width: 480px) { .j6n-demo-version:not([hidden]) { display: none; } }
+/* ---------- Fenêtre de recherche (<dialog> créé par showcase.js) ---------- */
+dialog.j6n-demo-search { max-width: 560px; margin-top: 10vh; }
+.j6n-demo-search__box { display: flex; flex-direction: column; gap: var(--j6n-space-3); padding: var(--j6n-space-4); }
+.j6n-demo-search__results { display: flex; flex-direction: column; gap: 2px; max-height: min(60vh, 420px); overflow-y: auto; }
+.j6n-demo-search__option { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--j6n-space-1) var(--j6n-space-3); cursor: pointer; }
+.j6n-demo-search__title { font-weight: 500; }
+.j6n-demo-search__option code { font-size: var(--j6n-text-xs); color: var(--j6n-text-muted); }
+.j6n-demo-search__page { margin-left: auto; font-size: var(--j6n-text-xs); color: var(--j6n-text-muted); }
+.j6n-demo-search__status { margin: 0; font-size: var(--j6n-text-xs); color: var(--j6n-text-muted); }
 
+/* Titre de section atteint par la recherche ou le sommaire : pas caché sous le header collant. */
+main h2[id] { scroll-margin-top: 84px; }

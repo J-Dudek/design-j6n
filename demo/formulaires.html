@@ -22,6 +22,7 @@
       <a class="j6n-nav__link" href="donnees.html">Données</a>
     </nav>
     <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" type="button" data-demo-search aria-haspopup="dialog" hidden><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="j6n-demo-switch__label">Rechercher</span><kbd class="j6n-demo-search__kbd" aria-hidden="true">/</kbd></button>
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="theme" aria-pressed="false"><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg><span class="j6n-demo-switch__label">Thème sombre</span></button>
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="variant" aria-pressed="false"><span class="j6n-demo-switch__icon" aria-hidden="true">✦</span><span class="j6n-demo-switch__label">Thème moderne</span></button>
   </header>
@@ -43,7 +44,7 @@
       <h1>Formulaires</h1>
       <p class="j6n-muted">Champs, groupes et saisies assistées.</p>
 
-      <h2>Champs de base</h2>
+      <h2 id="champs-de-base">Champs de base</h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-grid">
@@ -100,7 +101,7 @@
         </template>
       </div>
 
-      <h2>Champ avec icône — <code>.j6n-field--icon</code></h2>
+      <h2 id="champ-avec-icone">Champ avec icône — <code>.j6n-field--icon</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-field j6n-field--icon" style="max-width:280px;">
@@ -113,7 +114,7 @@
         </template>
       </div>
 
-      <h2>Recherche — <code>.j6n-search</code></h2>
+      <h2 id="recherche">Recherche — <code>.j6n-search</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-search">
@@ -123,7 +124,7 @@
         </template>
       </div>
 
-      <h2>Mot de passe — <code>.j6n-password</code></h2>
+      <h2 id="mot-de-passe">Mot de passe — <code>.j6n-password</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-field" style="max-width:360px;">
@@ -138,7 +139,7 @@
         </template>
       </div>
 
-      <h2>Curseur — <code>.j6n-range</code></h2>
+      <h2 id="curseur">Curseur — <code>.j6n-range</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-range-field" style="max-width:360px;">
@@ -151,7 +152,7 @@
         </template>
       </div>
 
-      <h2>Import — <code>.j6n-upload</code></h2>
+      <h2 id="import">Import — <code>.j6n-upload</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-upload" data-j6n-js="upload">
@@ -164,7 +165,7 @@
         </template>
       </div>
 
-      <h2>Combobox — <code>.j6n-combobox</code></h2>
+      <h2 id="combobox">Combobox — <code>.j6n-combobox</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-field" style="max-width:360px;">

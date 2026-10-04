@@ -22,6 +22,7 @@
       <a class="j6n-nav__link" href="donnees.html">Données</a>
     </nav>
     <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" type="button" data-demo-search aria-haspopup="dialog" hidden><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="j6n-demo-switch__label">Rechercher</span><kbd class="j6n-demo-search__kbd" aria-hidden="true">/</kbd></button>
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="theme" aria-pressed="false"><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg><span class="j6n-demo-switch__label">Thème sombre</span></button>
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="variant" aria-pressed="false"><span class="j6n-demo-switch__icon" aria-hidden="true">✦</span><span class="j6n-demo-switch__label">Thème moderne</span></button>
   </header>
@@ -43,7 +44,7 @@
       <h1>Retours &amp; alertes</h1>
       <p class="j6n-muted">Ce qui informe, avertit ou demande une confirmation.</p>
 
-      <h2>Alerte — <code>.j6n-alert</code></h2>
+      <h2 id="alerte">Alerte — <code>.j6n-alert</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-stack">
@@ -63,7 +64,7 @@
         </template>
       </div>
 
-      <h2>Toast — API <code>j6n.toast()</code></h2>
+      <h2 id="toast">Toast — API <code>j6n.toast()</code></h2>
       <p class="j6n-hint">Appelle une file d'attente globale (<code>#j6n-toast-region</code>) : les toasts s'affichent en bas à droite de la vraie page, pas dans l'encadré.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
@@ -75,7 +76,7 @@
         </template>
       </div>
 
-      <h2>Infobulle — <code>[data-tooltip]</code></h2>
+      <h2 id="infobulle">Infobulle — <code>[data-tooltip]</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-row">
@@ -86,7 +87,7 @@
         </template>
       </div>
 
-      <h2>Modale — <code>.j6n-modal</code></h2>
+      <h2 id="modale">Modale — <code>.j6n-modal</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <button class="j6n-btn" data-j6n-modal-open="delete-modal">Supprimer la sortie…</button>
@@ -106,7 +107,7 @@
         </template>
       </div>
 
-      <h2>Accordéon — <code>.j6n-accordion</code></h2>
+      <h2 id="accordeon">Accordéon — <code>.j6n-accordion</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-accordion" data-j6n-js="accordion-group">
@@ -126,7 +127,7 @@
         </template>
       </div>
 
-      <h2>Mise en avant — <code>.j6n-callout</code></h2>
+      <h2 id="mise-en-avant">Mise en avant — <code>.j6n-callout</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-callout j6n-callout--pine">
@@ -136,7 +137,7 @@
         </template>
       </div>
 
-      <h2>Notice — <code>.j6n-notice</code></h2>
+      <h2 id="notice">Notice — <code>.j6n-notice</code></h2>
       <p class="j6n-muted">Bandeau pleine largeur. Fermeture mémorisée en local, comme sur le DSFR.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
@@ -148,7 +149,7 @@
         </template>
       </div>
 
-      <h2>Consentement — <code>.j6n-consent</code></h2>
+      <h2 id="consentement">Consentement — <code>.j6n-consent</code></h2>
       <p class="j6n-muted">Réinterprétation du composant « cookies » du DSFR pour un usage perso — bandeau générique, mémorisé en local, confiné ici à l'encadré.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>

@@ -22,6 +22,7 @@
       <a class="j6n-nav__link" href="donnees.html">Données</a>
     </nav>
     <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" type="button" data-demo-search aria-haspopup="dialog" hidden><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="j6n-demo-switch__label">Rechercher</span><kbd class="j6n-demo-search__kbd" aria-hidden="true">/</kbd></button>
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="theme" aria-pressed="false"><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg><span class="j6n-demo-switch__label">Thème sombre</span></button>
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="variant" aria-pressed="false"><span class="j6n-demo-switch__icon" aria-hidden="true">✦</span><span class="j6n-demo-switch__label">Thème moderne</span></button>
   </header>
@@ -43,7 +44,7 @@
       <h1>Actions</h1>
       <p class="j6n-muted">Boutons, contrôles binaires et étiquettes filtrables. Chaque bloc a un onglet <strong>Code</strong> et un simulateur de largeur, comme sur systeme-de-design.gouv.fr.</p>
 
-      <h2>Bouton — <code>.j6n-btn</code></h2>
+      <h2 id="bouton">Bouton — <code>.j6n-btn</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-row">
@@ -63,7 +64,7 @@
         </template>
       </div>
 
-      <h2>Contrôle segmenté — <code>.j6n-segmented</code></h2>
+      <h2 id="controle-segmente">Contrôle segmenté — <code>.j6n-segmented</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-segmented" role="radiogroup" aria-label="Terrain">
@@ -74,7 +75,7 @@
         </template>
       </div>
 
-      <h2>Interrupteur — <code>.j6n-toggle</code></h2>
+      <h2 id="interrupteur">Interrupteur — <code>.j6n-toggle</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <label class="j6n-toggle">
@@ -85,7 +86,7 @@
         </template>
       </div>
 
-      <h2>Étiquette filtrable — <code>.j6n-tag</code></h2>
+      <h2 id="etiquette-filtrable">Étiquette filtrable — <code>.j6n-tag</code></h2>
       <p class="j6n-muted">Deux boutons frères par étiquette — le libellé (sélection) et le retrait sont deux arrêts Tab distincts.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>

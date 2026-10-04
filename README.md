@@ -287,7 +287,7 @@ API publique : `j6n.init(root)` (réactiver un sous-arbre injecté dynamiquement
 | `demo/retours.html` | alertes, toasts, infobulles, modale, accordéon, mise en avant, consentement |
 | `demo/donnees.html` | carte, tableau triable, citation, téléchargement, menu utilisateur, connexion externe |
 
-Chaque exemple des cinq pages de composants a un bloc **Résultat / Code** avec un simulateur de largeur (Mobile / Tablette / Large) et un bouton « Copier », dans l'esprit des pages de démonstration de systeme-de-design.gouv.fr. Ça vit dans `demo/showcase.css` + `demo/showcase.js` — un outil pour ces pages de démo, pas une partie du design system livré (rien à installer dans un vrai projet).
+Chaque exemple des cinq pages de composants a un bloc **Résultat / Code** avec un simulateur de largeur (Mobile / Tablette / Large) et un bouton « Copier », dans l'esprit des pages de démonstration de systeme-de-design.gouv.fr. Le header de la démo a aussi une recherche de composant (bouton « Rechercher », ou `/` et Ctrl+K au clavier) : elle indexe les titres de section (`<h2 id>`) des pages listées dans la navigation, sans liste à maintenir — une nouvelle section avec un `id` y apparaît d'elle-même. Elle demande que la démo soit servie (Netlify, ou `python3 -m http.server` en local) : ouverte en `file://`, le bouton reste caché. Ça vit dans `demo/showcase.css` + `demo/showcase.js` — un outil pour ces pages de démo, pas une partie du design system livré (rien à installer dans un vrai projet).
 
 ## Règles
 
