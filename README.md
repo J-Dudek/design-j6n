@@ -232,6 +232,78 @@ Le logo fait 28px de haut, avec une largeur libre (180px maximum), ce qui convie
 | `.j6n-connect` | connexion à un service externe, `--strava` `--garmin` |
 | `.j6n-unit-switch` | bascule d'unités (réutilise `.j6n-segmented`) |
 | `.j6n-pre` | blocs de code, toujours sombres ; `.tok-key` `.tok-str` `.tok-com` |
+| `.j6n-carousel` | carrousel accessible : `__toolbar`, `__progress`, `__nav`, `__counter`, `__viewport`, `__track`, `__slide`, `__dots`/`__dot`, `--fade` `--none` — voir [Carrousel](#carrousel) |
+
+### Carrousel
+
+Motif [WAI-ARIA APG Carousel](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/), conforme RGAA 13.8 / WCAG 2.2.2 : le défilement automatique est **toujours** interruptible. Ces règles ne sont pas réglables, c'est volontaire :
+
+- bouton Lecture/Pause en tête du carrousel, nom accessible qui reprend le texte visible (« Pause du défilement ») ;
+- pause tant que la souris survole les diapositives (reprise à la sortie) ;
+- arrêt dès que le focus entre dans le carrousel (flèches, pastilles, lien d'une diapositive…), sans reprise implicite — il faut réappuyer sur Lecture ;
+- arrêt quand l'onglet est masqué, pas de lecture automatique si `prefers-reduced-motion: reduce` (le bouton Lecture reste disponible) ;
+- diapositives hors champ en `inert` (ni focus ni lecture d'écran) ; `aria-live="off"` pendant le défilement, `"polite"` à l'arrêt pour annoncer les changements demandés par l'utilisateur ;
+- pastille active plus large, pas seulement plus colorée (RGAA 3.1), cibles de 44 px ; aux extrémités sans boucle, les flèches passent en `aria-disabled` (jamais `disabled`, qui ferait perdre le focus).
+
+```html
+<section class="j6n-carousel" data-j6n-js="carousel" aria-roledescription="carrousel" aria-label="Sorties de la semaine"
+         data-j6n-autoplay="true" data-j6n-delay="5s" data-j6n-transition="slide" data-j6n-duration="600">
+  <div class="j6n-carousel__toolbar">
+    <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" data-j6n-carousel-play>
+      <span class="j6n-carousel__play-icon" aria-hidden="true"></span><span class="j6n-carousel__play-label">Pause</span><span class="j6n-sr-only"> du défilement</span>
+    </button>
+    <div class="j6n-carousel__progress" aria-hidden="true"><span class="j6n-carousel__progress-bar"></span></div>
+    <div class="j6n-carousel__nav">
+      <span class="j6n-carousel__counter" aria-hidden="true">1 / 3</span>
+      <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--icon" data-j6n-carousel-prev aria-controls="sorties-track" aria-label="Diapositive précédente"><span class="j6n-carousel__arrow j6n-carousel__arrow--prev" aria-hidden="true"></span></button>
+      <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--icon" data-j6n-carousel-next aria-controls="sorties-track" aria-label="Diapositive suivante"><span class="j6n-carousel__arrow j6n-carousel__arrow--next" aria-hidden="true"></span></button>
+    </div>
+  </div>
+  <div class="j6n-carousel__viewport">
+    <div class="j6n-carousel__track" id="sorties-track" aria-live="off">
+      <div class="j6n-carousel__slide" role="group" aria-roledescription="diapositive" aria-label="1 sur 3">…</div>
+      <div class="j6n-carousel__slide" role="group" aria-roledescription="diapositive" aria-label="2 sur 3" data-j6n-delay="9s">…</div>
+      <div class="j6n-carousel__slide" role="group" aria-roledescription="diapositive" aria-label="3 sur 3">…</div>
+    </div>
+  </div>
+  <!-- Facultatif. Laissé vide, theme.js génère une pastille par diapositive. -->
+  <div class="j6n-carousel__dots" role="group" aria-label="Choisir une diapositive"></div>
+</section>
+```
+
+Le contenu d'une diapositive est libre (carte, image, texte). Pour une image légendée : `<figure class="j6n-carousel__slide">` avec `.j6n-carousel__media` (16/9, `object-fit: cover`) et `<figcaption class="j6n-carousel__caption">`. Le bouton Lecture/Pause, la barre de progression, le compteur et les pastilles sont tous facultatifs ; sans `data-j6n-autoplay`, le bouton et la barre sont masqués d'eux-mêmes.
+
+**Réglages** — en attribut sur le `.j6n-carousel`, ou en option JS (l'option JS l'emporte). Les durées acceptent des millisecondes (`5000`) ou des secondes (`"5s"`).
+
+| Attribut | Option JS | Défaut | Effet |
+| --- | --- | --- | --- |
+| `data-j6n-autoplay` | `autoplay` | `false` | défilement automatique |
+| `data-j6n-delay` | `delay` | `6000` | temps d'affichage d'une diapositive (1 s minimum) ; surchargeable par diapositive avec `data-j6n-delay` sur le `.j6n-carousel__slide` |
+| `data-j6n-transition` | `transition` | `'slide'` | `'slide'` (glissement), `'fade'` (fondu) ou `'none'` |
+| `data-j6n-duration` | `duration` | `--j6n-dur-3` (420 ms) | durée de la transition |
+| `data-j6n-easing` | `easing` | `--j6n-ease` | courbe CSS de la transition |
+| `data-j6n-loop` | `loop` | `true` | revenir au début après la dernière (`"false"` : s'arrête à la fin) |
+| `data-j6n-rotations` | `rotations` | `0` | nombre de tours avant arrêt automatique (`0` : illimité) |
+| `data-j6n-start` | `start` | `0` | diapositive de départ (index à partir de 0) |
+| `data-j6n-swipe` | `swipe` | `true` | glissement tactile (doigt/stylet ; la souris garde la sélection de texte) |
+| `data-j6n-progress` | `progress` | `true` | barre de temps restant (figée pendant une pause) |
+
+En CSS, les mêmes valeurs passent par `--j6n-carousel-delay`, `--j6n-carousel-duration` et `--j6n-carousel-easing`, posées par le JS sur chaque carrousel.
+
+**API JS** — `j6n.carousel(élément | sélecteur, options)` crée le carrousel, ou renvoie celui qui existe déjà (en lui appliquant `options`) :
+
+```js
+const c = j6n.carousel('#promo', { autoplay: true, delay: 4000, transition: 'fade', duration: 800 });
+c.next(); c.prev(); c.goTo(2);
+c.play(); c.pause();
+c.set({ delay: 8000, loop: false });   // réglage à chaud
+c.index; c.total; c.playing; c.options;
+
+el.addEventListener('j6n:carousel-change', (e) => console.log(e.detail.index, e.detail.total, e.detail.slide));
+el.addEventListener('j6n:carousel-state', (e) => console.log(e.detail.playing));
+```
+
+En React/Angular, monter le balisage puis appeler `j6n.carousel(ref)` (ou `j6n.init(conteneur)` si l'élément porte `data-j6n-js="carousel"`). Démonstration complète, avec réglages en direct : `demo/donnees.html#carrousel`.
 
 ### Utilitaires
 
@@ -257,8 +329,9 @@ Le logo fait 28px de haut, avec une largeur libre (180px maximum), ce qui convie
 | `data-j6n-js="table-sort"` | tri des lignes au clic sur un `.j6n-table__sort` |
 | `data-j6n-js="menu-toggle"` | ouvre/ferme le menu mobile du header |
 | `data-j6n-js="unit-switch"` | diffuse un évènement `j6n:unit-change` |
+| `data-j6n-js="carousel"` + `data-j6n-carousel-play/-prev/-next` | carrousel : défilement réglable, pause, flèches, pastilles, glissement tactile |
 
-API publique : `j6n.init(root)` (réactiver un sous-arbre injecté dynamiquement), `j6n.toast(message, { tone, duration })`, `j6n.openModal(id)`, `j6n.closeModal(id)`.
+API publique : `j6n.init(root)` (réactiver un sous-arbre injecté dynamiquement), `j6n.toast(message, { tone, duration })`, `j6n.openModal(id)`, `j6n.closeModal(id)`, `j6n.carousel(el, options)`.
 
 ## Exemple
 
@@ -288,7 +361,7 @@ API publique : `j6n.init(root)` (réactiver un sous-arbre injecté dynamiquement
 | `demo/formulaires.html` | champs, recherche, mot de passe, curseur, import, combobox |
 | `demo/navigation.html` | fil d'Ariane, onglets, menu déroulant, pagination, étapes, tuiles, pied de page |
 | `demo/retours.html` | alertes, toasts, infobulles, modale, accordéon, mise en avant, consentement |
-| `demo/donnees.html` | carte, tableau triable, citation, téléchargement, menu utilisateur, connexion externe |
+| `demo/donnees.html` | carte, tableau triable, citation, téléchargement, menu utilisateur, connexion externe, carrousel |
 
 Chaque exemple des cinq pages de composants a un bloc **Résultat / Code** avec un simulateur de largeur (Mobile / Tablette / Large) et un bouton « Copier », dans l'esprit des pages de démonstration de systeme-de-design.gouv.fr. Le header de la démo a aussi une recherche de composant (bouton « Rechercher », ou `/` et Ctrl+K au clavier) : elle indexe les titres de section (`<h2 id>`) des pages listées dans la navigation, sans liste à maintenir — une nouvelle section avec un `id` y apparaît d'elle-même. Elle demande que la démo soit servie (Netlify, ou `python3 -m http.server` en local) : ouverte en `file://`, le bouton reste caché. Ça vit dans `demo/showcase.css` + `demo/showcase.js` — un outil pour ces pages de démo, pas une partie du design system livré (rien à installer dans un vrai projet).
 

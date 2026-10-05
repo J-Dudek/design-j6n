@@ -5,7 +5,7 @@
    S'appuie sur les éléments natifs (<details>, <dialog>, popover)
    plutôt que de tout réimplémenter en JS.
    API publique : window.j6n.init(root), j6n.toast(msg, opts),
-   j6n.openModal(id), j6n.closeModal(id).
+   j6n.openModal(id), j6n.closeModal(id), j6n.carousel(el, options).
    ============================================================ */
 (function () {
   'use strict';
@@ -436,6 +436,324 @@
     });
   }
 
+  /* ---------- Carrousel (WAI-ARIA APG Carousel · RGAA 13.8 / WCAG 2.2.2) ----------
+     Chaque réglage se passe en data-j6n-* sur le carrousel ou en option de
+     j6n.carousel(el, options) — l'option JS l'emporte sur l'attribut. Les
+     invariants d'accessibilité ne sont pas réglables : pause au survol des
+     diapositives, arrêt dès que le focus entre dans le carrousel, diapositives
+     masquées inertes, pas de lecture automatique si prefers-reduced-motion. */
+  const CAROUSEL_DEFAULTS = {
+    autoplay: false,     // défilement automatique
+    delay: 6000,         // temps d'affichage d'une diapositive (ms, ou "6s") — surchargeable par diapositive
+    transition: 'slide', // 'slide' | 'fade' | 'none'
+    duration: null,      // durée de la transition (ms) — null : --j6n-dur-3
+    easing: null,        // courbe CSS — null : --j6n-ease
+    loop: true,          // revenir au début après la dernière diapositive
+    rotations: 0,        // nombre de tours avant arrêt automatique (0 : illimité)
+    start: 0,            // diapositive de départ (index à partir de 0)
+    swipe: true,         // glissement tactile
+    progress: true       // barre de temps restant
+  };
+  const CAROUSEL_MIN_DELAY = 1000;
+  const carousels = new WeakMap();
+
+  function parseTime(value) {
+    if (value === undefined || value === null || value === '') return undefined;
+    if (typeof value === 'number') return value;
+    const str = String(value).trim();
+    const n = parseFloat(str);
+    if (isNaN(n)) return undefined;
+    return /(^|[^m])s$/.test(str) ? n * 1000 : n;
+  }
+  function parseBool(value) { return value === undefined ? undefined : value !== 'false'; }
+
+  function carouselDataOptions(el) {
+    const d = el.dataset;
+    let transition = d.j6nTransition;
+    if (!transition && el.classList.contains('j6n-carousel--fade')) transition = 'fade';
+    if (!transition && el.classList.contains('j6n-carousel--none')) transition = 'none';
+    return {
+      autoplay: parseBool(d.j6nAutoplay),
+      delay: parseTime(d.j6nDelay),
+      transition: transition,
+      duration: parseTime(d.j6nDuration),
+      easing: d.j6nEasing,
+      loop: parseBool(d.j6nLoop),
+      rotations: d.j6nRotations !== undefined ? parseInt(d.j6nRotations, 10) || 0 : undefined,
+      start: d.j6nStart !== undefined ? parseInt(d.j6nStart, 10) || 0 : undefined,
+      swipe: parseBool(d.j6nSwipe),
+      progress: parseBool(d.j6nProgress)
+    };
+  }
+
+  function mergeOptions(base, extra) {
+    const out = {};
+    Object.keys(CAROUSEL_DEFAULTS).forEach(function (key) {
+      const value = extra && extra[key] !== undefined ? extra[key] : base[key];
+      out[key] = key === 'delay' || key === 'duration' ? parseTime(value) : value;
+    });
+    if (out.delay === undefined) out.delay = CAROUSEL_DEFAULTS.delay;
+    return out;
+  }
+
+  function createCarousel(el, options) {
+    const viewport = el.querySelector('.j6n-carousel__viewport');
+    const track = el.querySelector('.j6n-carousel__track');
+    const slides = Array.prototype.filter.call(track.children, function (s) { return s.classList.contains('j6n-carousel__slide'); });
+    const toolbar = el.querySelector('.j6n-carousel__toolbar');
+    const playBtn = el.querySelector('[data-j6n-carousel-play]');
+    const playLabel = playBtn ? playBtn.querySelector('.j6n-carousel__play-label') : null;
+    const prevBtn = el.querySelector('[data-j6n-carousel-prev]');
+    const nextBtn = el.querySelector('[data-j6n-carousel-next]');
+    const counter = el.querySelector('.j6n-carousel__counter');
+    const progress = el.querySelector('.j6n-carousel__progress');
+    const bar = progress ? progress.querySelector('.j6n-carousel__progress-bar') : null;
+    const dotsWrap = el.querySelector('.j6n-carousel__dots');
+    const total = slides.length;
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let opts = mergeOptions(mergeOptions(CAROUSEL_DEFAULTS, carouselDataOptions(el)), options);
+    let index = 0;
+    let stopped = reducedMotion;   // arrêt explicite (bouton, focus, glissement, fin des tours)
+    let hovered = false;
+    let pageHidden = document.hidden;
+    let timer = null;
+    let startedAt = 0;
+    let remaining = 0;
+    let advances = 0;
+    let wasRunning = null;
+
+    // ARIA : déjà attendu dans le HTML source, reconfirmé ici en filet de sécurité.
+    if (!el.hasAttribute('aria-roledescription')) el.setAttribute('aria-roledescription', 'carrousel');
+    if (!el.hasAttribute('aria-label') && !el.hasAttribute('aria-labelledby')) {
+      console.warn('[j6n] carrousel sans aria-label ni aria-labelledby (RGAA 13.8) :', el);
+    }
+    if (!track.id) track.id = 'j6n-carousel-' + Math.random().toString(36).slice(2, 8);
+    slides.forEach(function (slide, i) {
+      slide.setAttribute('role', 'group');
+      if (!slide.hasAttribute('aria-roledescription')) slide.setAttribute('aria-roledescription', 'diapositive');
+      if (!slide.hasAttribute('aria-label') && !slide.hasAttribute('aria-labelledby')) slide.setAttribute('aria-label', (i + 1) + ' sur ' + total);
+    });
+    [prevBtn, nextBtn].forEach(function (btn) { if (btn) btn.setAttribute('aria-controls', track.id); });
+
+    let dots = [];
+    if (dotsWrap) {
+      if (!dotsWrap.children.length) {
+        slides.forEach(function (slide, i) {
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'j6n-carousel__dot';
+          dot.setAttribute('aria-label', 'Diapositive ' + (i + 1) + ' sur ' + total);
+          dotsWrap.appendChild(dot);
+        });
+      }
+      if (!dotsWrap.hasAttribute('role')) dotsWrap.setAttribute('role', 'group');
+      if (!dotsWrap.hasAttribute('aria-label')) dotsWrap.setAttribute('aria-label', 'Choisir une diapositive');
+      dots = Array.prototype.slice.call(dotsWrap.querySelectorAll('.j6n-carousel__dot'));
+      dots.forEach(function (dot, i) {
+        dot.setAttribute('aria-controls', track.id);
+        dot.addEventListener('click', function () { pause(); goTo(i); });
+      });
+    }
+
+    function slideDelay(i) {
+      const own = parseTime(slides[i].dataset.j6nDelay);
+      return Math.max(CAROUSEL_MIN_DELAY, own !== undefined ? own : opts.delay);
+    }
+    function clearTimer() {
+      if (timer) { clearTimeout(timer); timer = null; }
+    }
+    function restartProgress() {
+      if (!bar) return;
+      bar.style.animation = 'none';
+      void bar.offsetWidth;
+      bar.style.animation = '';
+    }
+
+    function applyOptions() {
+      el.classList.remove('j6n-carousel--fade', 'j6n-carousel--none');
+      if (opts.transition === 'fade' || opts.transition === 'none') el.classList.add('j6n-carousel--' + opts.transition);
+      if (opts.duration !== undefined && opts.duration !== null) el.style.setProperty('--j6n-carousel-duration', opts.duration + 'ms');
+      else el.style.removeProperty('--j6n-carousel-duration');
+      if (opts.easing) el.style.setProperty('--j6n-carousel-easing', opts.easing);
+      else el.style.removeProperty('--j6n-carousel-easing');
+      const auto = opts.autoplay && total > 1;
+      if (playBtn) playBtn.hidden = !auto;
+      if (progress) progress.hidden = !auto || !opts.progress;
+      if (toolbar) toolbar.hidden = total < 2;
+      if (dotsWrap) dotsWrap.hidden = total < 2;
+    }
+
+    function render() {
+      slides.forEach(function (slide, i) {
+        const active = i === index;
+        slide.classList.toggle('is-active', active);
+        // inert : ni focus ni lecture d'écran dans les diapositives hors champ (RGAA 10.8 / 12.8)
+        slide.inert = !active;
+        if (active) slide.removeAttribute('aria-hidden');
+        else slide.setAttribute('aria-hidden', 'true');
+      });
+      track.style.transform = 'translateX(' + (-index * 100) + '%)';
+      dots.forEach(function (dot, i) {
+        if (i === index) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+      if (counter) counter.textContent = (index + 1) + ' / ' + total;
+      if (prevBtn) prevBtn.setAttribute('aria-disabled', String(!opts.loop && index === 0));
+      if (nextBtn) nextBtn.setAttribute('aria-disabled', String(!opts.loop && index === total - 1));
+      el.style.setProperty('--j6n-carousel-delay', slideDelay(index) + 'ms');
+      restartProgress();
+    }
+
+    // Un seul endroit décide si le temps s'écoule : lecture demandée, non arrêtée,
+    // et ni survolée ni dans un onglet masqué.
+    function sync() {
+      const running = opts.autoplay && total > 1 && !stopped;
+      const held = hovered || pageHidden;
+      el.classList.toggle('is-running', running);
+      el.classList.toggle('is-held', running && held);
+      el.classList.toggle('is-stopped', !running);
+      // annonce des changements seulement quand ils viennent de l'utilisateur (APG)
+      track.setAttribute('aria-live', running ? 'off' : 'polite');
+      if (playLabel) playLabel.textContent = running ? 'Pause' : 'Lecture';
+      if (running && !held) {
+        if (!timer) {
+          const wait = remaining > 0 ? remaining : slideDelay(index);
+          startedAt = Date.now();
+          remaining = wait;
+          timer = setTimeout(tick, wait);
+        }
+      } else if (timer) {
+        clearTimer();
+        remaining = running ? Math.max(0, remaining - (Date.now() - startedAt)) : 0;
+      }
+      if (running !== wasRunning) {
+        wasRunning = running;
+        el.dispatchEvent(new CustomEvent('j6n:carousel-state', { bubbles: true, detail: { playing: running } }));
+      }
+    }
+
+    function tick() {
+      timer = null;
+      remaining = 0;
+      const last = index === total - 1;
+      if (last && !opts.loop) { pause(); return; }
+      advances++;
+      goTo(last ? 0 : index + 1);
+      if (opts.rotations > 0 && advances >= opts.rotations * total) pause();
+    }
+
+    function goTo(i) {
+      if (!total) return;
+      const target = opts.loop ? ((i % total) + total) % total : Math.max(0, Math.min(total - 1, i));
+      const changed = target !== index;
+      index = target;
+      clearTimer();
+      remaining = 0;
+      render();
+      if (changed) el.dispatchEvent(new CustomEvent('j6n:carousel-change', { bubbles: true, detail: { index: index, total: total, slide: slides[index] } }));
+      sync();
+    }
+    function play() {
+      if (!opts.autoplay) { opts.autoplay = true; applyOptions(); }
+      stopped = false;
+      advances = 0;
+      restartProgress();
+      sync();
+    }
+    function pause() {
+      stopped = true;
+      sync();
+    }
+    function set(newOptions) {
+      opts = mergeOptions(opts, newOptions);
+      applyOptions();
+      clearTimer();
+      remaining = 0;
+      if (newOptions && newOptions.start !== undefined) goTo(opts.start);
+      else { render(); sync(); }
+    }
+
+    if (playBtn) playBtn.addEventListener('click', function () { if (el.classList.contains('is-running')) pause(); else play(); });
+    if (prevBtn) prevBtn.addEventListener('click', function () {
+      if (prevBtn.getAttribute('aria-disabled') === 'true') return;
+      pause(); goTo(index - 1);
+    });
+    if (nextBtn) nextBtn.addEventListener('click', function () {
+      if (nextBtn.getAttribute('aria-disabled') === 'true') return;
+      pause(); goTo(index + 1);
+    });
+    // focus dans le carrousel (hors bouton lecture/pause) : arrêt, sans reprise implicite (APG)
+    el.addEventListener('focusin', function (e) {
+      if (playBtn && playBtn.contains(e.target)) return;
+      if (el.classList.contains('is-running')) pause();
+    });
+    // survol des diapositives seulement : la barre d'outils reste réactive au clic
+    viewport.addEventListener('mouseenter', function () { hovered = true; sync(); });
+    viewport.addEventListener('mouseleave', function () { hovered = false; sync(); });
+    document.addEventListener('visibilitychange', function () { pageHidden = document.hidden; sync(); });
+
+    let swipeX = null;
+    let swipeY = 0;
+    viewport.addEventListener('pointerdown', function (e) {
+      if (!opts.swipe || e.pointerType === 'mouse') return;
+      swipeX = e.clientX;
+      swipeY = e.clientY;
+    });
+    viewport.addEventListener('pointerup', function (e) {
+      if (swipeX === null) return;
+      const dx = e.clientX - swipeX;
+      const dy = e.clientY - swipeY;
+      swipeX = null;
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+      const target = index + (dx < 0 ? 1 : -1);
+      if (!opts.loop && (target < 0 || target >= total)) return;
+      pause();
+      goTo(target);
+    });
+    viewport.addEventListener('pointercancel', function () { swipeX = null; });
+
+    el.classList.add('is-initializing');
+    applyOptions();
+    index = Math.max(0, Math.min(total - 1, opts.start || 0));
+    render();
+    sync();
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { el.classList.remove('is-initializing'); });
+    });
+
+    const api = {
+      next: function () { goTo(index + 1); },
+      prev: function () { goTo(index - 1); },
+      goTo: goTo,
+      play: play,
+      pause: pause,
+      set: set,
+      get index() { return index; },
+      get total() { return total; },
+      get playing() { return el.classList.contains('is-running'); },
+      get options() { return Object.assign({}, opts); }
+    };
+    carousels.set(el, api);
+    return api;
+  }
+
+  function carousel(target, options) {
+    const el = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!el) return null;
+    const existing = carousels.get(el);
+    if (existing) { if (options) existing.set(options); return existing; }
+    bind(el, 'carousel');
+    return createCarousel(el, options);
+  }
+
+  function initCarousels(root) {
+    each(root.querySelectorAll('[data-j6n-js="carousel"]'), function (el) {
+      if (!bind(el, 'carousel')) return;
+      createCarousel(el);
+    });
+  }
+
   /* ---------- Annonces discrètes pour lecteur d'écran (RGAA 7.4 / WCAG 4.1.3) ---------- */
   let announceRegion;
   function announce(message) {
@@ -528,6 +846,7 @@
     initTableSort(root);
     initMenuToggle(root);
     initUnitSwitch(root);
+    initCarousels(root);
   }
 
   document.documentElement.setAttribute('data-j6n', 'true');
@@ -537,5 +856,5 @@
     init(document);
   }
 
-  window.j6n = { init: init, toast: toast, openModal: openModal, closeModal: closeModal };
+  window.j6n = { init: init, toast: toast, openModal: openModal, closeModal: closeModal, carousel: carousel };
 })();

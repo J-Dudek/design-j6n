@@ -1122,6 +1122,111 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 .j6n-unit-switch .j6n-segmented {
   font-family: var(--j6n-font-mono), serif; }
 
+/* ---------- 18bis. Carrousel ----------
+   Motif WAI-ARIA APG « Carousel » + RGAA 13.8 / WCAG 2.2.2 : défilement
+   automatique toujours interruptible (bouton pause, survol, focus), diapositives
+   hors champ rendues inertes, aucun état porté par la seule couleur.
+   Réglages (temps d'affichage, transition, durée, courbe…) : data-j6n-* ou
+   j6n.carousel(el, options) — voir theme.js. Les valeurs passent par les
+   variables ci-dessous, posées par le JS sur chaque carrousel. */
+.j6n-carousel {
+  --j6n-carousel-delay: 6000ms;                     /* temps d'affichage d'une diapositive */
+  --j6n-carousel-duration: var(--j6n-dur-3);        /* durée de la transition */
+  --j6n-carousel-easing: var(--j6n-ease);           /* courbe de la transition */
+  display: flex; flex-direction: column; gap: var(--j6n-space-3);
+}
+/* hidden posé par le JS (lecture automatique désactivée, diapositive unique) doit
+   l'emporter sur le display des boutons et de la barre d'outils */
+.j6n-carousel [hidden] { display: none !important; }
+.j6n-carousel__toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--j6n-space-3); }
+.j6n-carousel__nav { display: flex; align-items: center; gap: var(--j6n-space-2); margin-left: auto; }
+.j6n-carousel__counter {
+  font-family: var(--j6n-font-mono), serif; font-size: var(--j6n-text-xs); font-variant-numeric: tabular-nums;
+  color: var(--j6n-text-muted); min-width: 5ch; text-align: center;
+}
+.j6n-carousel__play-label { white-space: nowrap; }
+.j6n-carousel__play-icon { display: inline-flex; gap: 3px; width: 12px; height: 12px; flex: none; }
+.j6n-carousel__play-icon::before,
+.j6n-carousel__play-icon::after { content: ''; width: 4px; height: 100%; background: currentColor; border-radius: 1px; }
+.j6n-carousel.is-stopped .j6n-carousel__play-icon { gap: 0; }
+.j6n-carousel.is-stopped .j6n-carousel__play-icon::before { width: 12px; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.j6n-carousel.is-stopped .j6n-carousel__play-icon::after { display: none; }
+
+/* Flèches : réutilise le trait du chevron, orienté gauche/droite */
+.j6n-carousel__arrow {
+  width: 9px; height: 9px; flex: none;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+}
+.j6n-carousel__arrow--prev { transform: translateX(2px) rotate(135deg); }
+.j6n-carousel__arrow--next { transform: translateX(-2px) rotate(-45deg); }
+.j6n-carousel [aria-disabled='true'] { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Barre de progression : remplie sur le temps d'affichage, figée pendant une pause */
+.j6n-carousel__progress {
+  flex: 1 1 80px; height: 4px; min-width: 60px;
+  background: var(--j6n-surface-2); border-radius: var(--j6n-radius-pill); overflow: hidden;
+}
+.j6n-carousel__progress-bar {
+  display: block; height: 100%; width: 100%;
+  background: var(--j6n-accent); border-radius: inherit;
+  transform: scaleX(0); transform-origin: left center;
+}
+.j6n-carousel.is-running .j6n-carousel__progress-bar { animation: j6n-carousel-progress var(--j6n-carousel-delay) linear both; }
+.j6n-carousel.is-held .j6n-carousel__progress-bar { animation-play-state: paused; }
+.j6n-carousel.is-stopped .j6n-carousel__progress { visibility: hidden; }
+@keyframes j6n-carousel-progress { to { transform: scaleX(1); } }
+
+.j6n-carousel__viewport {
+  position: relative; overflow: hidden;
+  border-radius: var(--j6n-radius-lg);
+  touch-action: pan-y;   /* le glissement horizontal est géré par le JS, le défilement vertical reste natif */
+}
+.j6n-carousel__track { display: flex; transition: transform var(--j6n-carousel-duration) var(--j6n-carousel-easing); }
+.j6n-carousel__slide { flex: 0 0 100%; min-width: 0; }
+.j6n-carousel__slide > .j6n-card { height: 100%; }
+
+/* Premier rendu : aucune transition, sinon les diapositives masquées « s'effacent » au chargement */
+.j6n-carousel.is-initializing .j6n-carousel__track,
+.j6n-carousel.is-initializing .j6n-carousel__slide { transition: none !important; }
+
+/* Fondu : diapositives empilées dans la même cellule de grille */
+.j6n-carousel--fade .j6n-carousel__track { display: grid; transform: none !important; transition: none; }
+.j6n-carousel--fade .j6n-carousel__slide {
+  grid-area: 1 / 1; opacity: 0; visibility: hidden;
+  transition: opacity var(--j6n-carousel-duration) var(--j6n-carousel-easing), visibility 0s linear var(--j6n-carousel-duration);
+}
+.j6n-carousel--fade .j6n-carousel__slide.is-active { opacity: 1; visibility: visible; transition-delay: 0s; }
+/* Sans transition */
+.j6n-carousel--none .j6n-carousel__track,
+.j6n-carousel--none .j6n-carousel__slide { transition: none; }
+
+/* Pastilles : l'active est plus large, pas seulement plus colorée (RGAA 3.1) */
+.j6n-carousel__dots { display: flex; flex-wrap: wrap; justify-content: center; }
+.j6n-carousel__dot {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; padding: 0;
+  background: transparent; border: 0; border-radius: var(--j6n-radius-pill); cursor: pointer;
+}
+.j6n-carousel__dot::before {
+  content: ''; width: 10px; height: 10px; border-radius: var(--j6n-radius-pill);
+  border: 2px solid var(--j6n-border-interactive); background: transparent;
+  transition: width var(--j6n-dur-2) var(--j6n-ease), background var(--j6n-dur-1) var(--j6n-ease);
+}
+.j6n-carousel__dot:hover::before { background: var(--j6n-surface-2); }
+.j6n-carousel__dot[aria-current='true']::before { width: 26px; background: var(--j6n-accent-strong); border-color: var(--j6n-accent-strong); }
+.j6n-carousel__dot:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
+
+/* Habillage par défaut d'une diapositive (facultatif) */
+.j6n-carousel__media { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--j6n-surface-2); }
+.j6n-carousel__caption { padding: var(--j6n-space-4) var(--j6n-space-5); background: var(--j6n-surface); border: var(--j6n-border-width) solid var(--j6n-border); border-top: 0; border-radius: 0 0 var(--j6n-radius-lg) var(--j6n-radius-lg); }
+.j6n-carousel__caption > :last-child { margin-bottom: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* La barre de progression est une information de temps, pas une animation
+     décorative : elle garde sa vraie durée (comme .j6n-spinner). */
+  .j6n-carousel.is-running .j6n-carousel__progress-bar { animation-duration: var(--j6n-carousel-delay) !important; }
+}
+
 /* ---------- 19. Mise en page à sommaire latéral (docs, réglages, démo) ---------- */
 .j6n-layout { display: flex; gap: var(--j6n-space-7); align-items: flex-start; }
 .j6n-layout > aside { position: sticky; top: 84px; flex: none; }

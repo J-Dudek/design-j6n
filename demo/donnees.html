@@ -188,6 +188,156 @@
           </div>
         </template>
       </div>
+      <h2 id="carrousel">Carrousel — <code>.j6n-carousel</code></h2>
+      <p class="j6n-muted">Défilement automatique réglable en <code>data-j6n-*</code>, toujours interruptible : bouton Pause, pause au survol des diapositives, arrêt dès que le focus entre dans le carrousel. Ici 5 s par diapositive, sauf la deuxième qui reste 9 s (<code>data-j6n-delay</code> posé sur la diapositive).</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <section class="j6n-carousel" data-j6n-js="carousel" aria-roledescription="carrousel" aria-label="Sorties de la semaine"
+                   data-j6n-autoplay="true" data-j6n-delay="5s" data-j6n-transition="slide" data-j6n-duration="600">
+            <div class="j6n-carousel__toolbar">
+              <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" data-j6n-carousel-play>
+                <span class="j6n-carousel__play-icon" aria-hidden="true"></span><span class="j6n-carousel__play-label">Pause</span><span class="j6n-sr-only"> du défilement</span>
+              </button>
+              <div class="j6n-carousel__progress" aria-hidden="true"><span class="j6n-carousel__progress-bar"></span></div>
+              <div class="j6n-carousel__nav">
+                <span class="j6n-carousel__counter" aria-hidden="true">1 / 3</span>
+                <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--icon" data-j6n-carousel-prev aria-controls="sorties-track" aria-label="Diapositive précédente"><span class="j6n-carousel__arrow j6n-carousel__arrow--prev" aria-hidden="true"></span></button>
+                <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--icon" data-j6n-carousel-next aria-controls="sorties-track" aria-label="Diapositive suivante"><span class="j6n-carousel__arrow j6n-carousel__arrow--next" aria-hidden="true"></span></button>
+              </div>
+            </div>
+            <div class="j6n-carousel__viewport">
+              <div class="j6n-carousel__track" id="sorties-track" aria-live="off">
+                <div class="j6n-carousel__slide" role="group" aria-roledescription="diapositive" aria-label="1 sur 3">
+                  <article class="j6n-card">
+                    <p class="j6n-card__meta">LUN. 28 SEPT. · 06:45</p>
+                    <h3 class="j6n-card__title">Boucle du lac</h3>
+                    <p class="j6n-muted">Footing en aisance, lever de soleil sur l'eau.</p>
+                    <a href="#carrousel">Voir la sortie</a>
+                  </article>
+                </div>
+                <div class="j6n-carousel__slide" role="group" aria-roledescription="diapositive" aria-label="2 sur 3" data-j6n-delay="9s">
+                  <article class="j6n-card">
+                    <p class="j6n-card__meta">MER. 30 SEPT. · 18:10</p>
+                    <h3 class="j6n-card__title">Fractionné sur piste</h3>
+                    <p class="j6n-muted">10 × 400 m, récupération 1 min. Plus de texte à lire : cette diapositive reste affichée 9 s.</p>
+                    <a href="#carrousel">Voir la sortie</a>
+                  </article>
+                </div>
+                <div class="j6n-carousel__slide" role="group" aria-roledescription="diapositive" aria-label="3 sur 3">
+                  <article class="j6n-card">
+                    <p class="j6n-card__meta">SAM. 3 OCT. · 07:12</p>
+                    <h3 class="j6n-card__title">Crête des Ayes</h3>
+                    <p class="j6n-muted">Sortie longue en sentier, brouillard jusqu'à 1200 m.</p>
+                    <a href="#carrousel">Voir la sortie</a>
+                  </article>
+                </div>
+              </div>
+            </div>
+            <div class="j6n-carousel__dots" role="group" aria-label="Choisir une diapositive">
+              <button type="button" class="j6n-carousel__dot" aria-controls="sorties-track" aria-label="Diapositive 1 sur 3" aria-current="true"></button>
+              <button type="button" class="j6n-carousel__dot" aria-controls="sorties-track" aria-label="Diapositive 2 sur 3"></button>
+              <button type="button" class="j6n-carousel__dot" aria-controls="sorties-track" aria-label="Diapositive 3 sur 3"></button>
+            </div>
+          </section>
+        </template>
+      </div>
+
+      <h2 id="carrousel-fondu">Carrousel en fondu, nombre de tours limité</h2>
+      <p class="j6n-muted">Transition en fondu de 800 ms, 4 s par diapositive, arrêt automatique après 2 tours (<code>data-j6n-rotations="2"</code>). Sans pastilles : elles sont facultatives.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <section class="j6n-carousel" data-j6n-js="carousel" aria-roledescription="carrousel" aria-label="Paysages du parcours"
+                   data-j6n-autoplay="true" data-j6n-delay="4000" data-j6n-transition="fade" data-j6n-duration="800" data-j6n-rotations="2">
+            <div class="j6n-carousel__toolbar">
+              <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" data-j6n-carousel-play>
+                <span class="j6n-carousel__play-icon" aria-hidden="true"></span><span class="j6n-carousel__play-label">Pause</span><span class="j6n-sr-only"> du défilement</span>
+              </button>
+              <div class="j6n-carousel__progress" aria-hidden="true"><span class="j6n-carousel__progress-bar"></span></div>
+              <div class="j6n-carousel__nav">
+                <span class="j6n-carousel__counter" aria-hidden="true">1 / 3</span>
+                <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--icon" data-j6n-carousel-prev aria-controls="paysages-track" aria-label="Diapositive précédente"><span class="j6n-carousel__arrow j6n-carousel__arrow--prev" aria-hidden="true"></span></button>
+                <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--icon" data-j6n-carousel-next aria-controls="paysages-track" aria-label="Diapositive suivante"><span class="j6n-carousel__arrow j6n-carousel__arrow--next" aria-hidden="true"></span></button>
+              </div>
+            </div>
+            <div class="j6n-carousel__viewport">
+              <div class="j6n-carousel__track" id="paysages-track" aria-live="off">
+                <figure class="j6n-carousel__slide j6n-m-0" role="group" aria-roledescription="diapositive" aria-label="1 sur 3">
+                  <svg class="j6n-carousel__media" viewBox="0 0 640 360" role="img" aria-label="Silhouette de crêtes au lever du jour"><rect width="640" height="360" style="fill: var(--j6n-accent-soft)"/><path d="M0 260 L140 150 L230 220 L360 110 L470 200 L640 130 V360 H0Z" style="fill: var(--j6n-pine)"/></svg>
+                  <figcaption class="j6n-carousel__caption"><strong>Km 4</strong> — sortie de la forêt, première vue sur la crête.</figcaption>
+                </figure>
+                <figure class="j6n-carousel__slide j6n-m-0" role="group" aria-roledescription="diapositive" aria-label="2 sur 3">
+                  <svg class="j6n-carousel__media" viewBox="0 0 640 360" role="img" aria-label="Lac au pied de deux sommets"><rect width="640" height="360" style="fill: var(--j6n-pine-soft)"/><path d="M0 230 L200 90 L330 200 L450 120 L640 240 V360 H0Z" style="fill: var(--j6n-pine)"/><rect y="270" width="640" height="90" style="fill: var(--j6n-info)"/></svg>
+                  <figcaption class="j6n-carousel__caption"><strong>Km 11</strong> — passage au bord du lac, ravitaillement.</figcaption>
+                </figure>
+                <figure class="j6n-carousel__slide j6n-m-0" role="group" aria-roledescription="diapositive" aria-label="3 sur 3">
+                  <svg class="j6n-carousel__media" viewBox="0 0 640 360" role="img" aria-label="Sommet pointu dans le brouillard"><rect width="640" height="360" style="fill: var(--j6n-surface-2)"/><path d="M0 300 L320 70 L640 300 V360 H0Z" style="fill: var(--j6n-accent-strong)"/></svg>
+                  <figcaption class="j6n-carousel__caption"><strong>Km 18</strong> — sommet, 1 840 m de dénivelé positif cumulé.</figcaption>
+                </figure>
+              </div>
+            </div>
+          </section>
+        </template>
+      </div>
+
+      <h2 id="carrousel-reglages">Carrousel — réglages en direct</h2>
+      <p class="j6n-muted">Le même composant piloté en JS : <code>j6n.carousel(el).set({ delay, transition, duration, loop })</code>. Les réglages s'appliquent immédiatement.</p>
+      <div class="j6n-card j6n-stack">
+        <div class="j6n-grid">
+          <div class="j6n-range-field">
+            <div class="j6n-range-field__top">
+              <label class="j6n-label" for="cfg-delay">Temps d'affichage</label>
+              <output class="j6n-range-field__value" for="cfg-delay">5 s</output>
+            </div>
+            <input class="j6n-range" data-j6n-js="range" data-unit=" s" id="cfg-delay" type="range" min="1" max="15" step="0.5" value="5">
+          </div>
+          <div class="j6n-range-field">
+            <div class="j6n-range-field__top">
+              <label class="j6n-label" for="cfg-duration">Durée de transition</label>
+              <output class="j6n-range-field__value" for="cfg-duration">400 ms</output>
+            </div>
+            <input class="j6n-range" data-j6n-js="range" data-unit=" ms" id="cfg-duration" type="range" min="0" max="2000" step="50" value="400">
+          </div>
+          <div class="j6n-field">
+            <label class="j6n-label" for="cfg-transition">Transition</label>
+            <select class="j6n-select" id="cfg-transition">
+              <option value="slide">Glissement</option>
+              <option value="fade">Fondu</option>
+              <option value="none">Aucune</option>
+            </select>
+          </div>
+          <label class="j6n-toggle">
+            <input type="checkbox" id="cfg-loop" checked>
+            <span class="j6n-toggle__track"></span>
+            Boucler
+          </label>
+        </div>
+
+        <section class="j6n-carousel" id="cfg-carousel" data-j6n-js="carousel" aria-roledescription="carrousel" aria-label="Carrousel de réglage"
+                 data-j6n-autoplay="true" data-j6n-delay="5s" data-j6n-duration="400">
+          <div class="j6n-carousel__toolbar">
+            <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" data-j6n-carousel-play>
+              <span class="j6n-carousel__play-icon" aria-hidden="true"></span><span class="j6n-carousel__play-label">Pause</span><span class="j6n-sr-only"> du défilement</span>
+            </button>
+            <div class="j6n-carousel__progress" aria-hidden="true"><span class="j6n-carousel__progress-bar"></span></div>
+            <div class="j6n-carousel__nav">
+              <span class="j6n-carousel__counter" aria-hidden="true">1 / 4</span>
+              <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--icon" data-j6n-carousel-prev aria-controls="cfg-track" aria-label="Diapositive précédente"><span class="j6n-carousel__arrow j6n-carousel__arrow--prev" aria-hidden="true"></span></button>
+              <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--icon" data-j6n-carousel-next aria-controls="cfg-track" aria-label="Diapositive suivante"><span class="j6n-carousel__arrow j6n-carousel__arrow--next" aria-hidden="true"></span></button>
+            </div>
+          </div>
+          <div class="j6n-carousel__viewport">
+            <div class="j6n-carousel__track" id="cfg-track" aria-live="off">
+              <div class="j6n-carousel__slide" role="group" aria-roledescription="diapositive" aria-label="1 sur 4"><div class="j6n-card"><div class="j6n-stat"><span class="j6n-stat__value">42,2<span class="j6n-stat__unit"> km</span></span><span class="j6n-stat__label">Objectif marathon</span></div></div></div>
+              <div class="j6n-carousel__slide" role="group" aria-roledescription="diapositive" aria-label="2 sur 4"><div class="j6n-card"><div class="j6n-stat"><span class="j6n-stat__value">4:58<span class="j6n-stat__unit"> /km</span></span><span class="j6n-stat__label">Allure cible</span></div></div></div>
+              <div class="j6n-carousel__slide" role="group" aria-roledescription="diapositive" aria-label="3 sur 4"><div class="j6n-card"><div class="j6n-stat"><span class="j6n-stat__value">612<span class="j6n-stat__unit"> km</span></span><span class="j6n-stat__label">Volume du bloc</span></div></div></div>
+              <div class="j6n-carousel__slide" role="group" aria-roledescription="diapositive" aria-label="4 sur 4"><div class="j6n-card"><div class="j6n-stat"><span class="j6n-stat__value">16<span class="j6n-stat__unit"> sem.</span></span><span class="j6n-stat__label">Durée du plan</span></div></div></div>
+            </div>
+          </div>
+          <div class="j6n-carousel__dots" role="group" aria-label="Choisir une diapositive"></div>
+        </section>
+        <p class="j6n-muted j6n-mb-0" id="cfg-log" aria-live="polite"></p>
+      </div>
+
     </main>
   </div>
 
@@ -224,6 +374,24 @@
       const value = e.detail.unit === 'mi' ? (km * 0.621371).toFixed(1).replace('.', ',') : km.toFixed(1).replace('.', ',');
       const unit = e.detail.unit === 'mi' ? ' mi' : ' km';
       el.innerHTML = `${value}<span class="j6n-stat__unit">${unit}</span>`;
+    });
+    // Réglages en direct du carrousel : simple câblage de démo vers l'API publique.
+    const cfgCarousel = j6n.carousel('#cfg-carousel');
+    const cfgDelay = document.getElementById('cfg-delay');
+    const cfgDuration = document.getElementById('cfg-duration');
+    const cfgTransition = document.getElementById('cfg-transition');
+    const cfgLoop = document.getElementById('cfg-loop');
+    function applyCfg() {
+      cfgCarousel.set({
+        delay: parseFloat(cfgDelay.value) * 1000,
+        duration: parseInt(cfgDuration.value, 10),
+        transition: cfgTransition.value,
+        loop: cfgLoop.checked
+      });
+    }
+    [cfgDelay, cfgDuration, cfgTransition, cfgLoop].forEach((input) => input.addEventListener('change', applyCfg));
+    document.getElementById('cfg-carousel').addEventListener('j6n:carousel-state', (e) => {
+      document.getElementById('cfg-log').textContent = e.detail.playing ? 'Défilement en cours.' : 'Défilement arrêté.';
     });
   </script>
 </body>
