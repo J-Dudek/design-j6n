@@ -3,7 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Foulée — données</title>
+<title>Cartes, tableaux et carrousel — design system Foulée</title>
+<meta name="description" content="Cartes, badges, tableaux, citations, blocs de code, menu utilisateur et carrousel accessible du design system Foulée, avec code HTML.">
+<link rel="canonical" href="https://design.byj6n.fr/demo/donnees.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Foulée">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Cartes, tableaux et carrousel — design system Foulée">
+<meta property="og:description" content="Cartes, badges, tableaux, citations, blocs de code, menu utilisateur et carrousel accessible du design system Foulée, avec code HTML.">
+<meta property="og:url" content="https://design.byj6n.fr/demo/donnees.html">
+<meta property="og:image" content="https://design.byj6n.fr/demo/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Foulée, design system : theme.css + theme.js, sans dépendance">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="../fonts/sora-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../fonts.css">
 <link rel="stylesheet" href="../theme.css">
 <link rel="stylesheet" href="showcase.css">
 </head>
@@ -51,7 +66,7 @@
           <div class="j6n-grid">
             <article class="j6n-card j6n-card--interactive">
               <p class="j6n-card__meta">SAM. 29 AOÛT · 07:12</p>
-              <h3 class="j6n-card__title">Crête des Ayes</h3>
+              <h3 class="j6n-card__title"><a class="j6n-card__link" href="?sortie=crete-des-ayes">Crête des Ayes</a></h3>
               <p class="j6n-muted">Sortie longue en sentier, brouillard jusqu'à 1200 m.</p>
               <div class="j6n-row j6n-gap-6" id="unit-stats">
                 <div class="j6n-stat">
@@ -99,9 +114,9 @@
       <h2 id="tableau">Tableau — <code>.j6n-table</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
-          <div class="j6n-table-wrap">
+          <div class="j6n-table-wrap" tabindex="0" role="region" aria-labelledby="sorties-caption">
             <table class="j6n-table" data-j6n-js="table-sort">
-              <caption class="j6n-sr-only">Historique des sorties, triable par colonne</caption>
+              <caption class="j6n-sr-only" id="sorties-caption">Historique des sorties, triable par colonne</caption>
               <thead>
                 <tr>
                   <th><button type="button" class="j6n-table__sort">Sortie</button></th>
@@ -138,10 +153,12 @@
       <h2 id="citation">Citation — <code>.j6n-quote</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
-          <blockquote class="j6n-quote">
-            <p>Le sentier ne pardonne pas l'impatience ; il récompense la régularité.</p>
-            <cite class="j6n-quote__cite">Carnet de sortie, col de la Ayes</cite>
-          </blockquote>
+          <figure class="j6n-quote">
+            <blockquote>
+              <p>Le sentier ne pardonne pas l'impatience ; il récompense la régularité.</p>
+            </blockquote>
+            <figcaption class="j6n-quote__cite"><cite>Carnet de sortie, col de la Ayes</cite></figcaption>
+          </figure>
         </template>
       </div>
 
@@ -165,8 +182,8 @@
       <h2 id="menu-utilisateur">Menu utilisateur — <code>.j6n-user-menu</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
-          <button class="j6n-user-menu__trigger" popovertarget="user-menu" aria-haspopup="true" aria-expanded="false">
-            <span class="j6n-user-menu__avatar">JD</span>
+          <button class="j6n-user-menu__trigger" popovertarget="user-menu" aria-expanded="false">
+            <span class="j6n-user-menu__avatar" aria-hidden="true">JD</span>
             <span class="j6n-user-menu__name">Julien</span>
           </button>
           <div class="j6n-dropdown__menu" popover id="user-menu">
@@ -306,7 +323,7 @@
             </select>
           </div>
           <label class="j6n-toggle">
-            <input type="checkbox" id="cfg-loop" checked>
+            <input role="switch" type="checkbox" id="cfg-loop" checked>
             <span class="j6n-toggle__track"></span>
             Boucler
           </label>

@@ -11,6 +11,36 @@ node --check demo/showcase.js
 echo "OK"
 
 echo
+echo "== Outil de migration (npx design-j6n migrate) =="
+node --check bin/design-j6n.mjs
+# la démo et la page 404 sont à jour : l'outil ne doit rien y trouver
+node bin/design-j6n.mjs migrate . --check > /dev/null || { node bin/design-j6n.mjs migrate .; exit 1; }
+echo "OK"
+
+echo
+echo "== theme.js se charge sans DOM (rendu côté serveur) =="
+node -e "require('./theme.js')"
+echo "OK"
+
+echo
+echo "== Polices déclarées dans fonts.css présentes dans fonts/ =="
+missing=0
+for f in $(grep -o "url('fonts/[^']*')" fonts.css | sed "s/url('//; s/')//"); do
+  [ -f "$f" ] || { echo "manquant : $f"; missing=1; }
+done
+[ "$missing" = 0 ] || exit 1
+echo "OK"
+
+echo
+echo "== Champ version du JSON-LD (réécrit au déploiement par stamp-version.sh) =="
+count=$(grep -c '"version": "' demo/index.html || true)
+if [ "$count" != "1" ]; then
+  echo "demo/index.html : $count champ(s) \"version\", 1 attendu — le déploiement Netlify échouerait."
+  exit 1
+fi
+echo "OK"
+
+echo
 echo "== Équilibre des accolades CSS =="
 python3 - <<'EOF'
 import sys

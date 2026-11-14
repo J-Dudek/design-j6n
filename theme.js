@@ -1,35 +1,174 @@
 /* ============================================================
    FOULÉE — contrôles & dynamisme
-   Aucune dépendance, aucun build. Charger après le DOM ou en fin
-   de <body> : <script src="theme.js"></script>
+   Aucune dépendance, aucun build. Charger en fin de <body>, ou dans
+   le <head> avec defer : <script src="theme.js" defer></script>
    S'appuie sur les éléments natifs (<details>, <dialog>, popover)
    plutôt que de tout réimplémenter en JS.
-   API publique : window.j6n.init(root), j6n.toast(msg, opts),
-   j6n.openModal(id), j6n.closeModal(id), j6n.carousel(el, options).
+   API publique : window.j6n.init(root), j6n.destroy(root),
+   j6n.toast(msg, opts), j6n.announce(msg, opts), j6n.openModal(id),
+   j6n.closeModal(id), j6n.carousel(el, options), j6n.dismissed(clé).
    ============================================================ */
 (function () {
   'use strict';
 
+  // Rendu côté serveur (Next.js, Angular SSR…) : ni window ni document — ne rien faire.
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
   const BOUND = 'j6nBound';
+  const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
 
   function each(list, fn) { Array.prototype.forEach.call(list, fn); }
+  function uid(prefix) { return prefix + '-' + Math.random().toString(36).slice(2, 8); }
+
+  function addToken(el, attr, token) {
+    const tokens = (el.getAttribute(attr) || '').split(/\s+/).filter(Boolean);
+    if (tokens.indexOf(token) === -1) tokens.push(token);
+    el.setAttribute(attr, tokens.join(' '));
+  }
+  function removeToken(el, attr, token) {
+    const tokens = (el.getAttribute(attr) || '').split(/\s+/).filter(function (t) { return t && t !== token; });
+    if (tokens.length) el.setAttribute(attr, tokens.join(' '));
+    else el.removeAttribute(attr);
+  }
+
+  /* ---------- Cycle de vie : init / destroy ----------
+     Chaque composant activé est enregistré avec un AbortController : tous ses
+     écouteurs (y compris ceux posés sur document ou window) passent par son
+     signal. j6n.destroy(root) les retire, coupe minuteries et observateurs, et
+     permet de réactiver le sous-arbre plus tard — indispensable en SPA, où les
+     composants sont démontés à chaque changement de route. */
+  const instances = [];
+
   function bind(el, key) {
-    if (el.dataset[BOUND] && el.dataset[BOUND].indexOf(key) > -1) return false;
+    const keys = (el.dataset[BOUND] || '').split(' ');
+    if (keys.indexOf(key) > -1) return false;
     el.dataset[BOUND] = (el.dataset[BOUND] || '') + ' ' + key;
     return true;
+  }
+  function unbind(el, key) {
+    const keys = (el.dataset[BOUND] || '').split(' ').filter(function (k) { return k && k !== key; });
+    if (keys.length) el.dataset[BOUND] = ' ' + keys.join(' ');
+    else delete el.dataset[BOUND];
+  }
+  // Marque l'élément comme activé et renvoie son cycle de vie, ou null s'il l'était déjà.
+  function setup(el, key) {
+    if (!bind(el, key)) return null;
+    const controller = new AbortController();
+    const instance = { el: el, key: key, controller: controller, teardowns: [] };
+    instances.push(instance);
+    return {
+      signal: controller.signal,
+      onDestroy: function (fn) { instance.teardowns.push(fn); }
+    };
+  }
+
+  // destroy(root) : composants situés dans root (root compris).
+  // destroy() sans argument : composants qui ne sont plus dans la page.
+  function destroy(root) {
+    for (let i = instances.length - 1; i >= 0; i--) {
+      const instance = instances[i];
+      const match = root
+        ? root === instance.el || (typeof root.contains === 'function' && root.contains(instance.el))
+        : !instance.el.isConnected;
+      if (!match) continue;
+      instance.controller.abort();
+      instance.teardowns.forEach(function (fn) { fn(); });
+      unbind(instance.el, instance.key);
+      instances.splice(i, 1);
+    }
+  }
+
+  /* ---------- Stockage local tolérant ----------
+     localStorage lève une exception quand il est bloqué (navigation privée de
+     certains navigateurs, cookies refusés) : sans try/catch, l'erreur stoppait
+     l'activation de tous les composants suivants. */
+  const storage = {
+    get: function (key) { try { return window.localStorage.getItem(key); } catch (e) { return null; } },
+    set: function (key, value) { try { window.localStorage.setItem(key, value); } catch (e) { /* stockage indisponible */ } }
+  };
+
+  /* ---------- Annonces pour lecteur d'écran (RGAA 7.5 / WCAG 4.1.3) ----------
+     Les deux zones existent dès l'activation : une zone live créée en même temps
+     que son contenu n'est souvent pas annoncée. */
+  const liveRegions = {};
+  function liveRegion(assertive) {
+    const key = assertive ? 'assertive' : 'polite';
+    let region = liveRegions[key];
+    if (!region || !region.isConnected) {
+      region = document.getElementById('j6n-live-' + key);
+      if (!region) {
+        region = document.createElement('div');
+        region.id = 'j6n-live-' + key;
+        region.className = 'j6n-sr-only';
+        region.setAttribute('aria-live', key);
+        region.setAttribute('aria-atomic', 'true');
+        if (!assertive) region.setAttribute('role', 'status');
+        document.body.appendChild(region);
+      }
+      liveRegions[key] = region;
+    }
+    return region;
+  }
+  function ensureLiveRegions() {
+    if (!document.body) return;
+    liveRegion(false);
+    liveRegion(true);
+  }
+  function announce(message, opts) {
+    const region = liveRegion(!!(opts && opts.assertive));
+    region.textContent = '';
+    // court délai : le texte doit changer après le vidage pour être annoncé, même identique
+    setTimeout(function () { region.textContent = message; }, 50);
+  }
+
+  /* ---------- Focus : où l'envoyer quand l'élément focalisé disparaît ---------- */
+  function isVisible(el) { return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length); }
+  function makeFocusable(el) {
+    if (!el.matches(FOCUSABLE) && !el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+    return el;
+  }
+  function focusAfter(target, selector) {
+    if (selector) {
+      const chosen = document.querySelector(selector);
+      if (chosen) return makeFocusable(chosen);
+    }
+    const candidates = document.querySelectorAll(FOCUSABLE);
+    for (let i = 0; i < candidates.length; i++) {
+      const el = candidates[i];
+      if (target.contains(el) || !isVisible(el)) continue;
+      if (target.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) return el;
+    }
+    const main = document.querySelector('main');
+    return main ? makeFocusable(main) : null;
+  }
+
+  /* ---------- Gardes globales : boutons occupés ou désactivés ----------
+     pointer-events: none ne bloque que la souris : au clavier, Entrée relançait
+     l'action d'un bouton .is-loading. On bloque le clic (souris ou clavier) en
+     phase de capture, avant les écouteurs de la page. */
+  function initGuards() {
+    const life = setup(document.documentElement, 'guards');
+    if (!life) return;
+    document.addEventListener('click', function (e) {
+      const blocked = e.target.closest && e.target.closest('.j6n-btn.is-loading, .j6n-btn[aria-disabled="true"], a.is-disabled, a[aria-disabled="true"]');
+      if (!blocked) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }, { capture: true, signal: life.signal });
   }
 
   /* ---------- Accordéon : groupe exclusif ---------- */
   function initAccordionGroups(root) {
     each(root.querySelectorAll('[data-j6n-js="accordion-group"]'), function (group) {
-      if (!bind(group, 'accordion-group')) return;
+      const life = setup(group, 'accordion-group');
+      if (!life) return;
       each(group.querySelectorAll(':scope > .j6n-accordion__item'), function (item) {
         item.addEventListener('toggle', function () {
           if (!item.open) return;
           each(group.querySelectorAll(':scope > .j6n-accordion__item'), function (other) {
             if (other !== item) other.open = false;
           });
-        });
+        }, { signal: life.signal });
       });
     });
   }
@@ -37,7 +176,8 @@
   /* ---------- Onglets ---------- */
   function initTabs(root) {
     each(root.querySelectorAll('[data-j6n-js="tabs"]'), function (group) {
-      if (!bind(group, 'tabs')) return;
+      const life = setup(group, 'tabs');
+      if (!life) return;
       const tabs = Array.prototype.slice.call(group.querySelectorAll('.j6n-tabs__tab'));
       const panels = tabs.map(function (tab) { return document.getElementById(tab.getAttribute('aria-controls')); });
 
@@ -52,7 +192,7 @@
       }
 
       tabs.forEach(function (tab, i) {
-        tab.addEventListener('click', function () { select(i, false); });
+        tab.addEventListener('click', function () { select(i, false); }, { signal: life.signal });
         tab.addEventListener('keydown', function (e) {
           const last = tabs.length - 1;
           let next = null;
@@ -61,7 +201,7 @@
           else if (e.key === 'Home') next = 0;
           else if (e.key === 'End') next = last;
           if (next !== null) { e.preventDefault(); select(next, true); }
-        });
+        }, { signal: life.signal });
       });
 
       const current = tabs.findIndex(function (t) { return t.getAttribute('aria-selected') === 'true'; });
@@ -72,27 +212,32 @@
   /* ---------- Modale (<dialog> natif) ---------- */
   function initModals(root) {
     each(root.querySelectorAll('[data-j6n-modal-open]'), function (btn) {
-      if (!bind(btn, 'modal-open')) return;
+      const life = setup(btn, 'modal-open');
+      if (!life) return;
       btn.addEventListener('click', function () {
         const dialog = document.getElementById(btn.getAttribute('data-j6n-modal-open'));
         if (dialog) dialog.showModal();
-      });
+      }, { signal: life.signal });
     });
     each(root.querySelectorAll('dialog.j6n-modal'), function (dialog) {
-      if (!bind(dialog, 'modal')) return;
+      const life = setup(dialog, 'modal');
+      if (!life) return;
       each(dialog.querySelectorAll('[data-j6n-modal-close]'), function (btn) {
-        btn.addEventListener('click', function () { dialog.close(); });
+        btn.addEventListener('click', function () { dialog.close(); }, { signal: life.signal });
       });
       dialog.addEventListener('click', function (e) {
         if (e.target === dialog) dialog.close();
-      });
+      }, { signal: life.signal });
     });
   }
 
   function openModal(id) { const d = document.getElementById(id); if (d) d.showModal(); }
   function closeModal(id) { const d = document.getElementById(id); if (d) d.close(); }
 
-  /* ---------- Menus déroulants (popover natif) : positionnement ---------- */
+  /* ---------- Menus déroulants (popover natif) ----------
+     Motif « disclosure » : un bouton qui affiche un panneau. Pas de
+     aria-haspopup (qui promet un role="menu" et la navigation aux flèches) —
+     à poser soi-même si l'on implémente un vrai menu ARIA. */
   function placePopover(trigger, popover) {
     const rect = trigger.getBoundingClientRect();
     const width = popover.offsetWidth || 200;
@@ -104,45 +249,61 @@
 
   function initDropdowns(root) {
     each(root.querySelectorAll('[popovertarget]'), function (trigger) {
-      if (!bind(trigger, 'popover-trigger')) return;
       const popover = document.getElementById(trigger.getAttribute('popovertarget'));
       if (!popover) return;
-      if (!trigger.hasAttribute('aria-haspopup')) trigger.setAttribute('aria-haspopup', 'true');
+      const life = setup(trigger, 'popover-trigger');
+      if (!life) return;
       trigger.setAttribute('aria-expanded', 'false');
-      trigger.addEventListener('click', function () { placePopover(trigger, popover); });
+      trigger.setAttribute('aria-controls', popover.id);
+      trigger.addEventListener('click', function () { placePopover(trigger, popover); }, { signal: life.signal });
       // reflète l'état ouvert/fermé sur le déclencheur — RGAA 7.3 / WCAG 4.1.2 :
       // ne pas compter uniquement sur l'exposition implicite du Popover API.
       popover.addEventListener('toggle', function (e) {
         const open = e.newState === 'open';
         trigger.setAttribute('aria-expanded', String(open));
         if (!open && popover.contains(document.activeElement)) trigger.focus();
-      });
+      }, { signal: life.signal });
       window.addEventListener('resize', function () {
         if (popover.matches(':popover-open')) placePopover(trigger, popover);
-      });
+      }, { signal: life.signal });
     });
   }
 
   /* ---------- Combobox (saisie + suggestions) ---------- */
   function initCombobox(root) {
     each(root.querySelectorAll('[data-j6n-js="combobox"]'), function (wrap) {
-      if (!bind(wrap, 'combobox')) return;
+      const life = setup(wrap, 'combobox');
+      if (!life) return;
+      const opt = { signal: life.signal };
       const input = wrap.querySelector('input');
       const list = wrap.querySelector('.j6n-combobox__list');
       const options = Array.prototype.slice.call(wrap.querySelectorAll('.j6n-combobox__option'));
+      const empty = wrap.querySelector('.j6n-combobox__empty');
       let activeIndex = -1;
+      let announceTimer = null;
 
       // rôles ARIA du motif combobox — posés en JS pour rester corrects même si le
       // balisage d'origine les oublie (RGAA 7.3 / WAI-ARIA APG Combobox).
-      if (!list.id) list.id = 'j6n-combobox-list-' + Math.random().toString(36).slice(2, 8);
+      if (!list.id) list.id = uid('j6n-combobox-list');
       list.setAttribute('role', 'listbox');
+      input.setAttribute('role', 'combobox');
+      input.setAttribute('aria-autocomplete', 'list');
       input.setAttribute('aria-controls', list.id);
       input.setAttribute('aria-expanded', 'false');
-      options.forEach(function (o) {
+      options.forEach(function (o, i) {
+        // sans id, aria-activedescendant ne pourrait désigner l'option active
+        if (!o.id) o.id = list.id + '-opt-' + i;
         o.setAttribute('role', 'option');
         o.setAttribute('aria-selected', 'false');
       });
+      // une listbox ne contient que des options : le message vide est annoncé à part
+      if (empty) empty.setAttribute('aria-hidden', 'true');
 
+      function resetActive() {
+        activeIndex = -1;
+        input.removeAttribute('aria-activedescendant');
+        options.forEach(function (o) { o.setAttribute('aria-selected', 'false'); o.classList.remove('is-active'); });
+      }
       function open() {
         placePopover(input, list);
         if (!list.matches(':popover-open')) list.showPopover();
@@ -150,10 +311,8 @@
       }
       function close() {
         if (list.matches(':popover-open')) list.hidePopover();
-        activeIndex = -1;
         input.setAttribute('aria-expanded', 'false');
-        input.removeAttribute('aria-activedescendant');
-        options.forEach(function (o) { o.setAttribute('aria-selected', 'false'); o.classList.remove('is-active'); });
+        resetActive();
       }
       function setActive(index) {
         options.forEach(function (o) { o.classList.remove('is-active'); o.setAttribute('aria-selected', 'false'); });
@@ -162,7 +321,7 @@
         activeIndex = ((index % visible.length) + visible.length) % visible.length;
         visible[activeIndex].classList.add('is-active');
         visible[activeIndex].setAttribute('aria-selected', 'true');
-        input.setAttribute('aria-activedescendant', visible[activeIndex].id || '');
+        input.setAttribute('aria-activedescendant', visible[activeIndex].id);
       }
       function choose(option) {
         input.value = option.textContent.trim();
@@ -172,17 +331,23 @@
 
       input.addEventListener('input', function () {
         const q = input.value.trim().toLowerCase();
-        let any = false;
+        let count = 0;
         options.forEach(function (o) {
           const match = !q || o.textContent.toLowerCase().indexOf(q) > -1;
           o.hidden = !match;
-          if (match) any = true;
+          if (match) count++;
         });
-        const empty = wrap.querySelector('.j6n-combobox__empty');
-        if (empty) empty.hidden = any;
+        if (empty) empty.hidden = count > 0;
+        resetActive();
         open();
-      });
-      input.addEventListener('focus', open);
+        // nombre de résultats annoncé une fois la frappe posée, pas à chaque touche
+        clearTimeout(announceTimer);
+        announceTimer = setTimeout(function () {
+          announce(count === 0 ? 'Aucun résultat' : count === 1 ? '1 suggestion' : count + ' suggestions');
+        }, 500);
+      }, opt);
+      input.addEventListener('focus', open, opt);
+      input.addEventListener('blur', close, opt);
       input.addEventListener('keydown', function (e) {
         if (e.key === 'ArrowDown') { e.preventDefault(); open(); setActive(activeIndex + 1); }
         else if (e.key === 'ArrowUp') { e.preventDefault(); open(); setActive(activeIndex - 1); }
@@ -190,28 +355,74 @@
           const visible = options.filter(function (o) { return !o.hidden; });
           if (activeIndex > -1 && visible[activeIndex]) { e.preventDefault(); choose(visible[activeIndex]); }
         } else if (e.key === 'Escape') close();
+      }, opt);
+      options.forEach(function (o) {
+        // garde le focus dans le champ au clic : sinon le blur fermerait la liste avant la sélection
+        o.addEventListener('mousedown', function (e) { e.preventDefault(); }, opt);
+        o.addEventListener('click', function () { choose(o); }, opt);
       });
-      options.forEach(function (o) { o.addEventListener('click', function () { choose(o); }); });
-      document.addEventListener('click', function (e) {
-        if (!wrap.contains(e.target) && !list.contains(e.target)) close();
-      });
+      // popover « auto » : fermé aussi par le navigateur (clic extérieur) — garder l'état ARIA aligné
+      list.addEventListener('toggle', function (e) {
+        if (e.newState === 'closed') { input.setAttribute('aria-expanded', 'false'); resetActive(); }
+      }, opt);
+      life.onDestroy(function () { clearTimeout(announceTimer); });
     });
   }
 
-  /* ---------- Infobulle : support tactile ---------- */
-  function initTooltips(root) {
-    if (!bind(root === document ? document.documentElement : root, 'tooltip')) return;
-    const isTouch = matchMedia('(hover: none)').matches;
-    if (!isTouch) return;
-    each(root.querySelectorAll('[data-tooltip]'), function (el) {
-      el.addEventListener('click', function (e) {
-        const wasOpen = el.classList.contains('is-visible');
-        each(document.querySelectorAll('[data-tooltip].is-visible'), function (o) { o.classList.remove('is-visible'); });
-        if (!wasOpen) { el.classList.add('is-visible'); e.stopPropagation(); }
-      });
+  /* ---------- Infobulle (RGAA 10.13 / WCAG 1.4.13) ----------
+     Le texte de data-tooltip devient un vrai élément, relié par aria-describedby :
+     lu comme description et non ajouté au nom du contrôle (ce que faisait le
+     ::after). L'infobulle reste affichée quand la souris passe dessus, et Échap
+     la masque sans déplacer le focus. */
+  const NO_CONTENT = /^(INPUT|IMG|SELECT|TEXTAREA|BR|HR|AREA|EMBED|WBR)$/;
+
+  function hideTooltips(dismiss) {
+    each(document.querySelectorAll('[data-tooltip]'), function (el) {
+      if (dismiss && el.matches(':hover, :focus-visible, .is-visible')) el.classList.add('is-dismissed');
+      el.classList.remove('is-visible');
     });
-    document.addEventListener('click', function () {
-      each(document.querySelectorAll('[data-tooltip].is-visible'), function (o) { o.classList.remove('is-visible'); });
+  }
+
+  function initTooltips(root) {
+    const global = setup(document.documentElement, 'tooltip-global');
+    if (global) {
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideTooltips(true); }, { signal: global.signal });
+      document.addEventListener('click', function () { hideTooltips(false); }, { signal: global.signal });
+    }
+    const isTouch = matchMedia('(hover: none)').matches;
+    each(root.querySelectorAll('[data-tooltip]'), function (el) {
+      if (NO_CONTENT.test(el.tagName)) {
+        console.warn('[j6n] data-tooltip sur un élément qui ne peut pas contenir l\'infobulle — le poser sur un conteneur ou un bouton :', el);
+        return;
+      }
+      const life = setup(el, 'tooltip');
+      if (!life) return;
+      const opt = { signal: life.signal };
+      const tip = document.createElement('span');
+      tip.className = 'j6n-tooltip';
+      tip.id = uid('j6n-tooltip');
+      // aria-hidden : hors du nom du contrôle ; aria-describedby le lit quand même
+      tip.setAttribute('aria-hidden', 'true');
+      tip.textContent = el.getAttribute('data-tooltip');
+      el.appendChild(tip);
+      addToken(el, 'aria-describedby', tip.id);
+
+      // un clic sur l'infobulle ne doit pas déclencher le bouton qui la porte
+      tip.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); }, opt);
+      el.addEventListener('mouseleave', function () { el.classList.remove('is-dismissed'); }, opt);
+      el.addEventListener('focusout', function () { el.classList.remove('is-dismissed', 'is-visible'); }, opt);
+      if (isTouch) {
+        el.addEventListener('click', function (e) {
+          const wasOpen = el.classList.contains('is-visible');
+          hideTooltips(false);
+          if (!wasOpen) { el.classList.remove('is-dismissed'); el.classList.add('is-visible'); e.stopPropagation(); }
+        }, opt);
+      }
+      life.onDestroy(function () {
+        tip.remove();
+        removeToken(el, 'aria-describedby', tip.id);
+        el.classList.remove('is-visible', 'is-dismissed');
+      });
     });
   }
 
@@ -226,7 +437,8 @@
   }
   function initPassword(root) {
     each(root.querySelectorAll('[data-j6n-js="password"]'), function (wrap) {
-      if (!bind(wrap, 'password')) return;
+      const life = setup(wrap, 'password');
+      if (!life) return;
       const input = wrap.querySelector('input');
       const toggle = wrap.querySelector('[data-j6n-password-toggle]');
       const meter = wrap.parentElement.querySelector('.j6n-password__meter');
@@ -235,19 +447,26 @@
       const classes = ['is-weak', 'is-weak', 'is-fair', 'is-good', 'is-strong'];
 
       if (toggle) {
+        // le libellé dit l'action (Afficher / Masquer) : pas d'aria-pressed en plus,
+        // un lecteur d'écran annoncerait « Masquer, enfoncé »
+        toggle.removeAttribute('aria-pressed');
+        if (!input.id) input.id = uid('j6n-password');
+        toggle.setAttribute('aria-controls', input.id);
         toggle.addEventListener('click', function () {
           const showing = input.type === 'text';
           input.type = showing ? 'password' : 'text';
           toggle.textContent = showing ? 'Afficher' : 'Masquer';
-          toggle.setAttribute('aria-pressed', String(!showing));
-        });
+        }, { signal: life.signal });
       }
       if (meter) {
+        // force annoncée quand elle change de palier, pas à chaque touche
+        if (meterLabel) meterLabel.setAttribute('aria-live', 'polite');
         input.addEventListener('input', function () {
           const score = input.value ? passwordScore(input.value) : 0;
           meter.className = 'j6n-password__meter ' + (input.value ? classes[score] : '');
-          if (meterLabel) meterLabel.textContent = input.value ? labels[score] : '';
-        });
+          const text = input.value ? labels[score] : '';
+          if (meterLabel && meterLabel.textContent !== text) meterLabel.textContent = text;
+        }, { signal: life.signal });
       }
     });
   }
@@ -255,7 +474,8 @@
   /* ---------- Curseur ---------- */
   function initRange(root) {
     each(root.querySelectorAll('[data-j6n-js="range"]'), function (input) {
-      if (!bind(input, 'range')) return;
+      const life = setup(input, 'range');
+      if (!life) return;
       const field = input.closest('.j6n-range-field');
       const output = field ? field.querySelector('.j6n-range-field__value') : null;
       function update() {
@@ -263,7 +483,7 @@
         input.style.setProperty('--_fill', pct + '%');
         if (output) output.textContent = input.value + (input.dataset.unit || '');
       }
-      input.addEventListener('input', update);
+      input.addEventListener('input', update, { signal: life.signal });
       update();
     });
   }
@@ -278,13 +498,28 @@
   }
   function initUpload(root) {
     each(root.querySelectorAll('[data-j6n-js="upload"]'), function (zone) {
-      if (!bind(zone, 'upload')) return;
+      const life = setup(zone, 'upload');
+      if (!life) return;
+      const opt = { signal: life.signal };
       const input = zone.querySelector('input[type="file"]');
+      const trigger = zone.querySelector('[data-j6n-upload-trigger]');
       const list = zone.parentElement.querySelector('.j6n-upload__list') || zone.querySelector('.j6n-upload__list');
 
-      function render(files) {
+      if (trigger) {
+        // le bouton visible ouvre le sélecteur : le champ masqué sort de l'ordre de
+        // tabulation, sinon il créait un arrêt invisible en doublon (RGAA 10.7)
+        input.tabIndex = -1;
+        trigger.addEventListener('click', function () { input.click(); }, opt);
+      }
+
+      function summary(count) {
+        return count === 0 ? 'Aucun fichier sélectionné' : count === 1 ? '1 fichier sélectionné' : count + ' fichiers sélectionnés';
+      }
+
+      function render(files, focusIndex) {
         if (!list) return;
         list.innerHTML = '';
+        const removes = [];
         each(files, function (file, i) {
           const row = document.createElement('div');
           row.className = 'j6n-upload__item';
@@ -303,54 +538,79 @@
             const dt = new DataTransfer();
             each(input.files, function (f, j) { if (j !== i) dt.items.add(f); });
             input.files = dt.files;
-            render(input.files);
+            render(input.files, i);
+            announce(file.name + ' retiré. ' + summary(input.files.length) + '.');
           });
           row.appendChild(name); row.appendChild(size); row.appendChild(remove);
           list.appendChild(row);
+          removes.push(remove);
         });
+        // le bouton cliqué a disparu : focus sur la ligne suivante, sinon sur le déclencheur
+        if (focusIndex !== undefined) {
+          const next = removes[Math.min(focusIndex, removes.length - 1)];
+          if (next) next.focus();
+          else (trigger || makeFocusable(zone)).focus();
+        }
       }
 
-      input.addEventListener('change', function () { render(input.files); });
+      input.addEventListener('change', function () {
+        render(input.files);
+        announce(summary(input.files.length));
+      }, opt);
       ['dragenter', 'dragover'].forEach(function (evt) {
-        zone.addEventListener(evt, function (e) { e.preventDefault(); zone.classList.add('is-dragover'); });
+        zone.addEventListener(evt, function (e) { e.preventDefault(); zone.classList.add('is-dragover'); }, opt);
       });
       ['dragleave', 'drop'].forEach(function (evt) {
-        zone.addEventListener(evt, function (e) { e.preventDefault(); zone.classList.remove('is-dragover'); });
+        zone.addEventListener(evt, function (e) { e.preventDefault(); zone.classList.remove('is-dragover'); }, opt);
       });
       zone.addEventListener('drop', function (e) {
         if (e.dataTransfer && e.dataTransfer.files.length) {
           input.files = e.dataTransfer.files;
           render(input.files);
+          announce(summary(input.files.length));
         }
-      });
+      }, opt);
     });
   }
 
-  /* ---------- Bandeaux : notice / consentement (mémorisés) ---------- */
+  /* ---------- Bandeaux : notice / consentement (mémorisés) ----------
+     data-j6n-dismiss="clé" mémorise la fermeture ; data-j6n-dismiss-value
+     précise la valeur enregistrée (ex. "accepte" / "refuse" pour un
+     consentement), relue avec j6n.dismissed("clé") et diffusée dans
+     l'évènement j6n:dismiss. data-j6n-dismiss-focus="sélecteur" choisit où
+     va le focus après fermeture (par défaut : l'élément focalisable suivant). */
   function initDismiss(root) {
     each(root.querySelectorAll('[data-j6n-dismiss], [data-j6n-dismiss-target]'), function (btn) {
-      if (!bind(btn, 'dismiss')) return;
       const key = btn.getAttribute('data-j6n-dismiss');
       const targetId = btn.getAttribute('data-j6n-dismiss-target');
       const target = targetId ? document.getElementById(targetId) : btn.closest('.j6n-notice, .j6n-consent, .j6n-alert');
       if (!target) return;
-      if (key && localStorage.getItem(key)) { target.hidden = true; return; }
+      const life = setup(btn, 'dismiss');
+      if (!life) return;
+      if (key && storage.get(key) !== null) { target.hidden = true; return; }
       btn.addEventListener('click', function () {
+        const value = btn.getAttribute('data-j6n-dismiss-value') || '1';
+        // le bouton va disparaître avec le bandeau : préparer la suite du parcours clavier (WCAG 2.4.3)
+        const next = target.contains(document.activeElement) ? focusAfter(target, btn.getAttribute('data-j6n-dismiss-focus')) : null;
         target.hidden = true;
-        if (key) localStorage.setItem(key, '1');
-      });
+        if (key) storage.set(key, value);
+        target.dispatchEvent(new CustomEvent('j6n:dismiss', { bubbles: true, detail: { key: key, value: value } }));
+        if (next) next.focus();
+      }, { signal: life.signal });
     });
   }
+  function dismissed(key) { return storage.get(key); }
 
   /* ---------- Sommaire : suivi de défilement ---------- */
   function initToc(root) {
     each(root.querySelectorAll('[data-j6n-js="toc"]'), function (toc) {
-      if (!bind(toc, 'toc')) return;
       const links = Array.prototype.slice.call(toc.querySelectorAll('a[href^="#"]'));
       const targets = links
         .map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); })
         .filter(Boolean);
       if (!targets.length || !('IntersectionObserver' in window)) return;
+      const life = setup(toc, 'toc');
+      if (!life) return;
       const observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
@@ -360,13 +620,33 @@
         });
       }, { rootMargin: '-20% 0px -70% 0px' });
       targets.forEach(function (t) { observer.observe(t); });
+      life.onDestroy(function () { observer.disconnect(); });
+    });
+  }
+
+  /* ---------- Tableau : zone de défilement accessible au clavier ----------
+     .j6n-table-wrap défile horizontalement sur petit écran : il doit pouvoir
+     recevoir le focus pour défiler aux flèches, et être nommé (RGAA 7.1). */
+  function initTableWraps(root) {
+    each(root.querySelectorAll('.j6n-table-wrap'), function (wrap) {
+      if (!bind(wrap, 'table-wrap')) return;
+      if (!wrap.hasAttribute('tabindex')) wrap.tabIndex = 0;
+      if (!wrap.hasAttribute('role')) wrap.setAttribute('role', 'region');
+      if (!wrap.hasAttribute('aria-label') && !wrap.hasAttribute('aria-labelledby')) {
+        const caption = wrap.querySelector('caption');
+        if (caption) {
+          if (!caption.id) caption.id = uid('j6n-caption');
+          wrap.setAttribute('aria-labelledby', caption.id);
+        }
+      }
     });
   }
 
   /* ---------- Tableau triable ---------- */
   function initTableSort(root) {
     each(root.querySelectorAll('[data-j6n-js="table-sort"]'), function (table) {
-      if (!bind(table, 'table-sort')) return;
+      const life = setup(table, 'table-sort');
+      if (!life) return;
       const tbody = table.querySelector('tbody');
       each(table.querySelectorAll('.j6n-table__sort'), function (btn) {
         btn.addEventListener('click', function () {
@@ -387,7 +667,7 @@
           });
           rows.forEach(function (r) { tbody.appendChild(r); });
           announce('Tableau trié par ' + btn.textContent.trim() + ', ordre ' + (asc ? 'croissant' : 'décroissant') + '.');
-        });
+        }, { signal: life.signal });
       });
     });
   }
@@ -395,9 +675,14 @@
   /* ---------- Menu mobile du header ---------- */
   function initMenuToggle(root) {
     each(root.querySelectorAll('[data-j6n-js="menu-toggle"]'), function (btn) {
-      if (!bind(btn, 'menu-toggle')) return;
-      const nav = btn.closest('.j6n-header').querySelector('.j6n-nav');
+      const header = btn.closest('.j6n-header');
+      const nav = header ? header.querySelector('.j6n-nav') : null;
       if (!nav) return;
+      const life = setup(btn, 'menu-toggle');
+      if (!life) return;
+      const opt = { signal: life.signal };
+      if (!nav.id) nav.id = uid('j6n-nav');
+      btn.setAttribute('aria-controls', nav.id);
       function set(open) {
         nav.classList.toggle('is-open', open);
         btn.setAttribute('aria-expanded', String(open));
@@ -410,28 +695,35 @@
           const first = nav.querySelector('a, button');
           if (first) first.focus();
         }
-      });
-      nav.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); });
+      }, opt);
+      nav.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); }, opt);
+      // quitter le menu ouvert au clavier (Tab) le referme, comme un clic à l'extérieur
+      nav.addEventListener('focusout', function (e) {
+        if (!nav.classList.contains('is-open')) return;
+        const to = e.relatedTarget;
+        if (to && !nav.contains(to) && to !== btn) set(false);
+      }, opt);
       document.addEventListener('keydown', function (e) {
         if (e.key !== 'Escape' || !nav.classList.contains('is-open')) return;
         set(false);
         btn.focus();
-      });
+      }, opt);
       document.addEventListener('click', function (e) {
         if (nav.classList.contains('is-open') && !nav.contains(e.target)) set(false);
-      });
+      }, opt);
     });
   }
 
   /* ---------- Bascule d'unités ---------- */
   function initUnitSwitch(root) {
     each(root.querySelectorAll('[data-j6n-js="unit-switch"]'), function (group) {
-      if (!bind(group, 'unit-switch')) return;
+      const life = setup(group, 'unit-switch');
+      if (!life) return;
       each(group.querySelectorAll('input[type="radio"]'), function (input) {
         input.addEventListener('change', function () {
           if (!input.checked) return;
           document.dispatchEvent(new CustomEvent('j6n:unit-change', { detail: { unit: input.value } }));
-        });
+        }, { signal: life.signal });
       });
     });
   }
@@ -496,7 +788,8 @@
     return out;
   }
 
-  function createCarousel(el, options) {
+  function createCarousel(el, options, life) {
+    const opt = { signal: life.signal };
     const viewport = el.querySelector('.j6n-carousel__viewport');
     const track = el.querySelector('.j6n-carousel__track');
     const slides = Array.prototype.filter.call(track.children, function (s) { return s.classList.contains('j6n-carousel__slide'); });
@@ -528,7 +821,7 @@
     if (!el.hasAttribute('aria-label') && !el.hasAttribute('aria-labelledby')) {
       console.warn('[j6n] carrousel sans aria-label ni aria-labelledby (RGAA 13.8) :', el);
     }
-    if (!track.id) track.id = 'j6n-carousel-' + Math.random().toString(36).slice(2, 8);
+    if (!track.id) track.id = uid('j6n-carousel');
     slides.forEach(function (slide, i) {
       slide.setAttribute('role', 'group');
       if (!slide.hasAttribute('aria-roledescription')) slide.setAttribute('aria-roledescription', 'diapositive');
@@ -552,7 +845,7 @@
       dots = Array.prototype.slice.call(dotsWrap.querySelectorAll('.j6n-carousel__dot'));
       dots.forEach(function (dot, i) {
         dot.setAttribute('aria-controls', track.id);
-        dot.addEventListener('click', function () { pause(); goTo(i); });
+        dot.addEventListener('click', function () { pause(); goTo(i); }, opt);
       });
     }
 
@@ -674,24 +967,24 @@
       else { render(); sync(); }
     }
 
-    if (playBtn) playBtn.addEventListener('click', function () { if (el.classList.contains('is-running')) pause(); else play(); });
+    if (playBtn) playBtn.addEventListener('click', function () { if (el.classList.contains('is-running')) pause(); else play(); }, opt);
     if (prevBtn) prevBtn.addEventListener('click', function () {
       if (prevBtn.getAttribute('aria-disabled') === 'true') return;
       pause(); goTo(index - 1);
-    });
+    }, opt);
     if (nextBtn) nextBtn.addEventListener('click', function () {
       if (nextBtn.getAttribute('aria-disabled') === 'true') return;
       pause(); goTo(index + 1);
-    });
+    }, opt);
     // focus dans le carrousel (hors bouton lecture/pause) : arrêt, sans reprise implicite (APG)
     el.addEventListener('focusin', function (e) {
       if (playBtn && playBtn.contains(e.target)) return;
       if (el.classList.contains('is-running')) pause();
-    });
+    }, opt);
     // survol des diapositives seulement : la barre d'outils reste réactive au clic
-    viewport.addEventListener('mouseenter', function () { hovered = true; sync(); });
-    viewport.addEventListener('mouseleave', function () { hovered = false; sync(); });
-    document.addEventListener('visibilitychange', function () { pageHidden = document.hidden; sync(); });
+    viewport.addEventListener('mouseenter', function () { hovered = true; sync(); }, opt);
+    viewport.addEventListener('mouseleave', function () { hovered = false; sync(); }, opt);
+    document.addEventListener('visibilitychange', function () { pageHidden = document.hidden; sync(); }, opt);
 
     let swipeX = null;
     let swipeY = 0;
@@ -699,7 +992,7 @@
       if (!opts.swipe || e.pointerType === 'mouse') return;
       swipeX = e.clientX;
       swipeY = e.clientY;
-    });
+    }, opt);
     viewport.addEventListener('pointerup', function (e) {
       if (swipeX === null) return;
       const dx = e.clientX - swipeX;
@@ -710,8 +1003,8 @@
       if (!opts.loop && (target < 0 || target >= total)) return;
       pause();
       goTo(target);
-    });
-    viewport.addEventListener('pointercancel', function () { swipeX = null; });
+    }, opt);
+    viewport.addEventListener('pointercancel', function () { swipeX = null; }, opt);
 
     el.classList.add('is-initializing');
     applyOptions();
@@ -735,6 +1028,11 @@
       get options() { return Object.assign({}, opts); }
     };
     carousels.set(el, api);
+    life.onDestroy(function () {
+      clearTimer();
+      el.classList.remove('is-running', 'is-held');
+      carousels.delete(el);
+    });
     return api;
   }
 
@@ -743,48 +1041,36 @@
     if (!el) return null;
     const existing = carousels.get(el);
     if (existing) { if (options) existing.set(options); return existing; }
-    bind(el, 'carousel');
-    return createCarousel(el, options);
+    const life = setup(el, 'carousel');
+    return life ? createCarousel(el, options, life) : null;
   }
 
   function initCarousels(root) {
     each(root.querySelectorAll('[data-j6n-js="carousel"]'), function (el) {
-      if (!bind(el, 'carousel')) return;
-      createCarousel(el);
+      const life = setup(el, 'carousel');
+      if (!life) return;
+      createCarousel(el, undefined, life);
     });
   }
 
-  /* ---------- Annonces discrètes pour lecteur d'écran (RGAA 7.4 / WCAG 4.1.3) ---------- */
-  let announceRegion;
-  function announce(message) {
-    if (!announceRegion) {
-      announceRegion = document.createElement('div');
-      announceRegion.className = 'j6n-sr-only';
-      announceRegion.setAttribute('aria-live', 'polite');
-      announceRegion.setAttribute('role', 'status');
-      document.body.appendChild(announceRegion);
-    }
-    announceRegion.textContent = '';
-    // reflow avant de reposer le texte : force l'annonce même si le message ne change pas
-    void announceRegion.offsetWidth;
-    announceRegion.textContent = message;
-  }
-
-  /* ---------- Toasts ---------- */
+  /* ---------- Toasts ----------
+     L'annonce passe par les zones live (assertive pour une erreur). Le toast
+     reste affiché tant que la souris est dessus ou que le focus y est
+     (WCAG 2.2.1) ; une erreur (tone: 'danger') ne disparaît pas seule.
+     duration: 0 → reste jusqu'à fermeture. */
   function toastRegion() {
     let region = document.getElementById('j6n-toast-region');
     if (!region) {
       region = document.createElement('div');
       region.id = 'j6n-toast-region';
-      region.setAttribute('aria-live', 'polite');
-      region.setAttribute('role', 'status');
       document.body.appendChild(region);
     }
     return region;
   }
   function toast(message, opts) {
     opts = opts || {};
-    const region = toastRegion();
+    const urgent = opts.tone === 'danger';
+    const duration = opts.duration !== undefined ? opts.duration : (urgent ? 0 : 6000);
     const el = document.createElement('div');
     el.className = 'j6n-toast' + (opts.tone ? ' j6n-toast--' + opts.tone : '');
     const text = document.createElement('span');
@@ -792,18 +1078,57 @@
     const close = document.createElement('button');
     close.type = 'button';
     close.className = 'j6n-toast__close';
-    close.setAttribute('aria-label', 'Fermer');
+    close.setAttribute('aria-label', 'Fermer la notification');
     close.textContent = '×';
     el.appendChild(text);
     el.appendChild(close);
-    region.appendChild(el);
+    toastRegion().appendChild(el);
+    announce(message, { assertive: urgent });
 
-    function dismiss() {
-      el.classList.add('is-leaving');
-      el.addEventListener('animationend', function () { el.remove(); }, { once: true });
+    let timer = null;
+    let remaining = duration;
+    let startedAt = 0;
+    let hovered = false;
+    let focused = false;
+    let returnFocus = null;
+    let gone = false;
+
+    function run() {
+      if (!duration || gone || hovered || focused || timer) return;
+      startedAt = Date.now();
+      timer = setTimeout(dismiss, remaining);
     }
+    function hold() {
+      if (!timer) return;
+      clearTimeout(timer);
+      timer = null;
+      remaining = Math.max(1000, remaining - (Date.now() - startedAt));
+    }
+    function dismiss() {
+      if (gone) return;
+      gone = true;
+      clearTimeout(timer);
+      if (el.contains(document.activeElement) && returnFocus && returnFocus.isConnected) returnFocus.focus();
+      el.classList.add('is-leaving');
+      const remove = function () { el.remove(); };
+      el.addEventListener('animationend', remove, { once: true });
+      setTimeout(remove, 600); // filet si aucune animation ne tourne
+    }
+
+    el.addEventListener('mouseenter', function () { hovered = true; hold(); });
+    el.addEventListener('mouseleave', function () { hovered = false; run(); });
+    el.addEventListener('focusin', function (e) {
+      if (!focused && e.relatedTarget && !el.contains(e.relatedTarget)) returnFocus = e.relatedTarget;
+      focused = true;
+      hold();
+    });
+    el.addEventListener('focusout', function (e) {
+      if (el.contains(e.relatedTarget)) return;
+      focused = false;
+      run();
+    });
     close.addEventListener('click', dismiss);
-    if (opts.duration !== 0) setTimeout(dismiss, opts.duration || 4000);
+    run();
     return el;
   }
 
@@ -814,23 +1139,20 @@
       const control = field.querySelector('input, select, textarea');
       if (!control) return;
       const describers = field.querySelectorAll('.j6n-hint, .j6n-field__count, .j6n-password__meter-label');
-      const ids = [];
       describers.forEach(function (el, i) {
         // liés même si vides pour l'instant (ex. le score du mot de passe se remplit
         // au fil de la saisie) : la relation doit exister dès le départ.
         if (!el.id) el.id = (control.id || 'j6n-field') + '-desc-' + i;
-        ids.push(el.id);
+        addToken(control, 'aria-describedby', el.id);
       });
-      if (!ids.length) return;
-      const existing = (control.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
-      ids.forEach(function (id) { if (existing.indexOf(id) === -1) existing.push(id); });
-      control.setAttribute('aria-describedby', existing.join(' '));
     });
   }
 
   /* ---------- Amorçage ---------- */
   function init(root) {
     root = root || document;
+    ensureLiveRegions();
+    initGuards();
     initFieldDescriptions(root);
     initAccordionGroups(root);
     initTabs(root);
@@ -843,11 +1165,48 @@
     initUpload(root);
     initDismiss(root);
     initToc(root);
+    initTableWraps(root);
     initTableSort(root);
     initMenuToggle(root);
     initUnitSwitch(root);
     initCarousels(root);
   }
+
+  /* ---------- Signal de migration 0.1.x → 0.2 ----------
+     Une seule fois par page, après chargement complet (feuilles de style et
+     polices déclarées) : si un usage de l'ancienne version est repéré, un
+     avertissement en console liste les points et renvoie vers
+     « npx design-j6n migrate ». Rien n'est affiché sinon.
+     Le faire taire (ex. polices système voulues) : <html data-j6n-quiet>. */
+  function legacyFindings() {
+    const found = [];
+    let hasFonts = false;
+    if (document.fonts && document.fonts.forEach) {
+      document.fonts.forEach(function (face) {
+        if (/^["']?(Sora|Inter)["']?$/.test(face.family)) hasFonts = true;
+      });
+    }
+    if (!hasFonts) found.push('Polices : fonts.css n\'est pas chargé — theme.css n\'importe plus Google Fonts, le texte s\'affiche en police système.');
+    function check(selector, message) {
+      try { if (document.querySelector(selector)) found.push(message); } catch (e) { /* sélecteur non pris en charge */ }
+    }
+    check('[popovertarget][aria-haspopup="true"]', 'Menu déroulant : retirer aria-haspopup="true" des déclencheurs popover.');
+    check('.j6n-consent [data-j6n-dismiss]:not([data-j6n-dismiss-value])', 'Consentement : ajouter data-j6n-dismiss-value="accepte" / "refuse" aux boutons.');
+    check('.j6n-stepper:not(ol)', 'Étapes : .j6n-stepper doit être une <ol> (avec aria-current="step").');
+    check('ul.j6n-pagination:not(nav ul)', 'Pagination : envelopper la <ul> dans <nav aria-label="Pagination">.');
+    check('blockquote.j6n-quote', 'Citation : passer à <figure class="j6n-quote"> + <figcaption>.');
+    return found;
+  }
+  function warnLegacy() {
+    if (document.documentElement.hasAttribute('data-j6n-quiet')) return;
+    const found = legacyFindings();
+    if (!found.length) return;
+    console.warn('[j6n] Usage antérieur à la 0.2 détecté :\n- ' + found.join('\n- ') +
+      '\nLancer « npx design-j6n migrate » dans le projet pour la liste complète et les corrections automatiques (--write). ' +
+      'Masquer ce message : <html data-j6n-quiet>.');
+  }
+  if (document.readyState === 'complete') setTimeout(warnLegacy, 0);
+  else window.addEventListener('load', warnLegacy, { once: true });
 
   document.documentElement.setAttribute('data-j6n', 'true');
   if (document.readyState === 'loading') {
@@ -856,5 +1215,14 @@
     init(document);
   }
 
-  window.j6n = { init: init, toast: toast, openModal: openModal, closeModal: closeModal, carousel: carousel };
+  window.j6n = {
+    init: init,
+    destroy: destroy,
+    toast: toast,
+    announce: announce,
+    openModal: openModal,
+    closeModal: closeModal,
+    carousel: carousel,
+    dismissed: dismissed
+  };
 })();

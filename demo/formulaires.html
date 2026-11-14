@@ -3,7 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Foulée — formulaires</title>
+<title>Composants de formulaire accessibles — design system Foulée</title>
+<meta name="description" content="Champs de formulaire Foulée : champ avec icône, recherche, mot de passe, curseur, import de fichier et combobox accessible, avec code à copier.">
+<link rel="canonical" href="https://design.byj6n.fr/demo/formulaires.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Foulée">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Composants de formulaire accessibles — design system Foulée">
+<meta property="og:description" content="Champs de formulaire Foulée : champ avec icône, recherche, mot de passe, curseur, import de fichier et combobox accessible, avec code à copier.">
+<meta property="og:url" content="https://design.byj6n.fr/demo/formulaires.html">
+<meta property="og:image" content="https://design.byj6n.fr/demo/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Foulée, design system : theme.css + theme.js, sans dépendance">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="../fonts/sora-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../fonts.css">
 <link rel="stylesheet" href="../theme.css">
 <link rel="stylesheet" href="showcase.css">
 </head>
@@ -43,9 +58,10 @@
     <main id="contenu" class="j6n-stack">
       <p class="j6n-eyebrow">Composants</p>
       <h1>Formulaires</h1>
-      <p class="j6n-muted">Champs, groupes et saisies assistées.</p>
+      <p class="j6n-muted">Champs, groupes et saisies assistées. Chaque champ repose sur un élément natif (<code>&lt;input&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;textarea&gt;</code>) relié à son <code>&lt;label&gt;</code> ; <code>theme.js</code> ajoute seulement ce que le navigateur ne fait pas seul : visibilité du mot de passe, valeur du curseur, glisser-déposer, suggestions filtrées.</p>
 
       <h2 id="champs-de-base">Champs de base</h2>
+      <p class="j6n-muted">Un <code>.j6n-field</code> regroupe libellé, champ et message d'aide. <code>theme.js</code> relie automatiquement le message <code>.j6n-hint</code> au champ par <code>aria-describedby</code>, pour qu'il soit lu avec lui. Les variantes <code>--valid</code> et <code>--danger</code> colorent le message ; en cas d'erreur, ajoutez <code>aria-invalid="true"</code> au champ. Les champs d'identité (email, pseudo, mot de passe) portent un <code>autocomplete</code> adapté. <code>.j6n-choice-tile</code> transforme radios et cases à cocher en tuiles, la sélection étant suivie en CSS par <code>:has()</code>.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-grid">
@@ -103,6 +119,7 @@
       </div>
 
       <h2 id="champ-avec-icone">Champ avec icône — <code>.j6n-field--icon</code></h2>
+      <p class="j6n-muted">L'icône est décorative (<code>aria-hidden="true"</code>) : le libellé seul doit suffire à comprendre le champ.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-field j6n-field--icon" style="max-width:280px;">
@@ -116,6 +133,7 @@
       </div>
 
       <h2 id="recherche">Recherche — <code>.j6n-search</code></h2>
+      <p class="j6n-muted">Champ et bouton fusionnés visuellement, mais restés deux éléments distincts. Sans libellé visible, le champ de type <code>search</code> reçoit un <code>aria-label</code>.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-search">
@@ -126,13 +144,14 @@
       </div>
 
       <h2 id="mot-de-passe">Mot de passe — <code>.j6n-password</code></h2>
+      <p class="j6n-muted">Avec <code>data-j6n-js="password"</code>, le bouton <code>data-j6n-password-toggle</code> bascule la visibilité — son libellé dit l'action (« Afficher » / « Masquer »), sans <code>aria-pressed</code> en plus, qui ferait annoncer « Masquer, enfoncé » — et la jauge <code>.j6n-password__meter</code> indique la force de la saisie. <code>autocomplete="new-password"</code> laisse le gestionnaire de mots de passe en proposer un.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-field" style="max-width:360px;">
             <label class="j6n-label" for="pwd">Mot de passe</label>
             <div class="j6n-password" data-j6n-js="password">
               <input class="j6n-input" id="pwd" type="password" autocomplete="new-password" placeholder="••••••••">
-              <button type="button" class="j6n-password__toggle" data-j6n-password-toggle aria-pressed="false">Afficher</button>
+              <button type="button" class="j6n-password__toggle" data-j6n-password-toggle>Afficher</button>
             </div>
             <div class="j6n-password__meter" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
             <span class="j6n-password__meter-label"></span>
@@ -141,6 +160,7 @@
       </div>
 
       <h2 id="curseur">Curseur — <code>.j6n-range</code></h2>
+      <p class="j6n-muted">Un <code>&lt;input type="range"&gt;</code> natif, donc réglable aux flèches du clavier. <code>data-j6n-js="range"</code> remplit la piste jusqu'au curseur et écrit la valeur dans l'<code>&lt;output&gt;</code> associé, avec l'unité donnée par <code>data-unit</code>.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-range-field" style="max-width:360px;">
@@ -154,12 +174,13 @@
       </div>
 
       <h2 id="import">Import — <code>.j6n-upload</code></h2>
+      <p class="j6n-muted">La zone accepte le glisser-déposer (<code>.is-dragover</code> pendant le survol) et liste les fichiers choisis dans <code>.j6n-upload__list</code>. Le bouton <code>data-j6n-upload-trigger</code> ouvre le sélecteur natif : la zone reste utilisable au clavier et sur écran tactile, où le glisser-déposer n'existe pas. <code>theme.js</code> retire alors le champ masqué de l'ordre de tabulation (sinon : un arrêt invisible en doublon), annonce le nombre de fichiers choisis et replace le focus sur la ligne suivante quand on en retire un.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-upload" data-j6n-js="upload">
             <p><strong>Glisser un fichier GPX ici</strong></p>
             <p class="j6n-upload__hint">ou</p>
-            <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" onclick="this.closest('.j6n-upload').querySelector('input').click()">Choisir un fichier</button>
+            <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" data-j6n-upload-trigger>Choisir un fichier</button>
             <input class="j6n-upload__input" type="file" multiple accept=".gpx" aria-label="Fichier GPX à importer">
           </div>
           <div class="j6n-upload__list"></div>
@@ -167,6 +188,7 @@
       </div>
 
       <h2 id="combobox">Combobox — <code>.j6n-combobox</code></h2>
+      <p class="j6n-muted">Saisie libre avec suggestions filtrées à la frappe, navigation aux flèches et sélection à Entrée. Le balisage suit le motif combobox du WAI-ARIA : <code>role="combobox"</code>, <code>aria-expanded</code> et <code>aria-controls</code> sur le champ, <code>role="listbox"</code> et <code>role="option"</code> sur la liste. Aucun élément natif ne combine filtrage et liste stylée : <code>&lt;select&gt;</code> ne filtre pas, <code>&lt;datalist&gt;</code> ne se met pas en forme.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-field" style="max-width:360px;">

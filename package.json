@@ -1,12 +1,42 @@
 {
   "name": "design-j6n",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "Design system personnel — Foulée. theme.css + theme.js, sans dépendance ni build.",
   "main": "theme.js",
   "style": "theme.css",
+  "types": "theme.d.ts",
+  "bin": {
+    "design-j6n": "bin/design-j6n.mjs"
+  },
+  "unpkg": "theme.min.js",
+  "jsdelivr": "theme.min.js",
+  "exports": {
+    ".": {
+      "types": "./theme.d.ts",
+      "default": "./theme.js"
+    },
+    "./theme.js": "./theme.js",
+    "./theme.min.js": "./theme.min.js",
+    "./theme.css": "./theme.css",
+    "./theme.min.css": "./theme.min.css",
+    "./fonts.css": "./fonts.css",
+    "./fonts/*": "./fonts/*",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "*.css",
+    "./theme.js",
+    "./theme.min.js"
+  ],
   "files": [
     "theme.css",
     "theme.js",
+    "theme.min.css",
+    "theme.min.js",
+    "theme.d.ts",
+    "fonts.css",
+    "fonts/",
+    "bin/",
     "README.md",
     "LICENSE"
   ],
@@ -22,5 +52,8 @@
     "css",
     "theme",
     "oklch"
-  ]
+  ],
+  "engines": {
+    "node": ">=18"
+  }
 }

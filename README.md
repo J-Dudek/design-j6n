@@ -1,7 +1,7 @@
 # design-j6n
 
 Design system personnel — **Foulée**. Nature et trail pour les couleurs, vert terminal pour l'énergie.
-Deux fichiers (`theme.css` + `theme.js`), aucune dépendance, aucun build. Utilisable en HTML statique, Angular ou React.
+Deux fichiers (`theme.css` + `theme.js`), plus `fonts.css` facultatif pour les polices auto-hébergées ; aucune dépendance, aucun build. Utilisable en HTML statique, Angular ou React.
 Deux thèmes visuels partagent les mêmes composants : **nature** (par défaut) et **moderne** (gris/bleu) — voir [Thèmes](#thèmes).
 
 - Préfixe : `--j6n-*` pour les variables, `.j6n-*` pour les classes, `data-j6n-*` pour les hooks JS
@@ -18,32 +18,91 @@ Via npm :
 npm install design-j6n
 ```
 
-Ou copier `theme.css` (styles) et `theme.js` (comportements) directement dans le projet. Les polices sont importées par `theme.css` lui-même.
+Ou copier `fonts.css` + le dossier `fonts/` (polices), `theme.css` (styles) et `theme.js` (comportements) directement dans le projet.
+
+| Fichier | Rôle |
+| --- | --- |
+| `fonts.css` + `fonts/` | polices auto-hébergées (Sora, IBM Plex Mono ; Inter et JetBrains Mono pour le thème moderne), sous-ensemble latin, ~155 Ko au total dont seules les familles utilisées sont téléchargées. Facultatif : sans lui, repli sur les polices système |
+| `theme.css` / `theme.min.css` | tokens + composants (version minifiée : ~10 Ko compressé) |
+| `theme.js` / `theme.min.js` | comportements (version minifiée : ~8 Ko compressé) |
+| `theme.d.ts` | types TypeScript de `window.j6n` |
+
+Les polices ne viennent plus de Google Fonts : aucune requête vers un serveur tiers (pas de transfert d'adresse IP des visiteurs, sujet sensible au regard du RGPD), pas de chaîne de requêtes avant l'affichage du texte.
 
 ### HTML statique
 
 ```html
+<link rel="preload" href="fonts/sora-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="theme.css">
-<script src="theme.js"></script>
+<script src="theme.js" defer></script>
 ```
+
+Le `preload` de Sora (police du texte courant) est facultatif mais accélère le premier affichage. `defer` permet de placer le script dans le `<head>` : il s'active une fois le HTML lu.
+
+Via CDN (sans npm) : `https://cdn.jsdelivr.net/npm/design-j6n@<version>/theme.min.css`, `…/theme.min.js` et `…/fonts.css` — toujours avec une version exacte.
 
 ### Angular
 
 ```jsonc
 // angular.json → architect.build.options
-"styles": ["src/theme.css", "src/styles.css"],
-"scripts": ["src/theme.js"]
+"styles": ["node_modules/design-j6n/fonts.css", "node_modules/design-j6n/theme.css", "src/styles.css"],
+"scripts": ["node_modules/design-j6n/theme.js"]
 ```
 
 ### React / Vite / CRA
 
 ```js
 // main.jsx ou index.js
-import 'design-j6n/theme.css'; // ou './theme.css' si copié dans le projet
-import 'design-j6n/theme.js';  // ou './theme.js'
+import 'design-j6n/fonts.css';
+import 'design-j6n/theme.css';
+import 'design-j6n';             // theme.js : s'exécute à l'import et expose window.j6n
 ```
 
-En SPA, si du contenu est injecté dynamiquement après le chargement initial (ex. un composant React monté plus tard), appeler `j6n.init(monConteneur)` pour activer les comportements sur ce sous-arbre.
+### SPA (React, Angular, Vue…) et rendu côté serveur
+
+- **Contenu ajouté après le chargement** (composant monté plus tard) : `j6n.init(monConteneur)` active les comportements sur ce sous-arbre.
+- **Contenu retiré** (changement de route, démontage) : `j6n.destroy(monConteneur)` retire écouteurs, minuteries (carrousel) et observateurs. `j6n.destroy()` sans argument nettoie tous les composants qui ne sont plus dans la page — pratique après chaque navigation. Sans cela, les écouteurs posés sur `document` s'accumulent.
+- **Rendu côté serveur** (Next.js, Angular SSR, Nuxt) : `theme.js` ne fait rien quand `window`/`document` n'existent pas ; l'importer reste sans risque. Les comportements s'activent côté navigateur.
+
+### Intégration dans un projet existant
+
+Les styles appliqués aux éléments HTML nus (`body`, titres, `p`, `a`, `hr`, `code`) sont dans une couche `@layer j6n-base` : n'importe quelle règle de votre projet hors couche l'emporte sur eux, quelle que soit sa spécificité. Les composants `.j6n-*` restent hors couche.
+
+### Migration depuis 0.1.x
+
+Un outil fourni avec le paquet repère tout ce qui change, fichier par fichier, et corrige ce qui peut l'être sans risque :
+
+```sh
+npx design-j6n migrate            # analyse seule : rien n'est modifié
+npx design-j6n migrate --write    # applique les corrections automatiques
+npx design-j6n migrate --check    # en CI : code de sortie 1 s'il reste quelque chose
+npx design-j6n@0.2 migrate        # sans npm (fichiers copiés à la main) : télécharge l'outil
+```
+
+Il analyse HTML, JSX/TSX, Vue, Svelte, templates Angular, CSS/SCSS et `angular.json` (hors `node_modules`, `dist`, `build` et dossiers cachés) :
+
+| Corrigé par `--write` | Signalé, à revoir à la main |
+| --- | --- |
+| `fonts.css` ajouté avant chaque `theme.css` (`<link>`, `import`, `@import`, `angular.json`) | copies locales de `theme.css` / `theme.js` antérieures à la 0.2 (à remplacer) |
+| `fonts.css` + `fonts/` copiés à côté des copies locales de `theme.css` | URL CDN à passer en 0.2 |
+| `aria-haspopup="true"` retiré des déclencheurs popover | étapes à passer en `<ol>` |
+| `aria-pressed` retiré du bouton afficher/masquer le mot de passe | pagination à placer dans une `<nav>`, liens désactivés en `href="#"` |
+| `onclick` d'import remplacé par `data-j6n-upload-trigger` | citation à passer en `<figure>` |
+| `data-j6n-dismiss-value` ajouté aux boutons « Accepter » / « Refuser » | carte interactive sans `.j6n-card__link` |
+| `role="switch"` ajouté aux interrupteurs | bouton `.is-loading` sans `aria-disabled` / `aria-busy`, infobulle sur un `input` |
+
+Seuls les `theme.css` de design-j6n sont touchés (référence au paquet, ou fichier contenant ses variables `--j6n-*`) : un `theme.css` propre au projet est ignoré.
+
+Dans le navigateur, `theme.js` signale aussi en console (`[j6n] Usage antérieur à la 0.2 détecté`) les cas qu'il repère sur la page — polices absentes, ancien balisage — en renvoyant vers cette commande. Si les polices système sont voulues, `<html data-j6n-quiet>` fait taire le message.
+
+Ce qui change :
+
+- **Polices** : `theme.css` n'importe plus Google Fonts. Ajoutez `fonts.css` (voir plus haut), sinon le texte s'affiche en police système.
+- **Menu déroulant** : `theme.js` ne pose plus `aria-haspopup="true"` (qui promettait un vrai menu ARIA, avec flèches et `role="menuitem"`). Retirez-le de votre balisage si vous l'aviez copié de la démo.
+- **Toast** : 6 s par défaut au lieu de 4, en pause tant que la souris ou le focus y est ; `tone: 'danger'` reste affiché jusqu'à fermeture.
+- **Consentement** : ajoutez `data-j6n-dismiss-value="accepte"` / `"refuse"` à chaque bouton pour distinguer le choix (lu avec `j6n.dismissed('clé')`).
+- **Étapes** et **pagination** : nouveau balisage, voir [Navigation](#navigation).
 
 ## Thème sombre
 
@@ -155,9 +214,9 @@ Pour changer l'écart d'une de ces classes à un endroit précis, ajoutez un uti
 
 | Classe | Variantes |
 | --- | --- |
-| `.j6n-btn` | `--secondary` `--pine` `--ghost` `--sm` `--lg` `--block` `--icon`, état `.is-loading` (spinner) |
-| `.j6n-segmented` | groupe de radios stylé, une seule sélection visible |
-| `.j6n-toggle` | interrupteur on/off (`__track`) |
+| `.j6n-btn` | `--secondary` `--pine` `--ghost` `--sm` `--lg` `--block` `--icon`, état `.is-loading` (spinner) — à accompagner de `aria-disabled="true"` et `aria-busy="true"` : `theme.js` bloque alors tout nouveau clic, clavier compris |
+| `.j6n-segmented` | groupe de radios stylé, une seule sélection visible (contour ≥ 3:1 sur l'option choisie) |
+| `.j6n-toggle` | interrupteur on/off (`__track`) — `role="switch"` sur la case à cocher pour l'annoncer « interrupteur » |
 | `.j6n-tag` | étiquette filtrable, `.is-active`, `__remove` |
 
 ### Formulaires
@@ -168,10 +227,10 @@ Pour changer l'écart d'une de ces classes à un endroit précis, ajoutez un uti
 | `.j6n-fieldset` / `.j6n-legend` | groupe de champs (radio/case à cocher) |
 | `.j6n-choice-tile` | radio/case à cocher en tuile bordée, sélection via `:has()` |
 | `.j6n-search` | champ + bouton fusionnés (`__input`, `__btn`) |
-| `.j6n-password` | champ + bascule visibilité (`__toggle`), `.j6n-password__meter` (force) |
+| `.j6n-password` | champ + bascule visibilité (`__toggle`, libellé « Afficher » / « Masquer », sans `aria-pressed`), `.j6n-password__meter` (force, annoncée quand elle change de palier) |
 | `.j6n-range-field` / `.j6n-range` | curseur avec piste remplie et valeur affichée |
-| `.j6n-upload` | zone de glisser-déposer, `.is-dragover`, `__list`/`__item` |
-| `.j6n-combobox` | saisie avec suggestions filtrées (`__list`, `__option`) |
+| `.j6n-upload` | zone de glisser-déposer, `.is-dragover`, `__list`/`__item`, bouton `data-j6n-upload-trigger` qui ouvre le sélecteur |
+| `.j6n-combobox` | saisie avec suggestions filtrées (`__list`, `__option`, `__empty`) — nombre de résultats annoncé, fermeture en quittant le champ |
 
 ### Navigation
 
@@ -180,14 +239,53 @@ Pour changer l'écart d'une de ces classes à un endroit précis, ajoutez un uti
 | `.j6n-header` | avec `.j6n-brand`, `.j6n-nav`, `.j6n-nav__link.is-active`, `.j6n-nav__toggle` (menu mobile) |
 | `.j6n-breadcrumb` | fil d'Ariane, `[aria-current="page"]` |
 | `.j6n-tabs__list` / `__tab` / `__panel` | onglets accessibles (flèches clavier) |
-| `.j6n-dropdown__menu` | menu déroulant (`popover` natif), `__item`, `__divider` |
+| `.j6n-dropdown__menu` | menu déroulant (`popover` natif), `__item`, `__divider` — motif « disclosure » : `aria-expanded` et `aria-controls` posés par `theme.js`, pas d'`aria-haspopup` |
 | `.j6n-sidemenu` | navigation verticale, `__link.is-active`, `__sublist` |
 | `.j6n-toc` | sommaire à suivi de défilement |
-| `.j6n-pagination` | `[aria-current="page"]`, `.is-ellipsis`, `.is-disabled` |
+| `.j6n-pagination` | `<ul>` dans un `<nav aria-label="Pagination">`, `[aria-current="page"]`, `.is-ellipsis`, `.is-disabled` |
 | `.j6n-skiplink` | lien d'évitement, visible au focus |
-| `.j6n-stepper` | étapes numérotées, `.is-current` / `.is-done` |
+| `.j6n-stepper` | étapes numérotées sur un `<ol>`, `.is-current` + `aria-current="step"`, `.is-done` — état écrit en texte masqué (`.j6n-sr-only`) |
 | `.j6n-tile` | tuile de navigation, `--horizontal` |
 | `.j6n-footer` | pied de page multi-colonnes (`__grid`, `__col`, `__bottom`) |
+
+**Pagination.** Des liens réels (`href="?page=2"`) : les robots suivent les pages, et chaque page reste accessible sans JavaScript. La page impossible (« Précédent » sur la première) n'a pas de `href` :
+
+```html
+<nav aria-label="Pagination">
+  <ul class="j6n-pagination">
+    <li><a class="is-disabled" role="link" aria-disabled="true">← Précédent</a></li>
+    <li><a href="?page=1" aria-current="page">1</a></li>
+    <li><a href="?page=2">2</a></li>
+    <li><a href="?page=2">Suivant →</a></li>
+  </ul>
+</nav>
+```
+
+**Étapes.** L'état de chaque étape est écrit, pas seulement dessiné (RGAA 3.1) :
+
+```html
+<ol class="j6n-stepper" aria-label="Publication de la sortie">
+  <li class="j6n-stepper__step is-done"><span class="j6n-stepper__num">1</span><span class="j6n-stepper__label">Import<span class="j6n-sr-only"> (terminée)</span></span></li>
+  <li class="j6n-stepper__step is-current" aria-current="step"><span class="j6n-stepper__num">2</span><span class="j6n-stepper__label">Publication<span class="j6n-sr-only"> (en cours)</span></span></li>
+  <li class="j6n-stepper__step"><span class="j6n-stepper__num">3</span><span class="j6n-stepper__label">Partage<span class="j6n-sr-only"> (à venir)</span></span></li>
+</ol>
+```
+
+**Fil d'Ariane et moteurs de recherche.** Le composant est accessible tel quel ; pour que Google l'affiche dans ses résultats, ajoutez le JSON-LD correspondant dans la page :
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://exemple.fr/" },
+    { "@type": "ListItem", "position": 2, "name": "Sorties", "item": "https://exemple.fr/sorties/" },
+    { "@type": "ListItem", "position": 3, "name": "Crête des Ayes" }
+  ]
+}
+</script>
+```
 
 **Logo de la marque (facultatif).** Par défaut, `.j6n-brand` affiche un rond aux couleurs du thème (`.j6n-brand__mark`). Pour utiliser votre logo, dans le header comme dans le footer, remplacez ce `<span>` par une image :
 
@@ -209,23 +307,23 @@ Le logo fait 28px de haut, avec une largeur libre (180px maximum), ce qui convie
 | Classe | Variantes |
 | --- | --- |
 | `dialog.j6n-modal` | modale (`<dialog>` natif), `__header`, `__body`, `__footer` |
-| `[data-tooltip]` | infobulle CSS, `data-tooltip-pos="bottom"` |
+| `[data-tooltip]` | infobulle, `data-tooltip-pos="bottom"` — `theme.js` en fait un élément relié par `aria-describedby` (lu comme description, pas ajouté au nom du bouton), survolable et masquable avec Échap (RGAA 10.13). À poser sur un élément qui peut avoir du contenu (bouton, lien, `span`), pas sur un `input` |
 | `.j6n-notice` | bandeau pleine largeur, fermeture mémorisée |
 | `.j6n-accordion` | `<details>` stylés, `__trigger`, `__panel` |
 | `.j6n-callout` | mise en avant, `--pine` |
-| `.j6n-consent` | bandeau de consentement générique, fermeture mémorisée |
+| `.j6n-consent` | bandeau de consentement générique, choix mémorisé (`data-j6n-dismiss-value`) |
 | `.j6n-alert` | `--success` `--warning` `--danger`, `__close` |
-| `.j6n-toast` | pile de toasts via l'API JS `j6n.toast()` |
+| `.j6n-toast` | pile de toasts via l'API JS `j6n.toast()` — annoncés au lecteur d'écran, en pause au survol et au focus |
 
 ### Données & contenu
 
 | Classe | Variantes |
 | --- | --- |
-| `.j6n-card` | `--interactive`, plus `.j6n-card__title`, `.j6n-card__meta` |
+| `.j6n-card` | `--interactive` (avec un `.j6n-card__link` dont la zone couvre la carte), plus `.j6n-card__title`, `.j6n-card__meta` |
 | `.j6n-stat` | `__value`, `__unit`, `__label` — chiffres tabulaires |
 | `.j6n-badge` | `--accent` `--pine` `--solid` `--success` `--warning` `--danger` `--info`, plus `.j6n-badge__dot` |
-| `.j6n-table` | `.j6n-table-wrap`, `[data-numeric]`, `.j6n-table__sort` (tri au clic) |
-| `.j6n-quote` | citation avec `__cite` |
+| `.j6n-table` | `.j6n-table-wrap` (zone de défilement focalisable, nommée par la légende — posé par `theme.js` si absent), `[data-numeric]`, `.j6n-table__sort` (tri au clic) |
+| `.j6n-quote` | `<figure>` avec `<blockquote>` et `<figcaption class="j6n-quote__cite">` (l'attribution reste hors de la citation) |
 | `.j6n-highlight` | mise en exergue de texte |
 | `.j6n-download` | lien de téléchargement, `__ext`, `__name`, `__meta` |
 | `.j6n-user-menu__trigger` | avatar + menu (réutilise `.j6n-dropdown__menu`) |
@@ -233,6 +331,17 @@ Le logo fait 28px de haut, avec une largeur libre (180px maximum), ce qui convie
 | `.j6n-unit-switch` | bascule d'unités (réutilise `.j6n-segmented`) |
 | `.j6n-pre` | blocs de code, toujours sombres ; `.tok-key` `.tok-str` `.tok-com` |
 | `.j6n-carousel` | carrousel accessible : `__toolbar`, `__progress`, `__nav`, `__counter`, `__viewport`, `__track`, `__slide`, `__dots`/`__dot`, `--fade` `--none` — voir [Carrousel](#carrousel) |
+
+**Niveaux de titre.** `.j6n-card__title` et `.j6n-modal__title` sont des classes : choisissez la balise (`h2`, `h3`…) qui suit la hiérarchie de votre page. La démo utilise `h3` parce que ses cartes sont sous un `h2`.
+
+**Carte entièrement cliquable.** Un seul vrai lien, dans le titre ; sa zone s'étend à toute la carte, mais son nom reste le titre :
+
+```html
+<article class="j6n-card j6n-card--interactive">
+  <h3 class="j6n-card__title"><a class="j6n-card__link" href="/sorties/crete-des-ayes">Crête des Ayes</a></h3>
+  <p class="j6n-muted">Sortie longue en sentier.</p>
+</article>
+```
 
 ### Carrousel
 
@@ -323,15 +432,29 @@ En React/Angular, monter le balisage puis appeler `j6n.carousel(ref)` (ou `j6n.i
 | `[data-tooltip]` | ajoute le support tactile (tap pour afficher/masquer) |
 | `data-j6n-js="password"` + `data-j6n-password-toggle` | bascule visibilité + indicateur de force |
 | `data-j6n-js="range"` | remplissage de piste + valeur affichée |
-| `data-j6n-js="upload"` | glisser-déposer + liste de fichiers |
-| `data-j6n-dismiss="clé"` + `data-j6n-dismiss-target="id"` | ferme et mémorise en `localStorage` (notice, consentement) |
+| `data-j6n-js="upload"` + `data-j6n-upload-trigger` | glisser-déposer + liste de fichiers ; le bouton ouvre le sélecteur, le champ masqué sort de l'ordre de tabulation |
+| `data-j6n-dismiss="clé"` + `data-j6n-dismiss-target="id"` | ferme et mémorise en `localStorage` (notice, consentement). `data-j6n-dismiss-value` : valeur enregistrée (défaut `1`) ; `data-j6n-dismiss-focus="sélecteur"` : où va le focus (défaut : élément suivant). Évènement `j6n:dismiss` (`detail.key`, `detail.value`) |
 | `data-j6n-js="toc"` | surligne le lien courant au défilement (`IntersectionObserver`) |
 | `data-j6n-js="table-sort"` | tri des lignes au clic sur un `.j6n-table__sort` |
 | `data-j6n-js="menu-toggle"` | ouvre/ferme le menu mobile du header |
 | `data-j6n-js="unit-switch"` | diffuse un évènement `j6n:unit-change` |
 | `data-j6n-js="carousel"` + `data-j6n-carousel-play/-prev/-next` | carrousel : défilement réglable, pause, flèches, pastilles, glissement tactile |
 
-API publique : `j6n.init(root)` (réactiver un sous-arbre injecté dynamiquement), `j6n.toast(message, { tone, duration })`, `j6n.openModal(id)`, `j6n.closeModal(id)`, `j6n.carousel(el, options)`.
+Sans attribut : `.j6n-table-wrap` (zone focalisable nommée), `[data-tooltip]` (infobulle reliée par `aria-describedby`), boutons `.is-loading` / `[aria-disabled="true"]` (clics bloqués).
+
+API publique (types dans `theme.d.ts`) :
+
+| Fonction | Rôle |
+| --- | --- |
+| `j6n.init(root)` | active les composants d'un sous-arbre injecté après le chargement |
+| `j6n.destroy(root)` | retire écouteurs, minuteries et observateurs du sous-arbre ; sans argument : des composants sortis de la page |
+| `j6n.toast(message, { tone, duration })` | notification ; `tone: 'danger'` annoncée en priorité et persistante ; `duration: 0` jusqu'à fermeture |
+| `j6n.announce(message, { assertive })` | message pour lecteur d'écran seulement (zone `aria-live` créée dès l'activation) |
+| `j6n.openModal(id)` / `j6n.closeModal(id)` | modale |
+| `j6n.carousel(el, options)` | pilote un carrousel |
+| `j6n.dismissed(clé)` | valeur mémorisée d'un bandeau fermé (ex. choix de consentement), ou `null` |
+
+`localStorage` indisponible (navigation privée, stockage bloqué) : les bandeaux restent simplement non mémorisés, le reste s'active normalement.
 
 ## Exemple
 
@@ -386,8 +509,11 @@ Un audit du code a été fait et corrigé sur cette base — pas seulement une r
 - **Contraste** : chaque paire texte/fond et chaque frontière fonctionnelle (champ, tuile de choix, tag, piste d'interrupteur…) a été *calculée* (conversion oklch → luminance relative WCAG), pas estimée à l'œil. Ça a fait remonter et corrigé de vrais échecs : `--j6n-border-strong` ne passait pas 3:1 sur fond clair *ni* sombre (d'où le nouveau `--j6n-border-interactive`, réservé aux frontières qui portent seules une information — les liserés purement décoratifs gardent `--j6n-border-strong`) ; `--j6n-danger` et `--j6n-pine`/`--j6n-pine-soft` tombaient sous 4.5:1 en thème sombre faute d'y avoir jamais été redéfinis ; l'ancien anneau de focus translucide n'atteignait que 1.3:1 en clair — remplacé par un anneau plein à deux tons (écart + trait), qui reste lisible même sur un bouton déjà coloré.
 - **Clavier** : chaque composant interactif est utilisable sans souris, y compris ceux avec un état caché (menu déroulant, combobox, onglets, accordéon, modale). Un vrai bug a été trouvé et corrigé au passage : l'étiquette `.j6n-tag` imbriquait un `<span>` de retrait *dans* le bouton principal — inatteignable au Tab et dupliquant le nom accessible du bouton. C'est maintenant deux boutons frères.
 - **Focus** : la modale (`<dialog>` natif) piège le focus et le restitue au déclencheur nativement ; les menus (Popover API) rendent le focus au bouton qui les a ouverts à la fermeture.
-- **ARIA** : posé dans le HTML source de chaque page, pas seulement calculé par `theme.js` au chargement — un analyseur statique (SonarQube, axe…) ne voit que le balisage, jamais le DOM que le JS construit ; `theme.js` reconfirme les mêmes attributs à l'exécution, en filet de sécurité pour qui oublierait de les écrire. `aria-expanded`/`aria-haspopup` sur les déclencheurs de menu (le Popover API ne les écrit pas lui-même), `role="listbox"`/`"option"` + `aria-selected`/`aria-controls` du combobox, `aria-current="page"` sur le lien de navigation actif, association automatique champ ↔ message d'aide/erreur via `aria-describedby` (`initFieldDescriptions`), annonce discrète (`aria-live`) du résultat d'un tri de tableau. Le combobox suit le motif officiel du WAI-ARIA (`role="option"` sur des `<div>`, pas de `<option>` natif) — c'est volontaire : aucun élément natif ne combine filtrage libre à la frappe et liste stylée (`<select>` ne filtre pas, `<datalist>` ne se stylise pas). Un linter générique « préfère le natif à ARIA » peut le signaler ; c'est un faux positif connu sur ce motif, documenté dans `demo/formulaires.html`.
+- **ARIA** : posé dans le HTML source de chaque page, pas seulement calculé par `theme.js` au chargement — un analyseur statique (SonarQube, axe…) ne voit que le balisage, jamais le DOM que le JS construit ; `theme.js` reconfirme les mêmes attributs à l'exécution, en filet de sécurité pour qui oublierait de les écrire. `aria-expanded`/`aria-controls` sur les déclencheurs de menu (le Popover API ne les écrit pas lui-même ; pas d'`aria-haspopup`, réservé aux vrais menus ARIA), `role="listbox"`/`"option"` + `aria-selected`/`aria-controls` du combobox, `aria-current="page"` sur le lien de navigation actif, association automatique champ ↔ message d'aide/erreur via `aria-describedby` (`initFieldDescriptions`), annonce discrète (`aria-live`) du résultat d'un tri de tableau. Le combobox suit le motif officiel du WAI-ARIA (`role="option"` sur des `<div>`, pas de `<option>` natif) — c'est volontaire : aucun élément natif ne combine filtrage libre à la frappe et liste stylée (`<select>` ne filtre pas, `<datalist>` ne se stylise pas). Un linter générique « préfère le natif à ARIA » peut le signaler ; c'est un faux positif connu sur ce motif, documenté dans `demo/formulaires.html`.
 - **Structure** : lien d'évitement, hiérarchie de titres sans saut de niveau, un seul `<main>` par page, `<nav>` distingués par `aria-label` quand il y en a plusieurs, légende de tableau (`.j6n-sr-only`), `autocomplete` sur les champs d'identité (email, mot de passe, pseudo).
+- **Contraste élevé (Windows)** : en mode `forced-colors`, les ombres disparaissent. Chaque anneau de focus est donc doublé d'un `outline` transparent, que ce mode rend visible, et les états dessinés en couleur de fond (interrupteur, option choisie, page courante, étape terminée, jauge, pastilles) reçoivent une couleur système.
+- **Messages de statut** : toasts, tri de tableau, nombre de suggestions, fichiers ajoutés ou retirés passent par deux zones `aria-live` créées dès l'activation (une zone créée en même temps que son contenu n'est souvent pas annoncée). Les toasts restent affichés tant que la souris ou le focus y est (WCAG 2.2.1).
+- **Focus préservé** : fermer un bandeau, retirer un fichier ou fermer un toast renvoie le focus à un endroit logique au lieu du haut de la page (WCAG 2.4.3).
 - **Mouvement** : `prefers-reduced-motion` déjà pris en compte pour tout le système ; l'indicateur de chargement (`.j6n-spinner`) garde un mouvement minimal même dans ce cas, un indicateur figé ne voulant plus rien dire.
 
 **Limite honnête** : ceci est un audit de code, pas une certification RGAA. Une conformité déclarée demande une méthodologie que je ne peux pas reproduire ici — échantillon de pages, tests réels au lecteur d'écran (NVDA, JAWS, VoiceOver), navigation clavier bout en bout par une personne, et la déclaration d'accessibilité elle-même. Avant une mise en production, fais au moins un passage clavier seul (Tab/Échap/flèches sur chaque page) et un passage avec un lecteur d'écran sur les composants les plus riches (combobox, modale, menu déroulant, tableau triable).
@@ -404,14 +530,14 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-Dans les deux cas, le projet est d'abord vérifié (`ci.yml`, réutilisé), puis empaqueté (`theme.css` + `theme.js` + `README.md` + `LICENSE`) en `.zip` et `.tar.gz` attachés à une Release GitHub, avec des notes générées depuis les commits/PR depuis le tag précédent, et enfin publié sur npm.
+Dans les deux cas, le projet est d'abord vérifié (`ci.yml`, réutilisé), puis empaqueté (`theme.css`, `theme.js`, leurs versions `.min` produites par esbuild, `theme.d.ts`, `fonts.css` + `fonts/`, `README.md`, `LICENSE`) en `.zip` et `.tar.gz` attachés à une Release GitHub, avec des notes générées depuis les commits/PR depuis le tag précédent, et enfin publié sur npm.
 
 - `scripts/validate.sh` — les mêmes vérifications tournent à chaque push/PR (`ci.yml`) et avant chaque release ; à lancer en local avant de taguer.
 - `scripts/package.sh` — assemble le paquet ; utilisable en local pour en vérifier le contenu (`VERSION=0.0.0-test scripts/package.sh`).
 
 ### Démo en ligne
 
-`netlify.toml` publie tout le dépôt (les pages de `demo/` référencent `../theme.css`/`../theme.js`, donc la racine doit être servie aussi) et redirige `/` vers `demo/index.html`. Connecter le dépôt sur [app.netlify.com](https://app.netlify.com) suffit — Netlify lit `netlify.toml` automatiquement, aucune configuration supplémentaire.
+`netlify.toml` publie tout le dépôt (les pages de `demo/` référencent `../theme.css`/`../theme.js`, donc la racine doit être servie aussi) et redirige `/` vers `/demo/` en 301 — une réécriture 200 ferait résoudre les chemins relatifs de la page depuis la racine (CSS, JS et liens en 404). `robots.txt`, `sitemap.xml` et `404.html` sont à la racine ; `404.html` n'utilise que des chemins absolus, Netlify la servant à n'importe quelle profondeur. À chaque déploiement, `scripts/stamp-version.sh` recopie la version de `package.json` dans le JSON-LD de `demo/index.html`. Connecter le dépôt sur [app.netlify.com](https://app.netlify.com) suffit — Netlify lit `netlify.toml` automatiquement, aucune configuration supplémentaire.
 
 ## Licence
 
