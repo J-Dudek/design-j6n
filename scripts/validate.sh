@@ -11,6 +11,15 @@ node --check demo/showcase.js
 echo "OK"
 
 echo
+echo "== Champ version du JSON-LD (réécrit au déploiement par stamp-version.sh) =="
+count=$(grep -c '"version": "' demo/index.html || true)
+if [ "$count" != "1" ]; then
+  echo "demo/index.html : $count champ(s) \"version\", 1 attendu — le déploiement Netlify échouerait."
+  exit 1
+fi
+echo "OK"
+
+echo
 echo "== Équilibre des accolades CSS =="
 python3 - <<'EOF'
 import sys

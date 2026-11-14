@@ -1,10 +1,17 @@
 [build]
   publish = "."
+  # Aligne la version du JSON-LD de demo/index.html sur package.json.
+  command = "bash scripts/stamp-version.sh"
 
 # La démo vit dans demo/ mais référence ../theme.css et ../theme.js (le design
 # system à la racine) : on publie donc tout le dépôt tel quel — les chemins
 # relatifs des pages restent identiques à l'ouverture locale d'un fichier.
+#
+# Redirection 301 (et non réécriture 200) : servie à « / », la page résolvait
+# ses chemins relatifs depuis la racine — showcase.css, showcase.js, logo.svg
+# et tous les liens internes (actions.html…) tombaient en 404, et « / »
+# dupliquait /demo/index.html.
 [[redirects]]
   from = "/"
-  to = "/demo/index.html"
-  status = 200
+  to = "/demo/"
+  status = 301

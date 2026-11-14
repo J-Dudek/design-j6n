@@ -3,7 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Foulée — actions</title>
+<title>Boutons, interrupteur et étiquettes — design system Foulée</title>
+<meta name="description" content="Boutons, contrôle segmenté, interrupteur et étiquettes filtrables du design system Foulée, avec code HTML à copier et aperçu responsive.">
+<link rel="canonical" href="https://design.byj6n.fr/demo/actions.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Foulée">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Boutons, interrupteur et étiquettes — design system Foulée">
+<meta property="og:description" content="Boutons, contrôle segmenté, interrupteur et étiquettes filtrables du design system Foulée, avec code HTML à copier et aperçu responsive.">
+<meta property="og:url" content="https://design.byj6n.fr/demo/actions.html">
+<meta property="og:image" content="https://design.byj6n.fr/demo/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Foulée, design system : theme.css + theme.js, sans dépendance">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../theme.css">
 <link rel="stylesheet" href="showcase.css">
 </head>
@@ -46,6 +59,7 @@
       <p class="j6n-muted">Boutons, contrôles binaires et étiquettes filtrables. Chaque bloc a un onglet <strong>Code</strong> et un simulateur de largeur, comme sur systeme-de-design.gouv.fr.</p>
 
       <h2 id="bouton">Bouton — <code>.j6n-btn</code></h2>
+      <p class="j6n-muted">Le bouton principal porte l'accent : un seul par écran, réservé à l'action principale. <code>--secondary</code>, <code>--pine</code> et <code>--ghost</code> couvrent les actions secondaires ; <code>--sm</code>, <code>--lg</code> et <code>--block</code> règlent la taille. Un bouton <code>--icon</code> n'a pas de texte visible : donnez-lui un <code>aria-label</code>. L'état <code>.is-loading</code> affiche un spinner, qui garde un mouvement minimal même avec <code>prefers-reduced-motion</code>.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-row">
@@ -66,6 +80,7 @@
       </div>
 
       <h2 id="controle-segmente">Contrôle segmenté — <code>.j6n-segmented</code></h2>
+      <p class="j6n-muted">Un groupe de boutons radio natifs mis en forme : une seule option sélectionnée, navigation aux flèches fournie par le navigateur, aucun JavaScript. Le conteneur porte <code>role="radiogroup"</code> et un <code>aria-label</code> qui nomme le choix. À préférer au menu déroulant quand il y a deux à quatre options courtes.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-segmented" role="radiogroup" aria-label="Terrain">
@@ -77,6 +92,7 @@
       </div>
 
       <h2 id="interrupteur">Interrupteur — <code>.j6n-toggle</code></h2>
+      <p class="j6n-muted">Une case à cocher native dans un <code>&lt;label&gt;</code> : le clic sur le texte, le focus clavier et l'état coché restent ceux du navigateur, <code>.j6n-toggle__track</code> ne fait que dessiner l'interrupteur. À réserver aux réglages qui s'appliquent tout de suite, sans bouton de validation ; dans un formulaire à envoyer, une case à cocher reste plus claire.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <label class="j6n-toggle">
@@ -89,6 +105,7 @@
 
       <h2 id="etiquette-filtrable">Étiquette filtrable — <code>.j6n-tag</code></h2>
       <p class="j6n-muted">Deux boutons frères par étiquette — le libellé (sélection) et le retrait sont deux arrêts Tab distincts.</p>
+      <p class="j6n-muted"><code>.is-active</code> marque la sélection et <code>aria-pressed</code> l'annonce aux lecteurs d'écran ; le bouton de retrait porte un <code>aria-label</code> qui nomme le filtre retiré, sans quoi il ne serait lu que « × ».</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-row" id="tag-row">

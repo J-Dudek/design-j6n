@@ -411,7 +411,7 @@ Dans les deux cas, le projet est d'abord vérifié (`ci.yml`, réutilisé), puis
 
 ### Démo en ligne
 
-`netlify.toml` publie tout le dépôt (les pages de `demo/` référencent `../theme.css`/`../theme.js`, donc la racine doit être servie aussi) et redirige `/` vers `demo/index.html`. Connecter le dépôt sur [app.netlify.com](https://app.netlify.com) suffit — Netlify lit `netlify.toml` automatiquement, aucune configuration supplémentaire.
+`netlify.toml` publie tout le dépôt (les pages de `demo/` référencent `../theme.css`/`../theme.js`, donc la racine doit être servie aussi) et redirige `/` vers `/demo/` en 301 — une réécriture 200 ferait résoudre les chemins relatifs de la page depuis la racine (CSS, JS et liens en 404). `robots.txt`, `sitemap.xml` et `404.html` sont à la racine ; `404.html` n'utilise que des chemins absolus, Netlify la servant à n'importe quelle profondeur. À chaque déploiement, `scripts/stamp-version.sh` recopie la version de `package.json` dans le JSON-LD de `demo/index.html`. Connecter le dépôt sur [app.netlify.com](https://app.netlify.com) suffit — Netlify lit `netlify.toml` automatiquement, aucune configuration supplémentaire.
 
 ## Licence
 
