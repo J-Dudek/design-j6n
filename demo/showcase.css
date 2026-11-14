@@ -44,7 +44,7 @@
   background: var(--j6n-surface); color: var(--j6n-text); box-shadow: var(--j6n-shadow-sm);
 }
 .j6n-showcase__tabs button:focus-visible, .j6n-showcase__viewport button:focus-visible, .j6n-showcase__copy:focus-visible {
-  outline: none; box-shadow: var(--j6n-ring);
+  outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring);
 }
 .j6n-showcase__viewport { margin-left: auto; }
 .j6n-showcase.is-code .j6n-showcase__viewport { display: none; }

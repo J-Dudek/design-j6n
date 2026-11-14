@@ -17,6 +17,8 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Foulée, design system : theme.css + theme.js, sans dépendance">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="../fonts/sora-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../fonts.css">
 <link rel="stylesheet" href="../theme.css">
 <link rel="stylesheet" href="showcase.css">
 </head>
@@ -142,14 +144,14 @@
       </div>
 
       <h2 id="mot-de-passe">Mot de passe — <code>.j6n-password</code></h2>
-      <p class="j6n-muted">Avec <code>data-j6n-js="password"</code>, le bouton <code>data-j6n-password-toggle</code> bascule la visibilité (son état passe par <code>aria-pressed</code>) et la jauge <code>.j6n-password__meter</code> indique la force de la saisie. <code>autocomplete="new-password"</code> laisse le gestionnaire de mots de passe en proposer un.</p>
+      <p class="j6n-muted">Avec <code>data-j6n-js="password"</code>, le bouton <code>data-j6n-password-toggle</code> bascule la visibilité — son libellé dit l'action (« Afficher » / « Masquer »), sans <code>aria-pressed</code> en plus, qui ferait annoncer « Masquer, enfoncé » — et la jauge <code>.j6n-password__meter</code> indique la force de la saisie. <code>autocomplete="new-password"</code> laisse le gestionnaire de mots de passe en proposer un.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-field" style="max-width:360px;">
             <label class="j6n-label" for="pwd">Mot de passe</label>
             <div class="j6n-password" data-j6n-js="password">
               <input class="j6n-input" id="pwd" type="password" autocomplete="new-password" placeholder="••••••••">
-              <button type="button" class="j6n-password__toggle" data-j6n-password-toggle aria-pressed="false">Afficher</button>
+              <button type="button" class="j6n-password__toggle" data-j6n-password-toggle>Afficher</button>
             </div>
             <div class="j6n-password__meter" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
             <span class="j6n-password__meter-label"></span>
@@ -172,13 +174,13 @@
       </div>
 
       <h2 id="import">Import — <code>.j6n-upload</code></h2>
-      <p class="j6n-muted">La zone accepte le glisser-déposer (<code>.is-dragover</code> pendant le survol) et liste les fichiers choisis dans <code>.j6n-upload__list</code>. Le bouton « Choisir un fichier » ouvre le sélecteur natif : la zone reste donc utilisable au clavier et sur écran tactile, où le glisser-déposer n'existe pas.</p>
+      <p class="j6n-muted">La zone accepte le glisser-déposer (<code>.is-dragover</code> pendant le survol) et liste les fichiers choisis dans <code>.j6n-upload__list</code>. Le bouton <code>data-j6n-upload-trigger</code> ouvre le sélecteur natif : la zone reste utilisable au clavier et sur écran tactile, où le glisser-déposer n'existe pas. <code>theme.js</code> retire alors le champ masqué de l'ordre de tabulation (sinon : un arrêt invisible en doublon), annonce le nombre de fichiers choisis et replace le focus sur la ligne suivante quand on en retire un.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div class="j6n-upload" data-j6n-js="upload">
             <p><strong>Glisser un fichier GPX ici</strong></p>
             <p class="j6n-upload__hint">ou</p>
-            <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" onclick="this.closest('.j6n-upload').querySelector('input').click()">Choisir un fichier</button>
+            <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" data-j6n-upload-trigger>Choisir un fichier</button>
             <input class="j6n-upload__input" type="file" multiple accept=".gpx" aria-label="Fichier GPX à importer">
           </div>
           <div class="j6n-upload__list"></div>

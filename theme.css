@@ -1,14 +1,19 @@
 /* ============================================================
    FOULÉE — design system
    Tokens + composants. Un seul fichier, aucune dépendance.
-   Usage : <link rel="stylesheet" href="theme.css">
+   Usage : <link rel="stylesheet" href="fonts.css">
+           <link rel="stylesheet" href="theme.css">
    Mode sombre : <html data-theme="dark"> (ou automatique via
    prefers-color-scheme si data-theme est absent).
    Thème visuel : <html data-j6n-theme="moderne"> (par défaut : nature).
    Les deux attributs se combinent librement (les 4 combinaisons existent).
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* Polices : fonts.css (auto-hébergées, à charger avant ce fichier). Plus
+   d'@import vers Google Fonts : il enchaînait trois requêtes avant le premier
+   texte, disparaissait sans bruit quand un bundler regroupait les CSS (un
+   @import doit rester en tête du fichier final) et envoyait l'IP des
+   visiteurs à un tiers. Sans fonts.css, repli sur les polices système. */
 
 /* ---------- 1. Tokens ---------- */
 :root {
@@ -214,35 +219,50 @@
 }
 
 /* ---------- 2. Base ---------- */
-*, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  margin: 0;
-  background: var(--j6n-bg);
-  color: var(--j6n-text);
-  font-family: var(--j6n-font-sans), serif;
-  font-size: var(--j6n-text-md);
-  line-height: var(--j6n-leading-body);
-  -webkit-font-smoothing: antialiased;
-  text-wrap: pretty;
-}
-h1, h2, h3, h4 { margin: 0 0 var(--j6n-space-3); line-height: var(--j6n-leading-tight); letter-spacing: var(--j6n-tracking-tight); font-weight: 600; overflow-wrap: break-word; }
-h1 { font-size: var(--j6n-text-3xl); font-weight: 700; }
-h2 { font-size: var(--j6n-text-2xl); }
-h3 { font-size: var(--j6n-text-xl); }
-h4 { font-size: var(--j6n-text-lg); }
-p  { margin: 0 0 var(--j6n-space-4); max-width: 68ch; }
-small { font-size: var(--j6n-text-sm); color: var(--j6n-text-muted); }
-hr { border: 0; border-top: var(--j6n-border-width) solid var(--j6n-border); margin: var(--j6n-space-7) 0; }
+/* Styles des éléments HTML nus (body, titres, p, a, hr…) dans une couche
+   @layer : dans un projet existant, n'importe quelle règle du projet hors
+   couche l'emporte, quelle que soit sa spécificité. Les composants .j6n-*
+   restent hors couche. */
+@layer j6n-base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--j6n-bg);
+    color: var(--j6n-text);
+    font-family: var(--j6n-font-sans), serif;
+    font-size: var(--j6n-text-md);
+    line-height: var(--j6n-leading-body);
+    -webkit-font-smoothing: antialiased;
+    text-wrap: pretty;
+  }
+  h1, h2, h3, h4 { margin: 0 0 var(--j6n-space-3); line-height: var(--j6n-leading-tight); letter-spacing: var(--j6n-tracking-tight); font-weight: 600; overflow-wrap: break-word; }
+  h1 { font-size: var(--j6n-text-3xl); font-weight: 700; }
+  h2 { font-size: var(--j6n-text-2xl); }
+  h3 { font-size: var(--j6n-text-xl); }
+  h4 { font-size: var(--j6n-text-lg); }
+  p  { margin: 0 0 var(--j6n-space-4); max-width: 68ch; }
+  small { font-size: var(--j6n-text-sm); color: var(--j6n-text-muted); }
+  hr { border: 0; border-top: var(--j6n-border-width) solid var(--j6n-border); margin: var(--j6n-space-7) 0; }
 
-a, .j6n-link {
+  a {
+    color: var(--j6n-accent-strong);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklch, var(--j6n-accent) 35%, transparent);
+    transition: color var(--j6n-dur-1) var(--j6n-ease), border-color var(--j6n-dur-1) var(--j6n-ease);
+  }
+  a:hover { color: var(--j6n-accent); border-bottom-color: currentColor; }
+  a:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-sm); }
+}
+
+.j6n-link {
   color: var(--j6n-accent-strong);
   text-decoration: none;
   border-bottom: 1px solid color-mix(in oklch, var(--j6n-accent) 35%, transparent);
   transition: color var(--j6n-dur-1) var(--j6n-ease), border-color var(--j6n-dur-1) var(--j6n-ease);
 }
-a:hover, .j6n-link:hover { color: var(--j6n-accent); border-bottom-color: currentColor; }
-a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-sm); }
+.j6n-link:hover { color: var(--j6n-accent); border-bottom-color: currentColor; }
+.j6n-link:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-sm); }
 
 /* Titre de section : petite capitale monospace, marqueur de balisage */
 .j6n-eyebrow {
@@ -293,7 +313,7 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
 }
 .j6n-btn:hover { transform: translateY(-1px); box-shadow: var(--j6n-shadow-md); }
 .j6n-btn:active { transform: translateY(0); box-shadow: none; }
-.j6n-btn:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
+.j6n-btn:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); }
 .j6n-btn[disabled], .j6n-btn.is-disabled { opacity: 0.45; pointer-events: none; }
 
 .j6n-btn--secondary { --_bg: transparent; --_fg: var(--j6n-text); --_bd: var(--j6n-border-interactive); }
@@ -321,7 +341,7 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
 }
 .j6n-textarea { min-height: 120px; resize: vertical; line-height: var(--j6n-leading-body); }
 .j6n-input::placeholder, .j6n-textarea::placeholder { color: var(--j6n-text-muted); }
-.j6n-input:focus, .j6n-select:focus, .j6n-textarea:focus { outline: none; border-color: var(--j6n-accent); box-shadow: var(--j6n-ring); }
+.j6n-input:focus, .j6n-select:focus, .j6n-textarea:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: var(--j6n-accent); box-shadow: var(--j6n-ring); }
 /* Select : rendu natif neutralisé (iOS/Android ignorent le padding, rognent le texte et
    imposent leur fond clair). Chevron dessiné en currentColor → suit le thème et le mode sombre. */
 .j6n-select {
@@ -366,6 +386,14 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
   transition: transform var(--j6n-dur-2) var(--j6n-ease), box-shadow var(--j6n-dur-2) var(--j6n-ease), border-color var(--j6n-dur-2) var(--j6n-ease);
 }
 .j6n-card--interactive:hover { transform: translateY(-2px); box-shadow: var(--j6n-shadow-md); border-color: var(--j6n-border-strong); }
+/* Carte entièrement cliquable : un seul vrai lien (.j6n-card__link, en général
+   dans le titre) dont la zone couvre la carte. Le nom du lien reste son texte,
+   pas tout le contenu de la carte. */
+.j6n-card--interactive { position: relative; }
+.j6n-card__link { color: inherit; border-bottom: 0; }
+.j6n-card__link::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+.j6n-card__link:focus-visible { box-shadow: none; }
+.j6n-card--interactive:has(.j6n-card__link:focus-visible) { box-shadow: var(--j6n-ring); }
 .j6n-card__title { font-size: var(--j6n-text-lg); font-weight: 600; margin: 0 0 var(--j6n-space-2); }
 .j6n-card__meta  {
   font-family: var(--j6n-font-mono), serif; font-size: var(--j6n-text-xs); color: var(--j6n-text-muted); letter-spacing: 0.04em; }
@@ -483,12 +511,21 @@ a:focus-visible, .j6n-link:focus-visible { outline: none; box-shadow: var(--j6n-
 /* couleur pleine, pas d'opacité : un « x » à 70% d'opacité tombait sous 4.5:1 en thème sombre */
 .j6n-toast__close { margin-left: auto; flex: none; background: none; border: 0; color: inherit; cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 2px; border-radius: var(--j6n-radius-sm); }
 .j6n-toast__close:hover { background: color-mix(in oklab, currentColor 18%, transparent); }
-.j6n-toast__close:focus-visible { outline: none; box-shadow: 0 0 0 2px currentColor; }
+.j6n-toast__close:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 2px currentColor; }
 @keyframes j6n-slide-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes j6n-slide-out { to { opacity: 0; transform: translateY(4px) scale(0.98); } }
 
 /* ---------- 9. Code ---------- */
-code, .j6n-code-inline {
+@layer j6n-base {
+  code {
+    font-family: var(--j6n-font-mono), serif; font-size: 0.9em;
+    background: var(--j6n-surface-2);
+    border: var(--j6n-border-width) solid var(--j6n-border);
+    border-radius: var(--j6n-radius-sm);
+    padding: 1px 5px;
+  }
+}
+.j6n-code-inline {
   font-family: var(--j6n-font-mono), serif; font-size: 0.9em;
   background: var(--j6n-surface-2);
   border: var(--j6n-border-width) solid var(--j6n-border);
@@ -577,7 +614,7 @@ code, .j6n-code-inline {
   transition: background var(--j6n-dur-1) var(--j6n-ease), color var(--j6n-dur-1) var(--j6n-ease);
 }
 .j6n-close:hover { background: var(--j6n-surface-2); color: var(--j6n-text); }
-.j6n-close:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
+.j6n-close:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); }
 
 @keyframes j6n-spin { to { transform: rotate(360deg); } }
 .j6n-spinner {
@@ -656,7 +693,7 @@ code, .j6n-code-inline {
   padding: var(--j6n-space-2) var(--j6n-space-1);
   min-height: 32px;
 }
-.j6n-password__toggle:focus-visible { outline: none; box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-sm); }
+.j6n-password__toggle:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-sm); }
 .j6n-password__meter { display: flex; gap: 4px; }
 .j6n-password__meter span { height: 4px; flex: 1; background: var(--j6n-border); border-radius: var(--j6n-radius-pill); transition: background var(--j6n-dur-2) var(--j6n-ease); }
 .j6n-password__meter.is-weak span:nth-child(-n+1) { background: var(--j6n-danger); }
@@ -690,7 +727,7 @@ code, .j6n-code-inline {
   width: 18px; height: 18px; border-radius: 50%;
   background: var(--j6n-surface); border: 2px solid var(--j6n-accent); box-shadow: var(--j6n-shadow-sm);
 }
-.j6n-range:focus-visible { outline: none; }
+.j6n-range:focus-visible { outline: 2px solid transparent; outline-offset: 2px; }
 .j6n-range:focus-visible::-webkit-slider-thumb { box-shadow: var(--j6n-ring); }
 .j6n-range:focus-visible::-moz-range-thumb { box-shadow: var(--j6n-ring); }
 
@@ -748,7 +785,12 @@ code, .j6n-code-inline {
   border-radius: var(--j6n-radius-sm); cursor: pointer;
   transition: background var(--j6n-dur-1) var(--j6n-ease), color var(--j6n-dur-1) var(--j6n-ease), box-shadow var(--j6n-dur-1) var(--j6n-ease);
 }
-.j6n-segmented input:checked + label { background: var(--j6n-surface); color: var(--j6n-text); box-shadow: var(--j6n-shadow-sm); }
+.j6n-segmented input:checked + label {
+  background: var(--j6n-surface); color: var(--j6n-text);
+  /* contour --j6n-border-interactive (≥ 3:1) : le fond seul ne contrastait qu'à 1,1:1
+     avec la piste, et la couleur du texte à 2,99:1 — RGAA 3.3 / WCAG 1.4.11 */
+  box-shadow: inset 0 0 0 1px var(--j6n-border-interactive), var(--j6n-shadow-sm);
+}
 .j6n-segmented input:focus-visible + label { box-shadow: var(--j6n-ring); }
 
 .j6n-toggle { display: inline-flex; align-items: center; gap: var(--j6n-space-3); font-size: var(--j6n-text-sm); cursor: pointer; }
@@ -785,14 +827,14 @@ code, .j6n-code-inline {
 .j6n-tag__label {
   font: inherit; color: inherit; background: none; border: 0; padding: 6px 2px; cursor: pointer;
 }
-.j6n-tag__label:focus-visible { outline: none; box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-sm); }
+.j6n-tag__label:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-sm); }
 .j6n-tag__remove {
   display: inline-flex; align-items: center; justify-content: center; flex: none;
   width: 22px; height: 22px; margin-right: 4px; border-radius: 50%; border: 0; background: transparent; color: inherit;
   font-size: 0.9em; line-height: 1; cursor: pointer;
 }
 .j6n-tag__remove:hover { background: color-mix(in oklab, currentColor 18%, transparent); }
-.j6n-tag__remove:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
+.j6n-tag__remove:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); }
 
 /* ---------- 16. Navigation ---------- */
 .j6n-breadcrumb ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--j6n-space-2); margin: 0; padding: 0; }
@@ -818,7 +860,7 @@ code, .j6n-code-inline {
 .j6n-tabs__tab:hover { color: var(--j6n-text); }
 .j6n-tabs__tab[aria-selected='true'] { color: var(--j6n-text); }
 .j6n-tabs__tab[aria-selected='true']::after { transform: scaleX(1); }
-.j6n-tabs__tab:focus-visible { outline: none; box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-sm); }
+.j6n-tabs__tab:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-sm); }
 .j6n-tabs__panel { padding-block: var(--j6n-space-5); }
 .j6n-tabs__panel[hidden] { display: none; }
 
@@ -837,7 +879,7 @@ code, .j6n-code-inline {
   text-decoration: none; cursor: pointer;
 }
 .j6n-dropdown__item:hover { background: var(--j6n-surface-2); }
-.j6n-dropdown__item:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
+.j6n-dropdown__item:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); }
 .j6n-dropdown__divider { border: 0; border-top: var(--j6n-border-width) solid var(--j6n-border); margin: var(--j6n-space-2) 0; }
 
 .j6n-sidemenu { display: flex; flex-direction: column; gap: 2px; min-width: 200px; }
@@ -886,7 +928,7 @@ code, .j6n-code-inline {
 }
 .j6n-skiplink:focus { top: var(--j6n-space-3); }
 
-.j6n-stepper { display: flex; }
+.j6n-stepper { display: flex; list-style: none; margin: 0; padding: 0; }
 .j6n-stepper__step { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: var(--j6n-space-2); text-align: center; }
 .j6n-stepper__step::before {
   content: ''; position: absolute; top: 15px; left: -50%; width: 100%; height: 2px; background: var(--j6n-border-strong); z-index: 0;
@@ -978,22 +1020,45 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 .j6n-modal__body { padding: var(--j6n-space-4) var(--j6n-space-5); color: var(--j6n-text-muted); }
 .j6n-modal__footer { display: flex; justify-content: flex-end; gap: var(--j6n-space-3); padding: 0 var(--j6n-space-5) var(--j6n-space-5); }
 
+/* Infobulle — theme.js transforme data-tooltip en <span class="j6n-tooltip">
+   relié par aria-describedby (RGAA 10.13 / WCAG 1.4.13) : survolable, masquable
+   avec Échap, hors du nom du contrôle. */
 [data-tooltip] { position: relative; }
-[data-tooltip]::after {
-  content: attr(data-tooltip);
+.j6n-tooltip {
   position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(4px);
   padding: 6px 10px; max-width: 220px; width: max-content;
-  font-size: var(--j6n-text-xs); font-weight: 500; text-align: center;
+  font-family: var(--j6n-font-sans), sans-serif; font-size: var(--j6n-text-xs); font-weight: 500; line-height: 1.4;
+  letter-spacing: normal; text-transform: none; white-space: normal; text-align: center;
   background: var(--j6n-text); color: var(--j6n-bg);
   border-radius: var(--j6n-radius-sm);
-  opacity: 0; pointer-events: none;
-  transition: opacity var(--j6n-dur-1) var(--j6n-ease), transform var(--j6n-dur-1) var(--j6n-ease);
+  cursor: default;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity var(--j6n-dur-1) var(--j6n-ease), transform var(--j6n-dur-1) var(--j6n-ease), visibility 0s linear var(--j6n-dur-1);
   z-index: 70;
 }
-[data-tooltip]:hover::after,
-[data-tooltip]:focus-visible::after,
-[data-tooltip].is-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
-[data-tooltip-pos='bottom']::after { bottom: auto; top: calc(100% + 8px); }
+/* pont invisible sur l'écart de 8px : la souris rejoint l'infobulle sans la fermer */
+.j6n-tooltip::before { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 8px; }
+[data-tooltip]:hover > .j6n-tooltip,
+[data-tooltip]:focus-visible > .j6n-tooltip,
+[data-tooltip].is-visible > .j6n-tooltip {
+  opacity: 1; visibility: visible; pointer-events: auto;
+  transform: translateX(-50%) translateY(0); transition-delay: 0s;
+}
+[data-tooltip].is-dismissed > .j6n-tooltip { opacity: 0; visibility: hidden; pointer-events: none; }
+[data-tooltip-pos='bottom'] > .j6n-tooltip { bottom: auto; top: calc(100% + 8px); }
+[data-tooltip-pos='bottom'] > .j6n-tooltip::before { top: auto; bottom: 100%; }
+/* Sans theme.js : repli sur le pseudo-élément, au survol et au focus seulement */
+:root:not([data-j6n]) [data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  padding: 6px 10px; max-width: 220px; width: max-content;
+  font-size: var(--j6n-text-xs); font-weight: 500; text-align: center; white-space: normal;
+  background: var(--j6n-text); color: var(--j6n-bg); border-radius: var(--j6n-radius-sm);
+  opacity: 0; pointer-events: none; z-index: 70;
+}
+:root:not([data-j6n]) [data-tooltip]:hover::after,
+:root:not([data-j6n]) [data-tooltip]:focus-visible::after { opacity: 1; }
+:root:not([data-j6n]) [data-tooltip-pos='bottom']::after { bottom: auto; top: calc(100% + 8px); }
 
 .j6n-notice {
   display: flex; align-items: center; justify-content: center; gap: var(--j6n-space-3);
@@ -1019,7 +1084,7 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
   min-height: 44px;
 }
 .j6n-accordion__trigger::-webkit-details-marker { display: none; }
-.j6n-accordion__trigger:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
+.j6n-accordion__trigger:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); }
 .j6n-accordion__trigger:hover { background: var(--j6n-surface-2); }
 .j6n-accordion__panel { padding: 0 var(--j6n-space-4) var(--j6n-space-4); color: var(--j6n-text-muted); }
 
@@ -1047,6 +1112,8 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 
 /* ---------- 18. Données & contenu ---------- */
 .j6n-table-wrap { overflow-x: auto; border: var(--j6n-border-width) solid var(--j6n-border); border-radius: var(--j6n-radius-md); }
+/* focalisable pour défiler au clavier (theme.js pose tabindex="0") */
+.j6n-table-wrap:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); }
 .j6n-table { width: 100%; border-collapse: collapse; font-size: var(--j6n-text-sm); }
 .j6n-table th, .j6n-table td { padding: var(--j6n-space-3) var(--j6n-space-4); text-align: left; border-bottom: var(--j6n-border-width) solid var(--j6n-border); }
 .j6n-table thead th {
@@ -1067,6 +1134,9 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 .j6n-table__sort[aria-sort='descending']::after { transform: rotate(45deg); opacity: 1; }
 
 .j6n-quote { margin: 0; padding-left: var(--j6n-space-5); border-left: 3px solid var(--j6n-border-strong); }
+/* <figure class="j6n-quote"><blockquote>…</blockquote><figcaption class="j6n-quote__cite"> :
+   l'attribution reste hors de la citation */
+.j6n-quote blockquote { margin: 0; }
 .j6n-quote p { font-size: var(--j6n-text-lg); font-weight: 500; line-height: var(--j6n-leading-tight); letter-spacing: var(--j6n-tracking-tight); }
 .j6n-quote__cite { display: block; margin-top: var(--j6n-space-3);
   font-family: var(--j6n-font-mono), serif; font-size: var(--j6n-text-xs); color: var(--j6n-text-muted); }
@@ -1095,7 +1165,7 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
   display: inline-flex; align-items: center; gap: var(--j6n-space-2);
   background: transparent; border: 0; padding: var(--j6n-space-1); border-radius: var(--j6n-radius-pill); cursor: pointer;
 }
-.j6n-user-menu__trigger:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
+.j6n-user-menu__trigger:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); }
 .j6n-user-menu__avatar {
   display: inline-flex; align-items: center; justify-content: center; flex: none;
   width: 32px; height: 32px; border-radius: 50%;
@@ -1114,7 +1184,7 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
   transition: border-color var(--j6n-dur-1) var(--j6n-ease), box-shadow var(--j6n-dur-1) var(--j6n-ease);
 }
 .j6n-connect:hover { border-color: var(--_brand); }
-.j6n-connect:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
+.j6n-connect:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); }
 .j6n-connect__mark { width: 10px; height: 10px; border-radius: 50%; background: var(--_brand); flex: none; }
 .j6n-connect--strava { --_brand: #fc4c02; }
 .j6n-connect--garmin { --_brand: #007cc3; }
@@ -1214,7 +1284,7 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
 }
 .j6n-carousel__dot:hover::before { background: var(--j6n-surface-2); }
 .j6n-carousel__dot[aria-current='true']::before { width: 26px; background: var(--j6n-accent-strong); border-color: var(--j6n-accent-strong); }
-.j6n-carousel__dot:focus-visible { outline: none; box-shadow: var(--j6n-ring); }
+.j6n-carousel__dot:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--j6n-ring); }
 
 /* Habillage par défaut d'une diapositive (facultatif) */
 .j6n-carousel__media { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--j6n-surface-2); }
@@ -1235,6 +1305,54 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
   .j6n-layout { flex-direction: column; }
   .j6n-layout > aside { position: static; width: 100%; }
   .j6n-layout > main { width: 100%; }
+}
+
+/* ---------- 19bis. Contraste élevé (Windows, forced-colors) — RGAA 10.7 / 3.3 ----------
+   Le navigateur impose les couleurs du système et supprime les ombres. Les anneaux
+   de focus passent donc aussi par un outline transparent (voir les :focus-visible),
+   que ce mode rend visible. Les états dessinés uniquement en couleur de fond
+   reçoivent ici une couleur système ; forced-color-adjust: none garantit qu'elle
+   s'applique telle quelle. */
+@media (forced-colors: active) {
+  .j6n-toggle__track { forced-color-adjust: none; background: Canvas; border: 1px solid CanvasText; }
+  .j6n-toggle__track::after { background: CanvasText; top: 2px; left: 2px; }
+  .j6n-toggle input:checked + .j6n-toggle__track { background: Highlight; border-color: Highlight; }
+  .j6n-toggle input:checked + .j6n-toggle__track::after { background: HighlightText; }
+
+  .j6n-segmented { border: 1px solid CanvasText; }
+  .j6n-segmented input:checked + label { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+
+  .j6n-tag.is-active { forced-color-adjust: none; background: Highlight; border-color: Highlight; color: HighlightText; }
+  .j6n-pagination [aria-current='page'] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+
+  .j6n-nav__link::after, .j6n-tabs__tab::after { forced-color-adjust: none; background: Highlight; }
+
+  .j6n-password__meter span { forced-color-adjust: none; background: Canvas; border: 1px solid CanvasText; height: 6px; }
+  .j6n-password__meter.is-weak span:nth-child(-n+1),
+  .j6n-password__meter.is-fair span:nth-child(-n+2),
+  .j6n-password__meter.is-good span:nth-child(-n+3),
+  .j6n-password__meter.is-strong span { background: CanvasText; }
+
+  /* curseur : piste et poignée en couleurs système (règles webkit et moz séparées :
+     un sélecteur inconnu invaliderait toute la règle dans l'autre moteur) */
+  .j6n-range { forced-color-adjust: none; }
+  .j6n-range::-webkit-slider-runnable-track { background: linear-gradient(to right, Highlight 0 var(--_fill), CanvasText var(--_fill) 100%); }
+  .j6n-range::-moz-range-track { background: CanvasText; }
+  .j6n-range::-moz-range-progress { background: Highlight; }
+  .j6n-range::-webkit-slider-thumb { background: Canvas; border-color: Highlight; }
+  .j6n-range::-moz-range-thumb { background: Canvas; border-color: Highlight; }
+
+  .j6n-stepper__step.is-done::before { forced-color-adjust: none; background: Highlight; }
+  .j6n-stepper__step.is-done .j6n-stepper__num { forced-color-adjust: none; background: Highlight; border-color: Highlight; }
+  .j6n-stepper__step.is-done .j6n-stepper__num::after { border-color: HighlightText; }
+
+  .j6n-carousel__dot::before { forced-color-adjust: none; border-color: ButtonText; }
+  .j6n-carousel__dot[aria-current='true']::before { background: Highlight; border-color: Highlight; }
+  .j6n-carousel__progress { forced-color-adjust: none; background: Canvas; border: 1px solid CanvasText; }
+  .j6n-carousel__progress-bar { background: Highlight; }
+
+  /* surfaces flottantes : sans ombre ni fond propre, un cadre les détache du contenu */
+  .j6n-tooltip, .j6n-toast { border: 1px solid CanvasText; }
 }
 
 /* ---------- 20. Utilitaires d'espacement ----------

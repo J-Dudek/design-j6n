@@ -17,6 +17,8 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Foulée, design system : theme.css + theme.js, sans dépendance">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="../fonts/sora-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../fonts.css">
 <link rel="stylesheet" href="../theme.css">
 <link rel="stylesheet" href="showcase.css">
 </head>
@@ -109,7 +111,7 @@
       <h2 id="menu-deroulant">Menu déroulant — <code>.j6n-dropdown</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
-          <button class="j6n-btn j6n-btn--secondary" popovertarget="actions-menu" aria-haspopup="true" aria-expanded="false">Actions ▾</button>
+          <button class="j6n-btn j6n-btn--secondary" popovertarget="actions-menu" aria-expanded="false">Actions ▾</button>
           <div class="j6n-dropdown__menu" popover id="actions-menu">
             <button type="button" class="j6n-dropdown__item">Dupliquer la sortie</button>
             <button type="button" class="j6n-dropdown__item">Exporter en GPX</button>
@@ -122,39 +124,41 @@
       <h2 id="pagination">Pagination — <code>.j6n-pagination</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
-          <ul class="j6n-pagination" aria-label="Pages de résultats">
-            <li><a href="#" class="is-disabled" aria-disabled="true">← Précédent</a></li>
-            <li><a href="#" aria-current="page">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><span class="is-ellipsis">…</span></li>
-            <li><a href="#">12</a></li>
-            <li><a href="#">Suivant →</a></li>
-          </ul>
+          <nav aria-label="Pagination">
+            <ul class="j6n-pagination">
+              <li><a class="is-disabled" role="link" aria-disabled="true">← Précédent</a></li>
+              <li><a href="?page=1" aria-current="page">1</a></li>
+              <li><a href="?page=2">2</a></li>
+              <li><a href="?page=3">3</a></li>
+              <li><span class="is-ellipsis">…</span></li>
+              <li><a href="?page=12">12</a></li>
+              <li><a href="?page=2">Suivant →</a></li>
+            </ul>
+          </nav>
         </template>
       </div>
 
       <h2 id="etapes">Étapes — <code>.j6n-stepper</code></h2>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
-          <div class="j6n-stepper">
-            <div class="j6n-stepper__step is-done">
+          <ol class="j6n-stepper" aria-label="Publication de la sortie">
+            <li class="j6n-stepper__step is-done">
               <span class="j6n-stepper__num">1</span>
-              <span class="j6n-stepper__label">Import GPX</span>
-            </div>
-            <div class="j6n-stepper__step is-done">
+              <span class="j6n-stepper__label">Import GPX<span class="j6n-sr-only"> (terminée)</span></span>
+            </li>
+            <li class="j6n-stepper__step is-done">
               <span class="j6n-stepper__num">2</span>
-              <span class="j6n-stepper__label">Vérification</span>
-            </div>
-            <div class="j6n-stepper__step is-current">
+              <span class="j6n-stepper__label">Vérification<span class="j6n-sr-only"> (terminée)</span></span>
+            </li>
+            <li class="j6n-stepper__step is-current" aria-current="step">
               <span class="j6n-stepper__num">3</span>
-              <span class="j6n-stepper__label">Publication</span>
-            </div>
-            <div class="j6n-stepper__step">
+              <span class="j6n-stepper__label">Publication<span class="j6n-sr-only"> (en cours)</span></span>
+            </li>
+            <li class="j6n-stepper__step">
               <span class="j6n-stepper__num">4</span>
-              <span class="j6n-stepper__label">Partage</span>
-            </div>
-          </div>
+              <span class="j6n-stepper__label">Partage<span class="j6n-sr-only"> (à venir)</span></span>
+            </li>
+          </ol>
         </template>
       </div>
 

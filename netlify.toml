@@ -15,3 +15,11 @@
   from = "/"
   to = "/demo/"
   status = 301
+
+# Polices auto-hébergées : mises en cache 30 jours (noms de fichiers non versionnés,
+# d'où pas de « immutable »).
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    Access-Control-Allow-Origin = "*"

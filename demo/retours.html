@@ -17,6 +17,8 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Foulée, design system : theme.css + theme.js, sans dépendance">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="../fonts/sora-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../fonts.css">
 <link rel="stylesheet" href="../theme.css">
 <link rel="stylesheet" href="showcase.css">
 </head>
@@ -114,7 +116,7 @@
               <p>« Crête des Ayes » et ses 18,4 km seront définitivement supprimés. Cette action est irréversible.</p>
             </div>
             <div class="j6n-modal__footer">
-              <button type="button" class="j6n-btn j6n-btn--secondary" data-j6n-modal-close>Annuler</button>
+              <button type="button" class="j6n-btn j6n-btn--secondary" data-j6n-modal-close autofocus>Annuler</button>
               <button type="button" class="j6n-btn" data-j6n-modal-close>Supprimer</button>
             </div>
           </dialog>
@@ -164,15 +166,15 @@
       </div>
 
       <h2 id="consentement">Consentement — <code>.j6n-consent</code></h2>
-      <p class="j6n-muted">Réinterprétation du composant « cookies » du DSFR pour un usage perso — bandeau générique, mémorisé en local, confiné ici à l'encadré.</p>
+      <p class="j6n-muted">Réinterprétation du composant « cookies » du DSFR pour un usage perso — bandeau générique, mémorisé en local, confiné ici à l'encadré. Chaque bouton enregistre sa valeur (<code>data-j6n-dismiss-value</code>) : le choix se relit avec <code>j6n.dismissed('j6n-consent')</code> et arrive dans l'évènement <code>j6n:dismiss</code>. Après fermeture, le focus passe à l'élément suivant au lieu de se perdre en haut de page.</p>
       <div class="j6n-showcase" data-j6n-js="showcase">
         <template>
           <div style="position:relative; height:180px; contain:layout paint;">
             <div class="j6n-consent" id="cookie-consent">
               <p>Foulée utilise le stockage local de ton navigateur pour retenir tes préférences (thème, unités). Rien n'est envoyé à un serveur tiers.</p>
               <div class="j6n-consent__actions">
-                <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" data-j6n-dismiss="j6n-consent" data-j6n-dismiss-target="cookie-consent">Refuser</button>
-                <button type="button" class="j6n-btn j6n-btn--sm" data-j6n-dismiss="j6n-consent" data-j6n-dismiss-target="cookie-consent">Accepter</button>
+                <button type="button" class="j6n-btn j6n-btn--secondary j6n-btn--sm" data-j6n-dismiss="j6n-consent" data-j6n-dismiss-value="refuse" data-j6n-dismiss-target="cookie-consent">Refuser</button>
+                <button type="button" class="j6n-btn j6n-btn--sm" data-j6n-dismiss="j6n-consent" data-j6n-dismiss-value="accepte" data-j6n-dismiss-target="cookie-consent">Accepter</button>
               </div>
             </div>
             <p style="position:absolute; top:0; left:0; right:0; text-align:center;"><button type="button" class="j6n-btn j6n-btn--ghost j6n-btn--sm" id="reset-consent">Réinitialiser</button></p>
@@ -216,6 +218,11 @@
     document.getElementById('reset-notice').addEventListener('click', () => {
       localStorage.removeItem('j6n-notice-beta');
       document.getElementById('beta-notice').hidden = false;
+    });
+    // Le choix est relu avec j6n.dismissed('j6n-consent') ("accepte" / "refuse"),
+    // ou capté à la fermeture via l'évènement j6n:dismiss.
+    document.getElementById('cookie-consent').addEventListener('j6n:dismiss', (e) => {
+      j6n.toast('Choix enregistré : ' + (e.detail.value === 'accepte' ? 'accepté' : 'refusé') + '.');
     });
     document.getElementById('reset-consent').addEventListener('click', () => {
       localStorage.removeItem('j6n-consent');
