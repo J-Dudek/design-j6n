@@ -41,7 +41,7 @@
         "JavaScript"
       ],
       "license": "https://opensource.org/licenses/MIT",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "url": "https://design.byj6n.fr/demo/",
       "image": "https://design.byj6n.fr/demo/og.png",
       "author": {
@@ -58,6 +58,7 @@
 <link rel="stylesheet" href="showcase.css">
 </head>
 <body>
+  <div class="j6n-scroll-progress" aria-hidden="true"></div>
   <a class="j6n-skiplink" href="#contenu">Aller au contenu</a>
 
   <header class="j6n-header">
@@ -70,6 +71,7 @@
       <a class="j6n-nav__link" href="navigation.html">Navigation</a>
       <a class="j6n-nav__link" href="retours.html">Retours</a>
       <a class="j6n-nav__link" href="donnees.html">Données</a>
+      <a class="j6n-nav__link" href="composants-v3.html">Nouveautés</a>
     </nav>
     <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
     <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" type="button" data-demo-search aria-haspopup="dialog" hidden><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="j6n-demo-switch__label">Rechercher</span><kbd class="j6n-demo-search__kbd" aria-hidden="true">/</kbd></button>
@@ -87,12 +89,13 @@
         <a class="j6n-sidemenu__link" href="navigation.html">Navigation</a>
         <a class="j6n-sidemenu__link" href="retours.html">Retours &amp; alertes</a>
         <a class="j6n-sidemenu__link" href="donnees.html">Données &amp; contenu</a>
+        <a class="j6n-sidemenu__link" href="composants-v3.html">Nouveautés V3</a>
       </nav>
     </aside>
 
     <main id="contenu" class="j6n-stack">
       <p class="j6n-eyebrow">Design system</p>
-      <h1>Foulée</h1>
+      <h1 class="j6n-text-gradient">Foulée</h1>
       <p class="j6n-muted">Un seul fichier CSS (<code>theme.css</code>) et un seul fichier JS (<code>theme.js</code>).</p>
 
       <div class="j6n-row">
@@ -106,7 +109,7 @@
       <p class="j6n-muted">Toutes les valeurs viennent des variables <code>--j6n-*</code> — aucune valeur codée en dur dans les composants.</p>
 
       <div class="j6n-grid">
-        <article class="j6n-card">
+        <article class="j6n-card" data-j6n-reveal>
           <h3 class="j6n-card__title">Couleurs</h3>
           <div class="j6n-row j6n-gap-2">
             <span style="width:32px;height:32px;border-radius:var(--j6n-radius-sm);background:var(--j6n-accent);" title="--j6n-accent"></span>
@@ -117,11 +120,11 @@
             <span style="width:32px;height:32px;border-radius:var(--j6n-radius-sm);background:var(--j6n-info);" title="--j6n-info"></span>
           </div>
         </article>
-        <article class="j6n-card">
+        <article class="j6n-card" data-j6n-reveal>
           <h3 class="j6n-card__title">Typographie</h3>
           <p class="j6n-mono j6n-muted j6n-m-0">Sora — texte courant<br>IBM Plex Mono — valeurs, code</p>
         </article>
-        <article class="j6n-card">
+        <article class="j6n-card" data-j6n-reveal>
           <h3 class="j6n-card__title">Cadence</h3>
           <div class="j6n-row j6n-gap-1" style="align-items:flex-end;">
             <span style="width:4px;height:4px;background:var(--j6n-pine);"></span>
@@ -137,15 +140,38 @@
 
       <hr class="j6n-divider-run">
 
+      <h2 id="v3">Nouveautés V3</h2>
+      <p class="j6n-muted">Composants plus arrondis, élévation en deux plans, animations au survol, à l'appui et au défilement — désactivées automatiquement si votre système demande un mouvement réduit.</p>
+      <div class="j6n-grid">
+        <article class="j6n-card j6n-stat" data-j6n-reveal>
+          <span class="j6n-stat__value" data-j6n-count="128">128</span>
+          <span class="j6n-stat__label">Compteur animé</span>
+        </article>
+        <article class="j6n-card" data-j6n-reveal>
+          <h3 class="j6n-card__title">États</h3>
+          <div class="j6n-row">
+            <span class="j6n-badge j6n-badge--success j6n-badge--live"><span class="j6n-badge__dot"></span>En direct</span>
+            <button class="j6n-btn j6n-btn--sm" type="button" onclick="j6n.toast('Enregistré', {tone:'success'})">Toast</button>
+          </div>
+        </article>
+        <article class="j6n-card" data-j6n-reveal>
+          <h3 class="j6n-card__title">Chargement</h3>
+          <div class="j6n-skeleton" style="height:14px;margin-bottom:8px;"></div>
+          <div class="j6n-skeleton" style="height:14px;width:60%;"></div>
+        </article>
+      </div>
+
+      <hr class="j6n-divider-run">
+
       <h2 id="regles">Règles</h2>
       <div class="j6n-grid">
-        <div class="j6n-callout">
+        <div class="j6n-callout" data-j6n-reveal="left">
           <p class="j6n-callout__title">À faire</p>
           <p>Passer par les variables <code>--j6n-*</code>, un seul accent par écran, cibles tactiles 44&nbsp;px minimum, mono pour les valeurs mesurées et le code.</p>
         </div>
-        <div class="j6n-callout j6n-callout--pine">
+        <div class="j6n-callout j6n-callout--pine" data-j6n-reveal="right">
           <p class="j6n-callout__title">À éviter</p>
-          <p>Dégradés de fond et ombres floues, mono pour du texte courant, px hors de l'échelle de cadence.</p>
+          <p>Dégradés vifs ou multicolores, animations qui bloquent la lecture, mono pour du texte courant, px hors de l'échelle de cadence.</p>
         </div>
       </div>
     </main>
@@ -197,9 +223,10 @@
         (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
     }
     themeBtn.setAttribute('aria-pressed', String(isDark()));
-    themeBtn.addEventListener('click', () => {
-      document.documentElement.dataset.theme = isDark() ? 'light' : 'dark';
-      themeBtn.setAttribute('aria-pressed', String(isDark()));
+    themeBtn.addEventListener('click', (e) => {
+      const next = isDark() ? 'light' : 'dark';
+      j6n.setTheme(next, e);
+      themeBtn.setAttribute('aria-pressed', String(next === 'dark'));
     });
 
     const variantBtn = document.getElementById('variant');

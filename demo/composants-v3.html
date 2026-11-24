@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Progression, avatar, tiroir et plus — design system Foulée</title>
+<meta name="description" content="Barre de progression, avatar, état vide, tiroir, chronologie, notation, mini-graphique et code à usage unique du design system Foulée, avec code HTML à copier.">
+<link rel="canonical" href="https://design.byj6n.fr/demo/composants-v3.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Foulée">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Progression, avatar, tiroir et plus — design system Foulée">
+<meta property="og:description" content="Barre de progression, avatar, état vide, tiroir, chronologie, notation, mini-graphique et code à usage unique du design system Foulée, avec code HTML à copier.">
+<meta property="og:url" content="https://design.byj6n.fr/demo/composants-v3.html">
+<meta property="og:image" content="https://design.byj6n.fr/demo/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Foulée, design system : theme.css + theme.js, sans dépendance">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="../fonts/sora-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../fonts.css">
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="showcase.css">
+</head>
+<body>
+  <div class="j6n-scroll-progress" aria-hidden="true"></div>
+  <a class="j6n-skiplink" href="#contenu">Aller au contenu</a>
+
+  <header class="j6n-header">
+    <a class="j6n-brand" href="index.html"><span class="j6n-brand__mark"></span> Foulée</a>
+    <span class="j6n-badge j6n-demo-version" data-demo-version hidden></span>
+    <nav class="j6n-nav" aria-label="Navigation principale">
+      <a class="j6n-nav__link" href="index.html">Sommaire</a>
+      <a class="j6n-nav__link" href="actions.html">Actions</a>
+      <a class="j6n-nav__link" href="formulaires.html">Formulaires</a>
+      <a class="j6n-nav__link" href="navigation.html">Navigation</a>
+      <a class="j6n-nav__link" href="retours.html">Retours</a>
+      <a class="j6n-nav__link" href="donnees.html">Données</a>
+      <a class="j6n-nav__link is-active" href="composants-v3.html" aria-current="page">Nouveautés</a>
+    </nav>
+    <button class="j6n-nav__toggle" data-j6n-js="menu-toggle" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" type="button" data-demo-search aria-haspopup="dialog" hidden><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="j6n-demo-switch__label">Rechercher</span><kbd class="j6n-demo-search__kbd" aria-hidden="true">/</kbd></button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="theme" aria-pressed="false"><svg class="j6n-demo-switch__icon" aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg><span class="j6n-demo-switch__label">Thème sombre</span></button>
+    <button class="j6n-btn j6n-btn--secondary j6n-btn--sm j6n-demo-switch" id="variant" aria-pressed="false"><span class="j6n-demo-switch__icon" aria-hidden="true">✦</span><span class="j6n-demo-switch__label">Thème moderne</span></button>
+  </header>
+
+  <div class="j6n-container j6n-layout j6n-py-7">
+    <aside>
+      <nav class="j6n-sidemenu" aria-label="Sections de la démo">
+        <a class="j6n-sidemenu__link" href="index.html">Sommaire</a>
+        <a class="j6n-sidemenu__link" href="espacements.html">Espacements</a>
+        <a class="j6n-sidemenu__link" href="actions.html">Actions</a>
+        <a class="j6n-sidemenu__link" href="formulaires.html">Formulaires</a>
+        <a class="j6n-sidemenu__link" href="navigation.html">Navigation</a>
+        <a class="j6n-sidemenu__link" href="retours.html">Retours &amp; alertes</a>
+        <a class="j6n-sidemenu__link" href="donnees.html">Données &amp; contenu</a>
+        <a class="j6n-sidemenu__link is-active" href="composants-v3.html" aria-current="page">Nouveautés V3</a>
+      </nav>
+    </aside>
+
+    <main id="contenu" class="j6n-stack">
+      <p class="j6n-eyebrow">Composants</p>
+      <h1>Nouveautés V3</h1>
+      <p class="j6n-muted">Huit composants ajoutés à la V3, plus les animations (<code>data-j6n-reveal</code>, <code>data-j6n-count</code>, <code>data-j6n-tilt</code>). Tous respectent <code>prefers-reduced-motion</code>.</p>
+
+      <h2 id="progression">Progression — <code>.j6n-progress</code></h2>
+      <p class="j6n-muted"><code>role="progressbar"</code> avec <code>aria-valuenow</code> ; la valeur visuelle passe par <code>--j6n-value</code>. Sans <code>aria-valuenow</code>, la barre est indéterminée (<code>--indeterminate</code>) : le libellé dit alors « en cours ».</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-stack">
+            <div>
+              <div class="j6n-progress-label"><span id="p1">Import de la trace</span><span class="j6n-progress-label__value">64&nbsp;%</span></div>
+              <div class="j6n-progress" role="progressbar" aria-labelledby="p1" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100"><span class="j6n-progress__bar" style="--j6n-value:64%"></span></div>
+            </div>
+            <div>
+              <div class="j6n-progress-label"><span id="p2">Analyse en cours</span></div>
+              <div class="j6n-progress j6n-progress--indeterminate" role="progressbar" aria-labelledby="p2"><span class="j6n-progress__bar"></span></div>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="avatar">Avatar — <code>.j6n-avatar</code></h2>
+      <p class="j6n-muted">Initiales ou image, quatre tailles, pastille d'état et groupe qui se chevauche. Le nom accessible vient de <code>aria-label</code> (ou de l'<code>alt</code> de l'image) ; la pastille doit être doublée d'un texte masqué.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-row">
+            <span class="j6n-avatar j6n-avatar--sm" role="img" aria-label="Julien">JD</span>
+            <span class="j6n-avatar" role="img" aria-label="Julien, en ligne">JD<span class="j6n-avatar__status"></span></span>
+            <span class="j6n-avatar j6n-avatar--lg j6n-avatar--square" role="img" aria-label="Alex">AX</span>
+            <div class="j6n-avatar-group" role="group" aria-label="Participants">
+              <span class="j6n-avatar" role="img" aria-label="Marie">MA</span>
+              <span class="j6n-avatar" role="img" aria-label="Léo">LE</span>
+              <span class="j6n-avatar j6n-avatar--more" role="img" aria-label="3 autres participants">+3</span>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="etat-vide">État vide — <code>.j6n-empty</code></h2>
+      <p class="j6n-muted">À afficher à la place d'une liste sans résultat : une phrase qui dit pourquoi, et une action pour en sortir.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-empty">
+            <span class="j6n-empty__icon" aria-hidden="true">⛰</span>
+            <h3 class="j6n-empty__title">Aucune sortie pour l'instant</h3>
+            <p class="j6n-empty__text">Importez une trace ou synchronisez votre montre pour voir vos sorties ici.</p>
+            <a class="j6n-btn" href="#etat-vide">Importer une trace</a>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="tiroir">Tiroir — <code>.j6n-drawer</code></h2>
+      <p class="j6n-muted">Une modale (<code>&lt;dialog class="j6n-modal j6n-drawer"&gt;</code>) accrochée à un bord : mêmes attributs <code>data-j6n-modal-open</code> / <code>data-j6n-modal-close</code>, même piège à focus, Échap ferme. Variantes <code>--left</code> et <code>--bottom</code>.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <button class="j6n-btn j6n-btn--secondary" type="button" data-j6n-modal-open="drawer-filtres">Filtres</button>
+          <dialog class="j6n-modal j6n-drawer" id="drawer-filtres" aria-labelledby="drawer-filtres-titre">
+            <div class="j6n-modal__header">
+              <h2 class="j6n-modal__title" id="drawer-filtres-titre">Filtres</h2>
+              <button class="j6n-close" type="button" data-j6n-modal-close aria-label="Fermer">×</button>
+            </div>
+            <div class="j6n-modal__body">
+              <label class="j6n-toggle"><input type="checkbox" role="switch"><span class="j6n-toggle__track"></span>Trail uniquement</label>
+            </div>
+            <div class="j6n-modal__footer">
+              <button class="j6n-btn" type="button" data-j6n-modal-close>Appliquer</button>
+            </div>
+          </dialog>
+        </template>
+      </div>
+
+      <h2 id="chronologie">Chronologie — <code>.j6n-timeline</code></h2>
+      <p class="j6n-muted">Une <code>&lt;ol&gt;</code> ; l'étape en cours porte <code>aria-current="step"</code>, les étapes terminées <code>.is-done</code> (le repère devient un carré : l'état ne dépend pas de la couleur seule).</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <ol class="j6n-timeline">
+            <li class="j6n-timeline__item is-done"><span class="j6n-timeline__marker"></span><span class="j6n-timeline__time">06:30</span><p class="j6n-timeline__title">Départ</p><p class="j6n-timeline__text">Parking du col.</p></li>
+            <li class="j6n-timeline__item" aria-current="step"><span class="j6n-timeline__marker"></span><span class="j6n-timeline__time">08:10</span><p class="j6n-timeline__title">Ravitaillement</p><p class="j6n-timeline__text">Km 18, +1&nbsp;200&nbsp;m D+.</p></li>
+            <li class="j6n-timeline__item"><span class="j6n-timeline__marker"></span><span class="j6n-timeline__time">10:45</span><p class="j6n-timeline__title">Arrivée</p><p class="j6n-timeline__text">Objectif : sous les 5 h.</p></li>
+          </ol>
+        </template>
+      </div>
+
+      <h2 id="notation">Notation — <code>.j6n-rating</code></h2>
+      <p class="j6n-muted">Lecture seule : <code>role="img"</code> + <code>aria-label</code>, valeur dans <code>--j6n-rating</code> (demi-étoiles acceptées). Saisie : des boutons radio natifs rangés de 5 à 1 — navigation aux flèches fournie par le navigateur.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-stack">
+            <span class="j6n-rating" role="img" aria-label="3,5 sur 5" style="--j6n-rating:3.5"></span>
+            <fieldset class="j6n-rating-input" style="border:0;padding:0;margin:0">
+              <legend class="j6n-sr-only">Votre note</legend>
+              <input type="radio" name="note" id="n5" value="5"><label for="n5" title="5 sur 5"><span aria-hidden="true">★</span><span class="j6n-sr-only">5 sur 5</span></label>
+              <input type="radio" name="note" id="n4" value="4"><label for="n4" title="4 sur 5"><span aria-hidden="true">★</span><span class="j6n-sr-only">4 sur 5</span></label>
+              <input type="radio" name="note" id="n3" value="3" checked><label for="n3" title="3 sur 5"><span aria-hidden="true">★</span><span class="j6n-sr-only">3 sur 5</span></label>
+              <input type="radio" name="note" id="n2" value="2"><label for="n2" title="2 sur 5"><span aria-hidden="true">★</span><span class="j6n-sr-only">2 sur 5</span></label>
+              <input type="radio" name="note" id="n1" value="1"><label for="n1" title="1 sur 5"><span aria-hidden="true">★</span><span class="j6n-sr-only">1 sur 5</span></label>
+            </fieldset>
+          </div>
+        </template>
+      </div>
+
+      <h2 id="sparkline">Mini-graphique — <code>.j6n-sparkline</code></h2>
+      <p class="j6n-muted">Un <code>&lt;svg&gt;</code> sans bibliothèque : le tracé se révèle de gauche à droite à l'affichage. Toujours un <code>role="img"</code> avec la tendance en toutes lettres — le graphique ne remplace pas la donnée.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <article class="j6n-card j6n-stat">
+            <span class="j6n-stat__label">Allure moyenne</span>
+            <span class="j6n-stat__value">5:12<span class="j6n-stat__unit"> /km</span></span>
+            <svg class="j6n-sparkline" viewBox="0 0 100 32" preserveAspectRatio="none" role="img" aria-label="Allure en baisse sur 8 sorties : de 5:40 à 5:12 par km">
+              <path class="j6n-sparkline__area" d="M0 8 L14 12 L28 10 L42 17 L56 15 L70 22 L84 20 L100 26 L100 32 L0 32 Z"/>
+              <path class="j6n-sparkline__line" d="M0 8 L14 12 L28 10 L42 17 L56 15 L70 22 L84 20 L100 26"/>
+            </svg>
+          </article>
+        </template>
+      </div>
+
+      <h2 id="otp">Code à usage unique — <code>.j6n-otp</code></h2>
+      <p class="j6n-muted">Un champ par caractère : saut automatique, retour arrière, flèches, collage du code entier. L'événement <code>j6n:otp</code> donne <code>detail.value</code> et <code>detail.complete</code>.</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-otp" role="group" aria-label="Code de vérification à 6 chiffres">
+            <input class="j6n-otp__input"><input class="j6n-otp__input"><input class="j6n-otp__input">
+            <input class="j6n-otp__input"><input class="j6n-otp__input"><input class="j6n-otp__input">
+          </div>
+        </template>
+      </div>
+
+      <h2 id="animations">Animations — <code>data-j6n-*</code></h2>
+      <p class="j6n-muted"><code>data-j6n-reveal</code> (apparition au défilement), <code>data-j6n-count</code> (compteur), <code>data-j6n-tilt</code> (inclinaison 3D au pointeur, ignorée sur écran tactile).</p>
+      <div class="j6n-showcase" data-j6n-js="showcase">
+        <template>
+          <div class="j6n-grid">
+            <article class="j6n-card j6n-stat" data-j6n-tilt><span class="j6n-stat__value" data-j6n-count="1280">1280</span><span class="j6n-stat__label">m de dénivelé</span></article>
+            <article class="j6n-card j6n-stat" data-j6n-reveal="zoom"><span class="j6n-stat__value" data-j6n-count="42.2" data-j6n-count-decimals="1">42,2</span><span class="j6n-stat__label">km</span></article>
+          </div>
+        </template>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="showcase.js"></script>
+  <script src="../theme.js"></script>
+  <script>
+    const themeBtn = document.getElementById('theme');
+    function isDark() {
+      return document.documentElement.dataset.theme === 'dark' ||
+        (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+    themeBtn.setAttribute('aria-pressed', String(isDark()));
+    themeBtn.addEventListener('click', (e) => {
+      const next = isDark() ? 'light' : 'dark';
+      j6n.setTheme(next, e);
+      themeBtn.setAttribute('aria-pressed', String(next === 'dark'));
+    });
+
+    const variantBtn = document.getElementById('variant');
+    function isModern() {
+      return document.documentElement.dataset.j6nTheme === 'moderne';
+    }
+    variantBtn.setAttribute('aria-pressed', String(isModern()));
+    variantBtn.addEventListener('click', () => {
+      if (isModern()) document.documentElement.removeAttribute('data-j6n-theme');
+      else document.documentElement.dataset.j6nTheme = 'moderne';
+      variantBtn.setAttribute('aria-pressed', String(isModern()));
+    });
+
+  </script>
+</body>
+</html>

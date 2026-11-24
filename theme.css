@@ -1355,6 +1355,409 @@ dialog.j6n-modal[open] { animation: j6n-modal-in var(--j6n-dur-2) var(--j6n-ease
   .j6n-tooltip, .j6n-toast { border: 1px solid CanvasText; }
 }
 
+/* ---------- 19ter. V3 — composants modernisés & animations ----------
+   Couche additive : mêmes classes, mêmes tokens. Rayons plus généreux, élévation
+   en deux plans, dégradés très discrets, états de survol/appui animés, entrées
+   « reveal » au défilement (data-j6n-reveal, activé par theme.js).
+   Tout mouvement est coupé par prefers-reduced-motion ; sans JS, rien n'est masqué. */
+:root {
+  --j6n-radius-md: 10px;
+  --j6n-radius-lg: 18px;
+  --j6n-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* léger dépassement : rebond */
+  --j6n-shadow-lift: 0 2px 4px oklch(0.24 0.015 155 / 0.05), 0 12px 32px oklch(0.24 0.015 155 / 0.10);
+  --j6n-glow: 0 0 0 1px color-mix(in oklab, var(--j6n-accent) 30%, transparent), 0 8px 28px color-mix(in oklab, var(--j6n-accent) 28%, transparent);
+  --j6n-sheen-alpha: 0.08;   /* reflet : s'éteint à 40 % de la hauteur ; borné par le contraste du texte (scripts/contrast.mjs) */
+  --j6n-sheen: linear-gradient(180deg, oklch(1 0 0 / var(--j6n-sheen-alpha)), transparent 40%);
+}
+[data-theme='dark'] { --j6n-shadow-lift: 0 2px 4px oklch(0 0 0 / 0.3), 0 14px 36px oklch(0 0 0 / 0.5); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) { --j6n-shadow-lift: 0 2px 4px oklch(0 0 0 / 0.3), 0 14px 36px oklch(0 0 0 / 0.5); }
+}
+
+/* Boutons : reflet, rebond à l'appui, halo au survol */
+.j6n-btn {
+  position: relative; isolation: isolate; overflow: hidden;
+  border-radius: var(--j6n-radius-pill);
+  transition: transform var(--j6n-dur-2) var(--j6n-ease-spring), background var(--j6n-dur-1) var(--j6n-ease), box-shadow var(--j6n-dur-2) var(--j6n-ease), border-color var(--j6n-dur-1) var(--j6n-ease);
+}
+/* Un bouton qui porte une infobulle ne peut pas rogner son contenu : pas d'onde, pas de coupe. */
+.j6n-btn[data-tooltip] { overflow: visible; }
+.j6n-btn:not(.j6n-btn--secondary):not(.j6n-btn--ghost)::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; background: var(--j6n-sheen); pointer-events: none; border-radius: inherit;
+}
+.j6n-btn:not(.j6n-btn--secondary):not(.j6n-btn--ghost):hover { box-shadow: var(--j6n-glow); }
+.j6n-btn:hover { transform: translateY(-2px); }
+.j6n-btn:active { transform: translateY(0) scale(0.97); transition-duration: var(--j6n-dur-1); }
+/* Onde au clic : posée par theme.js (--j6n-x/--j6n-y = point d'appui) */
+.j6n-btn__ripple {
+  position: absolute; z-index: -1; left: var(--j6n-x, 50%); top: var(--j6n-y, 50%);
+  width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%;
+  background: currentColor; opacity: 0.22; pointer-events: none;
+  animation: j6n-ripple 600ms var(--j6n-ease) forwards;
+}
+@keyframes j6n-ripple { to { transform: scale(var(--j6n-ripple-scale, 24)); opacity: 0; } }
+.j6n-btn--icon { border-radius: 50%; }
+
+/* Champs : liseré qui s'épaissit au focus, fond qui se détend */
+.j6n-input, .j6n-select, .j6n-textarea {
+  border-radius: var(--j6n-radius-md);
+  transition: border-color var(--j6n-dur-1) var(--j6n-ease), box-shadow var(--j6n-dur-2) var(--j6n-ease), background var(--j6n-dur-2) var(--j6n-ease);
+}
+.j6n-input:hover:not(:focus):not(:disabled), .j6n-select:hover:not(:focus):not(:disabled), .j6n-textarea:hover:not(:focus):not(:disabled) {
+  background: color-mix(in oklab, var(--j6n-accent-soft) 35%, var(--j6n-surface));
+}
+.j6n-input[aria-invalid='true'] { animation: j6n-shake 360ms var(--j6n-ease) 1; }
+@keyframes j6n-shake { 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+
+/* Cartes & tuiles : dégradé de surface, survol « lévite », filet d'accent qui se dessine */
+.j6n-card, .j6n-tile {
+  position: relative;
+  background: linear-gradient(160deg, var(--j6n-surface), color-mix(in oklab, var(--j6n-surface) 94%, var(--j6n-accent-soft)));
+  box-shadow: var(--j6n-shadow-sm), inset 0 1px 0 oklch(1 0 0 / 0.5);
+  transition: transform var(--j6n-dur-3) var(--j6n-ease), box-shadow var(--j6n-dur-3) var(--j6n-ease), border-color var(--j6n-dur-2) var(--j6n-ease);
+}
+[data-theme='dark'] .j6n-card, [data-theme='dark'] .j6n-tile { box-shadow: var(--j6n-shadow-sm), inset 0 1px 0 oklch(1 0 0 / 0.05); }
+.j6n-card--interactive::after, .j6n-tile::after {
+  content: ''; position: absolute; left: var(--j6n-space-5); right: var(--j6n-space-5); bottom: 0; height: 2px;
+  border-radius: 2px 2px 0 0; background: linear-gradient(90deg, var(--j6n-accent), var(--j6n-pine));
+  transform: scaleX(0); transform-origin: left; transition: transform var(--j6n-dur-3) var(--j6n-ease); pointer-events: none;
+}
+.j6n-card--interactive:hover::after, .j6n-tile:hover::after { transform: scaleX(1); }
+.j6n-card--interactive:hover, .j6n-tile:hover { transform: translateY(-4px); box-shadow: var(--j6n-shadow-lift); }
+.j6n-tile__mark { transition: transform var(--j6n-dur-3) var(--j6n-ease-spring); }
+.j6n-tile:hover .j6n-tile__mark { transform: rotate(-6deg) scale(1.1); }
+
+/* En-tête : verre dépoli, ombre qui apparaît au défilement (.is-scrolled posée par theme.js) */
+.j6n-header { transition: box-shadow var(--j6n-dur-3) var(--j6n-ease), border-color var(--j6n-dur-3) var(--j6n-ease); }
+.j6n-header::before { backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); }
+.j6n-header.is-scrolled { box-shadow: var(--j6n-shadow-md); }
+.j6n-brand__mark { transition: transform var(--j6n-dur-3) var(--j6n-ease-spring); }
+.j6n-brand:hover .j6n-brand__mark { transform: rotate(90deg) scale(1.12); }
+.j6n-nav__link { border-radius: var(--j6n-radius-pill); transition: color var(--j6n-dur-1) var(--j6n-ease), background var(--j6n-dur-2) var(--j6n-ease); }
+.j6n-nav__link:hover { background: var(--j6n-surface-2); }
+
+/* Badges : pastille qui pulse sur les états « vivants » */
+.j6n-badge { transition: transform var(--j6n-dur-2) var(--j6n-ease-spring); }
+.j6n-badge:hover { transform: scale(1.06); }
+.j6n-badge--solid, .j6n-badge--accent { background-image: var(--j6n-sheen); }
+.j6n-badge--live .j6n-badge__dot { animation: j6n-live 1.8s var(--j6n-ease) infinite; }
+@keyframes j6n-live { 0% { box-shadow: 0 0 0 0 color-mix(in oklab, currentColor 55%, transparent); } 70%, 100% { box-shadow: 0 0 0 7px transparent; } }
+
+/* Interrupteur, segmenté, tags : rebond */
+.j6n-toggle__track { transition: background var(--j6n-dur-2) var(--j6n-ease); }
+.j6n-toggle__track::after { width: 18px; transition: transform var(--j6n-dur-2) var(--j6n-ease-spring), width var(--j6n-dur-1) var(--j6n-ease); }
+.j6n-toggle:active .j6n-toggle__track::after { width: 22px; }
+.j6n-toggle:active input:checked + .j6n-toggle__track::after { transform: translateX(12px); }
+.j6n-toggle input:checked + .j6n-toggle__track { background-image: var(--j6n-sheen); }
+.j6n-segmented { border-radius: var(--j6n-radius-pill); }
+.j6n-segmented label { border-radius: var(--j6n-radius-pill); }
+.j6n-tag:active { transform: scale(0.95); }
+.j6n-tag { transition: transform var(--j6n-dur-2) var(--j6n-ease-spring), border-color var(--j6n-dur-1) var(--j6n-ease), background var(--j6n-dur-1) var(--j6n-ease), color var(--j6n-dur-1) var(--j6n-ease); }
+
+/* Alertes : entrée douce, filet d'accent arrondi */
+.j6n-alert { border-radius: var(--j6n-radius-lg); box-shadow: var(--j6n-shadow-sm); animation: j6n-slide-in var(--j6n-dur-3) var(--j6n-ease) both; }
+.j6n-callout { border-radius: 0 var(--j6n-radius-lg) var(--j6n-radius-lg) 0; background: linear-gradient(90deg, color-mix(in oklab, var(--j6n-accent-soft) 55%, var(--j6n-surface-2)), var(--j6n-surface-2)); }
+.j6n-callout--pine { background: linear-gradient(90deg, color-mix(in oklab, var(--j6n-pine-soft) 80%, var(--j6n-surface-2)), var(--j6n-surface-2)); }
+
+/* Toasts : verre sombre, rebond à l'entrée, barre de temps (--j6n-toast-duration posée par theme.js) */
+.j6n-toast { position: relative; overflow: hidden; border-radius: var(--j6n-radius-lg); box-shadow: var(--j6n-shadow-lift); animation: j6n-toast-in var(--j6n-dur-3) var(--j6n-ease-spring) both; }
+@keyframes j6n-toast-in { from { opacity: 0; transform: translateX(24px) scale(0.96); } to { opacity: 1; transform: none; } }
+.j6n-toast[style*='--j6n-toast-duration']::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: currentColor; opacity: 0.35;
+  transform-origin: left; animation: j6n-toast-timer var(--j6n-toast-duration) linear forwards;
+}
+@keyframes j6n-toast-timer { to { transform: scaleX(0); } }
+.j6n-toast:hover::after, .j6n-toast:focus-within::after { animation-play-state: paused; }
+
+/* Modale : fond flouté, ressort à l'ouverture */
+dialog.j6n-modal { border-radius: calc(var(--j6n-radius-lg) + 4px); box-shadow: var(--j6n-shadow-lift); }
+dialog.j6n-modal::backdrop { background: oklch(0.1 0 0 / 0.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: j6n-fade var(--j6n-dur-3) var(--j6n-ease) both; }
+dialog.j6n-modal[open] { animation: j6n-modal-spring var(--j6n-dur-3) var(--j6n-ease-spring) both; }
+@keyframes j6n-modal-spring { from { opacity: 0; transform: translateY(16px) scale(0.94); } to { opacity: 1; transform: none; } }
+@keyframes j6n-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* Menus déroulants : ouverture animée via @starting-style (support progressif) */
+[popover].j6n-dropdown__menu {
+  border-radius: var(--j6n-radius-lg); box-shadow: var(--j6n-shadow-lift); padding: var(--j6n-space-2);
+  transition: opacity var(--j6n-dur-2) var(--j6n-ease), transform var(--j6n-dur-2) var(--j6n-ease), overlay var(--j6n-dur-2) allow-discrete, display var(--j6n-dur-2) allow-discrete;
+}
+[popover].j6n-dropdown__menu:popover-open { opacity: 1; transform: none; }
+[popover].j6n-dropdown__menu:not(:popover-open) { opacity: 0; transform: translateY(-6px) scale(0.97); }
+@starting-style { [popover].j6n-dropdown__menu:popover-open { opacity: 0; transform: translateY(-6px) scale(0.97); } }
+.j6n-dropdown__item { border-radius: var(--j6n-radius-md); transition: background var(--j6n-dur-1) var(--j6n-ease), padding-left var(--j6n-dur-2) var(--j6n-ease); }
+.j6n-dropdown__item:hover { padding-left: calc(var(--j6n-space-3) + 4px); }
+
+/* Accordéon : cartes arrondies, ouverture en hauteur fluide quand le navigateur sait animer `auto` */
+.j6n-accordion__item { border-radius: var(--j6n-radius-lg); transition: border-color var(--j6n-dur-2) var(--j6n-ease), box-shadow var(--j6n-dur-3) var(--j6n-ease); }
+.j6n-accordion__item[open], .j6n-accordion__item:has(> .j6n-accordion__trigger[aria-expanded='true']) { box-shadow: var(--j6n-shadow-md); border-color: var(--j6n-border-strong); }
+@supports (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+  details.j6n-accordion__item::details-content { block-size: 0; overflow: clip; transition: block-size var(--j6n-dur-3) var(--j6n-ease), content-visibility var(--j6n-dur-3) allow-discrete; }
+  details.j6n-accordion__item[open]::details-content { block-size: auto; }
+}
+
+/* Onglets : l'indicateur glisse déjà (scaleX) ; on ajoute un fondu d'arrivée au panneau */
+.j6n-tabs__panel:not([hidden]) { animation: j6n-slide-in var(--j6n-dur-3) var(--j6n-ease) both; }
+
+/* Squelette : balayage lumineux plutôt qu'un simple clignotement */
+.j6n-skeleton {
+  background: linear-gradient(100deg, var(--j6n-surface-2) 30%, color-mix(in oklab, var(--j6n-surface-2) 55%, var(--j6n-surface)) 50%, var(--j6n-surface-2) 70%) 0 0 / 220% 100%;
+  animation: j6n-shimmer 1.6s linear infinite;
+}
+@keyframes j6n-shimmer { to { background-position: -220% 0; } }
+
+/* Titre d'accueil : dégradé animé, opt-in (.j6n-text-gradient) */
+.j6n-text-gradient {
+  background: linear-gradient(100deg, var(--j6n-accent-strong), var(--j6n-pine), var(--j6n-accent), var(--j6n-accent-strong)) 0 0 / 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: j6n-gradient-pan 8s ease-in-out infinite alternate;
+}
+@keyframes j6n-gradient-pan { to { background-position: 100% 0; } }
+
+/* Apparition au défilement. theme.js ajoute .j6n-reveal-ready sur <html> avant d'observer :
+   sans JS, ou si le script échoue, le contenu reste visible. */
+.j6n-reveal-ready [data-j6n-reveal] {
+  opacity: 0; transform: translateY(var(--j6n-reveal-distance, 20px));
+  transition: opacity var(--j6n-dur-3) var(--j6n-ease), transform var(--j6n-dur-3) var(--j6n-ease);
+  transition-delay: calc(var(--j6n-reveal-index, 0) * 70ms);
+}
+.j6n-reveal-ready [data-j6n-reveal='left']  { transform: translateX(-24px); }
+.j6n-reveal-ready [data-j6n-reveal='right'] { transform: translateX(24px); }
+.j6n-reveal-ready [data-j6n-reveal='zoom']  { transform: scale(0.94); }
+.j6n-reveal-ready [data-j6n-reveal].is-revealed { opacity: 1; transform: none; }
+
+/* Compteur animé (data-j6n-count) : chiffres de largeur fixe pour ne pas faire trembler la mise en page */
+[data-j6n-count] { font-variant-numeric: tabular-nums; }
+
+/* Mouvement réduit : tout est immédiat, rien ne reste masqué */
+@media (prefers-reduced-motion: reduce) {
+  .j6n-reveal-ready [data-j6n-reveal] { opacity: 1; transform: none; transition: none; }
+  .j6n-btn__ripple, .j6n-badge--live .j6n-badge__dot, .j6n-text-gradient, .j6n-skeleton, .j6n-toast::after { animation: none !important; }
+  .j6n-btn:hover, .j6n-card--interactive:hover, .j6n-tile:hover { transform: none; }
+  [popover].j6n-dropdown__menu { transition: none; }
+}
+@media (forced-colors: active) {
+  .j6n-text-gradient { background: none; color: CanvasText; -webkit-background-clip: border-box; background-clip: border-box; }
+  .j6n-btn::before, .j6n-card--interactive::after, .j6n-tile::after { display: none; }
+}
+
+/* ---------- 19quater. V3 — nouveaux composants ----------
+   Progression, avatar, état vide, tiroir, chronologie, notation, mini-graphique,
+   code à usage unique. Mêmes tokens, mêmes conventions (BEM, aucun état porté par la
+   seule couleur, cibles ≥ 44 px, mouvement coupé sous prefers-reduced-motion). */
+
+/* Progression : <div class="j6n-progress" role="progressbar" aria-valuenow="60" aria-valuemin="0"
+   aria-valuemax="100" aria-label="…"><span class="j6n-progress__bar" style="--j6n-value:60%"></span></div>
+   Indéterminée : .j6n-progress--indeterminate (sans aria-valuenow). */
+.j6n-progress {
+  position: relative; height: 10px; overflow: hidden;
+  background: var(--j6n-surface-2); border-radius: var(--j6n-radius-pill);
+  box-shadow: inset 0 0 0 1px var(--j6n-border-interactive);
+}
+.j6n-progress--lg { height: 16px; }
+.j6n-progress__bar {
+  position: absolute; inset: 0 auto 0 0; width: var(--j6n-value, 0%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--j6n-accent-strong), var(--j6n-accent));
+  transition: width var(--j6n-dur-3) var(--j6n-ease);
+}
+.j6n-progress__bar::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(100deg, transparent 30%, oklch(1 0 0 / 0.35) 50%, transparent 70%) 0 0 / 200% 100%;
+  animation: j6n-shimmer 1.8s linear infinite;
+}
+.j6n-progress--indeterminate .j6n-progress__bar { width: 40%; animation: j6n-indeterminate 1.4s var(--j6n-ease) infinite; }
+@keyframes j6n-indeterminate { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.j6n-progress-label { display: flex; justify-content: space-between; gap: var(--j6n-space-3); font-size: var(--j6n-text-sm); margin-bottom: var(--j6n-space-2); }
+.j6n-progress-label__value { font-family: var(--j6n-font-mono), serif; font-variant-numeric: tabular-nums; color: var(--j6n-text-muted); }
+
+/* Avatar : image ou initiales (le nom accessible vient de aria-label ou de l'alt) */
+.j6n-avatar {
+  --_size: 40px;
+  position: relative; display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: var(--_size); height: var(--_size); border-radius: 50%;
+  background: var(--j6n-accent-soft); color: var(--j6n-accent-strong);
+  font-size: calc(var(--_size) * 0.36); font-weight: 600; letter-spacing: 0.02em;
+  overflow: visible; user-select: none;
+  box-shadow: 0 0 0 2px var(--j6n-surface);
+}
+.j6n-avatar > img { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
+.j6n-avatar--sm { --_size: 28px; }
+.j6n-avatar--lg { --_size: 56px; }
+.j6n-avatar--xl { --_size: 80px; }
+.j6n-avatar--square { border-radius: var(--j6n-radius-md); }
+/* Pastille d'état : la forme + le texte masqué portent l'information, pas la seule couleur */
+.j6n-avatar__status {
+  position: absolute; right: -1px; bottom: -1px; width: 28%; height: 28%; min-width: 8px; min-height: 8px;
+  border-radius: 50%; background: var(--j6n-success); box-shadow: 0 0 0 2px var(--j6n-surface);
+}
+.j6n-avatar__status--away { background: var(--j6n-warning); }
+.j6n-avatar__status--off { background: var(--j6n-text-muted); }
+.j6n-avatar-group { display: inline-flex; align-items: center; }
+.j6n-avatar-group > .j6n-avatar + .j6n-avatar { margin-left: calc(var(--_size, 40px) * -0.16); }
+.j6n-avatar-group > .j6n-avatar { transition: transform var(--j6n-dur-2) var(--j6n-ease-spring); }
+.j6n-avatar-group > .j6n-avatar:hover { transform: translateY(-3px); z-index: 1; }
+.j6n-avatar--more { background: var(--j6n-surface-2); color: var(--j6n-text); font-family: var(--j6n-font-mono), serif; }
+
+/* État vide */
+.j6n-empty {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--j6n-space-3);
+  padding: var(--j6n-space-8) var(--j6n-space-5);
+  border: var(--j6n-border-width) dashed var(--j6n-border-strong); border-radius: var(--j6n-radius-lg);
+  background: color-mix(in oklab, var(--j6n-accent-soft) 25%, var(--j6n-surface));
+}
+.j6n-empty__icon {
+  display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%;
+  background: var(--j6n-accent-soft); color: var(--j6n-accent-strong); font-size: 1.75rem;
+  animation: j6n-float 4s ease-in-out infinite;
+}
+@keyframes j6n-float { 50% { transform: translateY(-6px); } }
+.j6n-empty__title { margin: 0; font-size: var(--j6n-text-lg); font-weight: 600; }
+.j6n-empty__text { margin: 0; max-width: 42ch; color: var(--j6n-text-muted); }
+
+/* Tiroir : <dialog class="j6n-modal j6n-drawer"> — mêmes attributs que la modale
+   (data-j6n-modal-open / data-j6n-modal-close), donc même gestion du focus et d'Échap. */
+dialog.j6n-drawer {
+  margin: 0 0 0 auto; max-width: min(420px, 100vw); width: 100%; height: 100dvh; max-height: 100dvh;
+  border-radius: var(--j6n-radius-lg) 0 0 var(--j6n-radius-lg);
+  display: none; flex-direction: column;
+}
+dialog.j6n-drawer[open] { display: flex; animation: j6n-drawer-in var(--j6n-dur-3) var(--j6n-ease) both; }
+dialog.j6n-drawer.j6n-drawer--left { margin: 0 auto 0 0; border-radius: 0 var(--j6n-radius-lg) var(--j6n-radius-lg) 0; }
+dialog.j6n-drawer.j6n-drawer--left[open] { animation-name: j6n-drawer-in-left; }
+dialog.j6n-drawer.j6n-drawer--bottom {
+  margin: auto 0 0; max-width: none; width: 100%; height: auto; max-height: 85dvh;
+  border-radius: var(--j6n-radius-lg) var(--j6n-radius-lg) 0 0;
+}
+dialog.j6n-drawer.j6n-drawer--bottom[open] { animation-name: j6n-drawer-in-bottom; }
+dialog.j6n-drawer .j6n-modal__body { flex: 1; overflow-y: auto; }
+@keyframes j6n-drawer-in { from { opacity: 0.6; transform: translateX(48px); } to { opacity: 1; transform: none; } }
+@keyframes j6n-drawer-in-left { from { opacity: 0.6; transform: translateX(-48px); } to { opacity: 1; transform: none; } }
+@keyframes j6n-drawer-in-bottom { from { opacity: 0.6; transform: translateY(48px); } to { opacity: 1; transform: none; } }
+
+/* Chronologie : <ol class="j6n-timeline"><li class="j6n-timeline__item">…
+   Étape en cours : aria-current="step" ; terminée : .is-done (le repère change de forme, pas que de couleur). */
+.j6n-timeline { list-style: none; margin: 0; padding: 0; }
+.j6n-timeline__item { position: relative; padding: 0 0 var(--j6n-space-5) var(--j6n-space-6); }
+.j6n-timeline__item::before {
+  content: ''; position: absolute; left: 7px; top: 18px; bottom: 0; width: 2px; background: var(--j6n-border-strong);
+}
+.j6n-timeline__item:last-child { padding-bottom: 0; }
+.j6n-timeline__item:last-child::before { display: none; }
+.j6n-timeline__marker {
+  position: absolute; left: 0; top: 4px; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--j6n-surface); border: 2px solid var(--j6n-border-interactive);
+  transition: transform var(--j6n-dur-3) var(--j6n-ease-spring), background var(--j6n-dur-2) var(--j6n-ease);
+}
+.j6n-timeline__item.is-done .j6n-timeline__marker { background: var(--j6n-accent); border-color: var(--j6n-accent); border-radius: 4px; }
+.j6n-timeline__item[aria-current='step'] .j6n-timeline__marker { border-color: var(--j6n-accent-strong); box-shadow: 0 0 0 4px var(--j6n-accent-soft); transform: scale(1.15); }
+.j6n-timeline__time { font-family: var(--j6n-font-mono), serif; font-size: var(--j6n-text-xs); color: var(--j6n-text-muted); letter-spacing: 0.04em; }
+.j6n-timeline__title { margin: 2px 0; font-weight: 600; }
+.j6n-timeline__text { margin: 0; color: var(--j6n-text-muted); font-size: var(--j6n-text-sm); }
+
+/* Notation. Lecture seule : <span class="j6n-rating" role="img" aria-label="4 sur 5" style="--j6n-rating:4"></span>
+   (demi-étoiles : 3.5). Saisie : <fieldset class="j6n-rating-input"> + 5 radios, rangées de 5 à 1. */
+.j6n-rating {
+  --_star: 1.25em; --j6n-rating: 0;
+  display: inline-block; width: calc(var(--_star) * 5); height: var(--_star); vertical-align: -0.2em;
+  background:
+    linear-gradient(90deg, var(--j6n-warning) calc(var(--j6n-rating) / 5 * 100%), var(--j6n-border-interactive) 0);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cg id='s'%3E%3Cpath d='M10 1l2.6 5.6 6 .7-4.5 4.1 1.2 6L10 14.5 4.7 17.4l1.2-6L1.4 7.3l6-.7z'/%3E%3C/g%3E%3Cuse href='%23s' x='20'/%3E%3Cuse href='%23s' x='40'/%3E%3Cuse href='%23s' x='60'/%3E%3Cuse href='%23s' x='80'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cg id='s'%3E%3Cpath d='M10 1l2.6 5.6 6 .7-4.5 4.1 1.2 6L10 14.5 4.7 17.4l1.2-6L1.4 7.3l6-.7z'/%3E%3C/g%3E%3Cuse href='%23s' x='20'/%3E%3Cuse href='%23s' x='40'/%3E%3Cuse href='%23s' x='60'/%3E%3Cuse href='%23s' x='80'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+.j6n-rating-input { display: inline-flex; flex-direction: row-reverse; justify-content: flex-end; border: 0; padding: 0; margin: 0; }
+.j6n-rating-input input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.j6n-rating-input label {
+  display: grid; place-items: center; width: 44px; height: 44px; font-size: 1.75rem; line-height: 1; cursor: pointer;
+  color: var(--j6n-border-interactive); transition: color var(--j6n-dur-1) var(--j6n-ease), transform var(--j6n-dur-2) var(--j6n-ease-spring);
+}
+.j6n-rating-input label:hover, .j6n-rating-input label:hover ~ label,
+.j6n-rating-input input:checked ~ label { color: var(--j6n-warning); }
+.j6n-rating-input label:hover { transform: scale(1.2); }
+.j6n-rating-input input:focus-visible + label { box-shadow: var(--j6n-ring); border-radius: var(--j6n-radius-md); }
+
+/* Mini-graphique : <svg class="j6n-sparkline" viewBox="0 0 100 32" role="img" aria-label="…">
+   <path class="j6n-sparkline__area" d="…Z"/><path class="j6n-sparkline__line" pathLength="1" d="…"/></svg> */
+.j6n-sparkline { display: block; width: 100%; height: 40px; overflow: visible; }
+.j6n-sparkline__line {
+  fill: none; stroke: var(--j6n-accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+/* Le tracé se révèle de gauche à droite par découpe (clip-path) : un dash animé via pathLength se
+   désynchronise dès que vector-effect: non-scaling-stroke est actif. */
+.j6n-sparkline { clip-path: inset(-4px 100% -4px -4px); animation: j6n-reveal-line 1.4s var(--j6n-ease) 0.15s forwards; }
+@keyframes j6n-reveal-line { to { clip-path: inset(-4px -4px -4px -4px); } }
+.j6n-sparkline__area { fill: color-mix(in oklab, var(--j6n-accent) 16%, transparent); stroke: none; }
+.j6n-sparkline__dot { fill: var(--j6n-accent-strong); }
+
+/* Code à usage unique : <div class="j6n-otp" role="group" aria-label="Code à 6 chiffres"> + .j6n-otp__input × n
+   (theme.js : saut automatique, retour arrière, collage du code entier). */
+.j6n-otp { display: inline-flex; gap: var(--j6n-space-2); }
+.j6n-otp__input {
+  width: 48px; height: 56px; padding: 0; text-align: center;
+  font-family: var(--j6n-font-mono), serif; font-size: var(--j6n-text-lg); font-weight: 600; color: var(--j6n-text);
+  background: var(--j6n-surface); border: var(--j6n-border-width) solid var(--j6n-border-interactive); border-radius: var(--j6n-radius-md);
+  transition: border-color var(--j6n-dur-1) var(--j6n-ease), box-shadow var(--j6n-dur-2) var(--j6n-ease), transform var(--j6n-dur-2) var(--j6n-ease-spring);
+}
+.j6n-otp__input:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: var(--j6n-accent); box-shadow: var(--j6n-ring); transform: translateY(-2px); }
+.j6n-otp__input[aria-invalid='true'] { border-color: var(--j6n-danger); animation: j6n-shake 360ms var(--j6n-ease) 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .j6n-progress__bar::after, .j6n-empty__icon { animation: none !important; }
+  .j6n-sparkline { animation: none; clip-path: none; }
+  .j6n-progress--indeterminate .j6n-progress__bar { animation-duration: 3s !important; }  /* reste lisible : indique « en cours » */
+  dialog.j6n-drawer[open] { animation: none; }
+}
+@media (forced-colors: active) {
+  .j6n-progress { forced-color-adjust: none; border: 1px solid CanvasText; background: Canvas; }
+  .j6n-progress__bar { background: Highlight; }
+  .j6n-progress__bar::after { display: none; }
+  .j6n-rating { background: CanvasText; }
+  .j6n-timeline__marker { forced-color-adjust: none; border-color: CanvasText; }
+  .j6n-timeline__item.is-done .j6n-timeline__marker { background: Highlight; border-color: Highlight; }
+  .j6n-sparkline__line { stroke: CanvasText; }
+}
+
+/* ---------- 19quinquies. V3 — mouvement avancé ----------
+   Inclinaison 3D, barre de lecture pilotée par le défilement, bascule de thème en cercle.
+   Chaque effet est un bonus : sans le support navigateur, la page reste identique et complète. */
+
+/* Inclinaison : data-j6n-tilt (theme.js pose --j6n-tilt-x / --j6n-tilt-y au pointeur ; pointeur fin uniquement) */
+[data-j6n-tilt] { transform-style: preserve-3d; will-change: transform; }
+[data-j6n-tilt].is-tilting {
+  transform: perspective(900px) translateY(-4px) rotateX(var(--j6n-tilt-x, 0deg)) rotateY(var(--j6n-tilt-y, 0deg));
+  transition: box-shadow var(--j6n-dur-3) var(--j6n-ease), border-color var(--j6n-dur-2) var(--j6n-ease), transform 90ms linear;
+  box-shadow: var(--j6n-shadow-lift);
+}
+
+/* Barre de lecture : <div class="j6n-scroll-progress" aria-hidden="true"></div> — se remplit avec le défilement de la page.
+   Décorative (aria-hidden). Sans animation-timeline, elle reste simplement invisible. */
+.j6n-scroll-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .j6n-scroll-progress {
+    display: block; position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 60; pointer-events: none;
+    background: linear-gradient(90deg, var(--j6n-accent-strong), var(--j6n-accent));
+    transform: scaleX(0); transform-origin: left;
+    animation: j6n-scroll-fill linear both; animation-timeline: scroll(root block);
+  }
+  @keyframes j6n-scroll-fill { to { transform: scaleX(1); } }
+}
+
+/* Bascule de thème (j6n.setTheme) : le nouveau thème « s'étend » depuis le point de clic.
+   .j6n-theme-transition n'existe que le temps de la transition. */
+.j6n-theme-transition::view-transition-old(root),
+.j6n-theme-transition::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+.j6n-theme-transition::view-transition-new(root) { animation: j6n-theme-reveal 520ms var(--j6n-ease) both; }
+@keyframes j6n-theme-reveal {
+  from { clip-path: circle(0 at var(--j6n-theme-x, 50%) var(--j6n-theme-y, 50%)); }
+  to   { clip-path: circle(150vmax at var(--j6n-theme-x, 50%) var(--j6n-theme-y, 50%)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-j6n-tilt].is-tilting { transform: none; }
+  .j6n-scroll-progress { display: none; }
+}
+
 /* ---------- 20. Utilitaires d'espacement ----------
    Calqués sur l'échelle de cadence : le chiffre est celui du token
    (.j6n-mt-4 = margin-top: var(--j6n-space-4)), 0 annule l'espacement,

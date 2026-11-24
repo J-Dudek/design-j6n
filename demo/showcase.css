@@ -147,3 +147,9 @@ main h2[id] { scroll-margin-top: 84px; }
 .j6n-demo-bar--7 { width: var(--j6n-space-7); }
 .j6n-demo-bar--8 { width: var(--j6n-space-8); }
 .j6n-demo-bar--9 { width: var(--j6n-space-9); }
+
+/* Transitions entre pages de la démo (View Transitions, navigation même origine).
+   Ignoré sans support ; l'en-tête reste en place pendant le fondu. */
+@view-transition { navigation: auto; }
+.j6n-header { view-transition-name: j6n-header; }
+@media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
