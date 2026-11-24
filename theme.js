@@ -6,7 +6,11 @@
    plutôt que de tout réimplémenter en JS.
    API publique : window.j6n.init(root), j6n.destroy(root),
    j6n.toast(msg, opts), j6n.announce(msg, opts), j6n.openModal(id),
-   j6n.closeModal(id), j6n.carousel(el, options), j6n.dismissed(clé).
+   j6n.closeModal(id), j6n.carousel(el, options), j6n.dismissed(clé),
+   j6n.setTheme(mode, event).
+   V3 : apparitions au défilement [data-j6n-reveal], compteurs [data-j6n-count],
+   onde au clic des boutons, ombre d'en-tête au défilement — tous coupés si
+   l'utilisateur demande un mouvement réduit.
    ============================================================ */
 (function () {
   'use strict';
@@ -219,7 +223,7 @@
         if (dialog) dialog.showModal();
       }, { signal: life.signal });
     });
-    each(root.querySelectorAll('dialog.j6n-modal'), function (dialog) {
+    each(root.querySelectorAll('dialog.j6n-modal, dialog.j6n-drawer'), function (dialog) {
       const life = setup(dialog, 'modal');
       if (!life) return;
       each(dialog.querySelectorAll('[data-j6n-modal-close]'), function (btn) {
@@ -1082,6 +1086,7 @@
     close.textContent = '×';
     el.appendChild(text);
     el.appendChild(close);
+    if (duration) el.style.setProperty('--j6n-toast-duration', duration + 'ms');
     toastRegion().appendChild(el);
     announce(message, { assertive: urgent });
 
@@ -1149,6 +1154,181 @@
   }
 
   /* ---------- Amorçage ---------- */
+  /* ---------- V3 : animations ---------- */
+  const reducedMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+
+  // Apparition au défilement. <html> ne reçoit .j6n-reveal-ready qu'ici : sans JS,
+  // sans IntersectionObserver ou en mouvement réduit, le contenu reste visible.
+  function initReveal(root) {
+    if (reducedMotion.matches || typeof IntersectionObserver === 'undefined') return;
+    const items = root.querySelectorAll('[data-j6n-reveal]');
+    if (!items.length) return;
+    document.documentElement.classList.add('j6n-reveal-ready');
+    each(items, function (el) {
+      const life = setup(el, 'reveal');
+      if (!life) return;
+      // Cascade entre frères : délai croissant, plafonné à 6 pour ne jamais faire attendre.
+      const siblings = Array.prototype.filter.call(el.parentElement ? el.parentElement.children : [el], function (n) { return n.hasAttribute('data-j6n-reveal'); });
+      el.style.setProperty('--j6n-reveal-index', String(Math.min(siblings.indexOf(el), 6)));
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          el.classList.add('is-revealed');
+          observer.disconnect();
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+      observer.observe(el);
+      life.onDestroy(function () { observer.disconnect(); el.classList.remove('is-revealed'); el.style.removeProperty('--j6n-reveal-index'); });
+    });
+  }
+
+  // Compteur : data-j6n-count="1280" (ou le texte courant) → monte de 0 à la valeur à l'apparition.
+  // data-j6n-count-decimals fixe le nombre de décimales. Le texte d'origine reste la valeur sans JS.
+  function initCount(root) {
+    const items = root.querySelectorAll('[data-j6n-count]');
+    each(items, function (el) {
+      const life = setup(el, 'count');
+      if (!life) return;
+      const raw = el.getAttribute('data-j6n-count') || el.textContent;
+      const target = parseFloat(String(raw).replace(',', '.'));
+      if (!isFinite(target) || reducedMotion.matches || typeof IntersectionObserver === 'undefined') return;
+      const decimals = parseInt(el.getAttribute('data-j6n-count-decimals') || '0', 10);
+      const original = el.textContent;
+      const format = function (n) { return n.toLocaleString(document.documentElement.lang || undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }); };
+      let frame = 0;
+      const observer = new IntersectionObserver(function (entries) {
+        if (!entries.some(function (e) { return e.isIntersecting; })) return;
+        observer.disconnect();
+        const start = performance.now();
+        const span = 900;
+        const tick = function (now) {
+          const t = Math.min((now - start) / span, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          el.textContent = format(target * eased);
+          if (t < 1) frame = requestAnimationFrame(tick);
+          else el.textContent = original;
+        };
+        frame = requestAnimationFrame(tick);
+      }, { threshold: 0.4 });
+      observer.observe(el);
+      life.onDestroy(function () { observer.disconnect(); cancelAnimationFrame(frame); el.textContent = original; });
+    });
+  }
+
+  // Onde au point d'appui. Purement décorative : aria-hidden, retirée à la fin de l'animation.
+  function initRipple(root) {
+    each(root.querySelectorAll('.j6n-btn:not([data-tooltip])'), function (btn) {
+      const life = setup(btn, 'ripple');
+      if (!life) return;
+      btn.addEventListener('pointerdown', function (e) {
+        if (reducedMotion.matches || btn.disabled || e.button > 0) return;
+        const rect = btn.getBoundingClientRect();
+        const wave = document.createElement('span');
+        wave.className = 'j6n-btn__ripple';
+        wave.setAttribute('aria-hidden', 'true');
+        wave.style.setProperty('--j6n-x', (e.clientX - rect.left) + 'px');
+        wave.style.setProperty('--j6n-y', (e.clientY - rect.top) + 'px');
+        wave.style.setProperty('--j6n-ripple-scale', String(Math.ceil(Math.max(rect.width, rect.height) / 5)));
+        btn.appendChild(wave);
+        wave.addEventListener('animationend', function () { wave.remove(); }, { once: true });
+      }, { signal: life.signal });
+    });
+  }
+
+  // En-tête : .is-scrolled dès que la page a défilé, pour faire apparaître l'ombre.
+  function initHeaderScroll(root) {
+    each(root.querySelectorAll('.j6n-header'), function (header) {
+      const life = setup(header, 'header-scroll');
+      if (!life) return;
+      let ticking = false;
+      const update = function () { header.classList.toggle('is-scrolled', window.scrollY > 8); ticking = false; };
+      window.addEventListener('scroll', function () {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      }, { passive: true, signal: life.signal });
+      life.onDestroy(function () { header.classList.remove('is-scrolled'); });
+      update();
+    });
+  }
+
+  // Code à usage unique : un champ par caractère, saut automatique, retour arrière, collage.
+  function initOtp(root) {
+    each(root.querySelectorAll('.j6n-otp'), function (group) {
+      const life = setup(group, 'otp');
+      if (!life) return;
+      const inputs = Array.prototype.slice.call(group.querySelectorAll('.j6n-otp__input'));
+      inputs.forEach(function (input, i) {
+        input.setAttribute('maxlength', '1');
+        if (!input.hasAttribute('inputmode')) input.setAttribute('inputmode', 'numeric');
+        if (!input.hasAttribute('autocomplete')) input.setAttribute('autocomplete', i === 0 ? 'one-time-code' : 'off');
+        if (!input.hasAttribute('aria-label')) input.setAttribute('aria-label', 'Caractère ' + (i + 1) + ' sur ' + inputs.length);
+        input.addEventListener('input', function () {
+          if (input.value && inputs[i + 1]) inputs[i + 1].focus();
+          group.dispatchEvent(new CustomEvent('j6n:otp', { bubbles: true, detail: { value: inputs.map(function (n) { return n.value; }).join(''), complete: inputs.every(function (n) { return n.value; }) } }));
+        }, { signal: life.signal });
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'Backspace' && !input.value && inputs[i - 1]) { inputs[i - 1].focus(); inputs[i - 1].value = ''; e.preventDefault(); }
+          else if (e.key === 'ArrowLeft' && inputs[i - 1]) { inputs[i - 1].focus(); e.preventDefault(); }
+          else if (e.key === 'ArrowRight' && inputs[i + 1]) { inputs[i + 1].focus(); e.preventDefault(); }
+        }, { signal: life.signal });
+        input.addEventListener('focus', function () { input.select(); }, { signal: life.signal });
+        input.addEventListener('paste', function (e) {
+          const text = ((e.clipboardData && e.clipboardData.getData('text')) || '').replace(/\s+/g, '');
+          if (!text) return;
+          e.preventDefault();
+          for (let k = 0; k < text.length && i + k < inputs.length; k++) inputs[i + k].value = text[k];
+          inputs[Math.min(i + text.length, inputs.length - 1)].focus();
+          inputs[0].dispatchEvent(new Event('input', { bubbles: true }));
+        }, { signal: life.signal });
+      });
+    });
+  }
+
+  // Inclinaison 3D au pointeur (souris/stylet seulement ; jamais en mouvement réduit).
+  function initTilt(root) {
+    if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    each(root.querySelectorAll('[data-j6n-tilt]'), function (el) {
+      const life = setup(el, 'tilt');
+      if (!life) return;
+      const max = parseFloat(el.getAttribute('data-j6n-tilt')) || 6;
+      el.addEventListener('pointermove', function (e) {
+        if (reducedMotion.matches) return;
+        const rect = el.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width - 0.5;
+        const py = (e.clientY - rect.top) / rect.height - 0.5;
+        el.style.setProperty('--j6n-tilt-x', (-py * max * 2).toFixed(2) + 'deg');
+        el.style.setProperty('--j6n-tilt-y', (px * max * 2).toFixed(2) + 'deg');
+        el.classList.add('is-tilting');
+      }, { signal: life.signal });
+      el.addEventListener('pointerleave', function () {
+        el.classList.remove('is-tilting');
+        el.style.removeProperty('--j6n-tilt-x');
+        el.style.removeProperty('--j6n-tilt-y');
+      }, { signal: life.signal });
+      life.onDestroy(function () { el.classList.remove('is-tilting'); });
+    });
+  }
+
+  // Thème : j6n.setTheme('dark' | 'light' | 'auto', event?) — cercle qui s'étend depuis le clic
+  // quand le navigateur sait faire une View Transition ; changement immédiat sinon.
+  function setTheme(mode, origin) {
+    const html = document.documentElement;
+    const apply = function () {
+      if (mode === 'auto') html.removeAttribute('data-theme');
+      else html.setAttribute('data-theme', mode);
+    };
+    if (typeof document.startViewTransition !== 'function' || reducedMotion.matches) { apply(); return; }
+    if (origin && typeof origin.clientX === 'number') {
+      html.style.setProperty('--j6n-theme-x', origin.clientX + 'px');
+      html.style.setProperty('--j6n-theme-y', origin.clientY + 'px');
+    }
+    html.classList.add('j6n-theme-transition');
+    const transition = document.startViewTransition(apply);
+    const done = function () { html.classList.remove('j6n-theme-transition'); };
+    transition.finished.then(done, done);
+  }
+
   function init(root) {
     root = root || document;
     ensureLiveRegions();
@@ -1170,6 +1350,12 @@
     initMenuToggle(root);
     initUnitSwitch(root);
     initCarousels(root);
+    initReveal(root);
+    initCount(root);
+    initRipple(root);
+    initHeaderScroll(root);
+    initOtp(root);
+    initTilt(root);
   }
 
   /* ---------- Signal de migration 0.1.x → 0.2 ----------
@@ -1223,6 +1409,7 @@
     openModal: openModal,
     closeModal: closeModal,
     carousel: carousel,
-    dismissed: dismissed
+    dismissed: dismissed,
+    setTheme: setTheme
   };
 })();

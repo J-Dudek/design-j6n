@@ -122,4 +122,8 @@ sys.exit(0 if ok else 1)
 EOF
 
 echo
+echo "== Contrastes de la couche V3 (4 thèmes) =="
+node scripts/contrast.mjs
+
+echo
 echo "Tout est bon."

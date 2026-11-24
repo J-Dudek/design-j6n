@@ -54,6 +54,8 @@ export interface J6n {
   carousel(target: string | Element, options?: J6nCarouselOptions): J6nCarousel | null;
   /** Valeur mémorisée par data-j6n-dismiss (ex. "accepte" / "refuse"), ou null. */
   dismissed(key: string): string | null;
+  /** Change le thème clair/sombre ; avec un événement de pointeur, le nouveau thème s'étend en cercle depuis le clic (View Transitions). 'auto' suit le système. */
+  setTheme(mode: 'light' | 'dark' | 'auto', origin?: { clientX: number; clientY: number }): void;
 }
 
 declare global {

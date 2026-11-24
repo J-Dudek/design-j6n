@@ -104,6 +104,39 @@ Ce qui change :
 - **Consentement** : ajoutez `data-j6n-dismiss-value="accepte"` / `"refuse"` à chaque bouton pour distinguer le choix (lu avec `j6n.dismissed('clé')`).
 - **Étapes** et **pagination** : nouveau balisage, voir [Navigation](#navigation).
 
+## V3 — composants modernisés & animations
+
+Couche additive (aucune classe renommée) : rayons plus généreux, élévation en deux plans, reflets discrets, boutons à rebond, cartes qui lévitent, modale et menus animés, squelette à balayage lumineux. Démo : `demo/composants-v3.html`.
+
+### Nouveaux composants
+
+| Classe | Usage |
+|---|---|
+| `.j6n-progress` (+ `--indeterminate`, `--lg`) | barre de progression, `role="progressbar"`, valeur via `--j6n-value` |
+| `.j6n-avatar` (+ `--sm`, `--lg`, `--xl`, `--square`), `.j6n-avatar-group`, `.j6n-avatar__status` | initiales ou image, pastille d'état |
+| `.j6n-empty` | état vide : icône, titre, texte, action |
+| `.j6n-drawer` (+ `--left`, `--bottom`) | tiroir : `<dialog class="j6n-modal j6n-drawer">`, mêmes attributs que la modale |
+| `.j6n-timeline` | chronologie `<ol>` ; `aria-current="step"`, `.is-done` |
+| `.j6n-rating`, `.j6n-rating-input` | notation en lecture seule (`--j6n-rating`) ou en saisie (radios natifs) |
+| `.j6n-sparkline` | mini-graphique SVG qui se révèle au chargement |
+| `.j6n-otp` | code à usage unique : saut auto, collage ; événement `j6n:otp` |
+
+### Animations
+
+| Attribut / classe | Effet |
+|---|---|
+| `data-j6n-reveal` (`left`, `right`, `zoom`) | apparition au défilement, cascade automatique entre frères |
+| `data-j6n-count="128"` (`data-j6n-count-decimals`) | compteur qui monte de 0 à la valeur |
+| `data-j6n-tilt="6"` | inclinaison 3D au pointeur (souris/stylet seulement) |
+| `.j6n-text-gradient` | titre à dégradé animé |
+| `.j6n-badge--live` | pastille qui pulse |
+| `.j6n-scroll-progress` | barre de lecture liée au défilement (`animation-timeline`) |
+| `j6n.setTheme('dark', event)` | bascule clair/sombre en cercle depuis le clic (View Transitions) |
+
+Transitions entre pages (navigateurs compatibles) : ajouter `@view-transition { navigation: auto; }` à votre CSS — non activé par défaut car il s'applique à tout le site.
+
+Tout mouvement est coupé sous `prefers-reduced-motion: reduce` ; sans JS, ou sans le support navigateur, le contenu reste visible et complet. `node scripts/contrast.mjs` vérifie les contrastes des associations V3 dans les 4 thèmes (lancé par `scripts/validate.sh`).
+
 ## Thème sombre
 
 Sans rien faire, le thème suit `prefers-color-scheme`. Pour forcer un mode, poser l'attribut sur `<html>` :
